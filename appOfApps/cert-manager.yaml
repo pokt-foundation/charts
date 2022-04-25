@@ -1,0 +1,39 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+
+spec:
+  destination:
+    namespace: cert-manager
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ''
+    repoURL: 'https://charts.jetstack.io'
+    targetRevision: v1.*
+    chart: cert-manager
+    helm:
+      parameters:
+      - name: "ingressShim.defaultIssuerKind"
+        value: ClusterIssuer
+      - name: "ingressShim.defaultIssuerName"
+        value: letsencrypt-prod
+      - name: "ingressShim.defaultIssuerGroup"
+        value: cert-manager.io
+      - name: "ingressShim.installCRDs"
+        value: "true"
+      - name: "installCRDs"
+        value: "true"
+      valueFiles:
+        - values.yaml
+  project: utils
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
