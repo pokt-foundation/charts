@@ -1,0 +1,123 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ethereum.fullname" . }}
+  labels:
+    {{- include "ethereum.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ethereum.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "ethereum.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ethereum.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - args:
+          {{- if eq .Values.geth.network "mainnet" }}
+          # Ethereum mainnet
+          - --mainnet
+          {{- else if eq .Values.geth.network "goerli" }}
+          # Görli network: pre-configured proof-of-authority test network
+          - --goerli
+          {{- else if eq .Values.geth.network "rinkeby" }}
+          # Rinkeby network: pre-configured proof-of-authority test network
+          - --rinkeby
+          {{- else if eq .Values.geth.network "ropsten" }}
+          # Ropsten network: pre-configured proof-of-work test network
+          - --ropsten
+          {{- else if eq .Values.geth.network "sepolia" }}
+          # Sepolia network: pre-configured proof-of-work test network
+          - --sepolia
+          {{- end }}
+          {{- if .Values.geth.logging.verbosity }}
+          # Logging verbosity: 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=detail (default: 3)
+          - --verbosity
+          - "{{ .Values.geth.logging.verbosity }}"
+          {{- end }}
+          {{- if .Values.geth.logging.jsonFormat }}
+          # Format logs with JSON
+          - --log.json
+          {{- end }}
+          {{- if .Values.geth.miner.enabled }}
+          # Enable mining
+          - --mine
+          {{- end }}
+          {{- if and .Values.geth.miner.enabled .Values.geth.miner.threads }}
+          # Number of CPU threads to use for mining (default: 0)
+          - --miner.threads
+          - "{{ .Values.geth.miner.threads }}"
+          {{- end }}
+          {{- if .Values.geth.networkID }}
+          # Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli instead) (default: 1)
+          - --networkid
+          - "{{ .Values.geth.networkID }}"
+          {{- end }}
+          {{- if .Values.geth.vmDebug }}
+          # Record information useful for VM and contract debugging
+          - --vmdebug
+          {{- end }}
+          # Extra/un-managed arguments
+          {{- range .Values.geth.extraArgs }}
+          {{- if .name }}
+          - {{ printf "--%s" .name }}
+          {{- end }}
+          {{- if .value }}
+          - "{{ .value }}"
+          {{- end }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: {{ .Chart.Name }}
+          ports:
+            - containerPort: 8545
+              protocol: TCP
+              name: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: chaindata
+              mountPath: /root/.ethereum/geth/chaindata
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ethereum.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: chaindata
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: {{ .Values.storageSize }}
+        {{- if .Values.storageClassName }}
+        storageClassName: {{ .Values.storageClassName }}
+        {{- end }}

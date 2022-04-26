@@ -1,0 +1,173 @@
+{{- if .Values.http.ingress.enabled -}}
+{{- $fullName := include "avalanche.fullname" . -}}
+{{- $svcName := printf "%s-http" $fullName  -}}
+{{- $svcPort := .Values.http.service.port -}}
+{{- if and .Values.http.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.http.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.http.ingress.annotations "kubernetes.io/ingress.class" .Values.http.ingress.className}}
+  {{- end }}
+{{- end }}
+---
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $svcName }}
+  labels:
+    {{- include "avalanche.labels" . | nindent 4 }}
+  {{- with .Values.http.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.http.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.http.ingress.className }}
+  {{- end }}
+  {{- if not .Values.http.ingress.hostname }}
+  {{- if .Values.http.ingress.tls }}
+  tls:
+    {{- range .Values.http.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.http.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
+  {{- else }}
+  tls:
+    - hosts:
+        - {{ .Values.http.ingress.hostname }}
+      secretName: {{ .Values.http.ingress.hostname }}-tls
+  rules:
+    - host: {{ .Values.http.ingress.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.staking.ingress.enabled -}}
+{{- $fullName := include "avalanche.fullname" . -}}
+{{- $svcName := printf "%s-staking" $fullName  -}}
+{{- $svcPort := .Values.staking.service.port -}}
+{{- if and .Values.staking.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.staking.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.staking.ingress.annotations "kubernetes.io/ingress.class" .Values.staking.ingress.className}}
+  {{- end }}
+{{- end }}
+---
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $svcName }}
+  labels:
+    {{- include "avalanche.labels" . | nindent 4 }}
+  {{- with .Values.staking.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.staking.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.staking.ingress.className }}
+  {{- end }}
+  {{- if not .Values.staking.ingress.hostname }}
+  {{- if .Values.staking.ingress.tls }}
+  tls:
+    {{- range .Values.staking.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.staking.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
+  {{- else }}
+  tls:
+    - hosts:
+        - {{ .Values.staking.ingress.hostname }}
+      secretName: {{ .Values.staking.ingress.hostname }}-tls
+  rules:
+      - host: {{ .Values.staking.ingress.hostname }}
+        http:
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+              backend:
+                {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+                service:
+                  name: {{ $svcName }}
+                  port:
+                    number: {{ $svcPort }}
+                {{- else }}
+                serviceName: {{ $svcName }}
+                servicePort: {{ $svcPort }}
+                {{- end }}
+    {{- end }}
+{{- end }}

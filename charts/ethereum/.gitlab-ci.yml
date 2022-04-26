@@ -1,0 +1,24 @@
+stages:
+  - publish
+
+variables:
+  # The GitLab project ID for the repository that supports the Helm chart repository
+  HELM_REPO_PROJECT_ID: 32152108
+
+publish helm chart:
+  image:
+    name: curlimages/curl
+  only:
+    refs:
+      - /^v.*$/
+  script:
+    - |
+      curl -X POST \
+        -F "token=${PIPELINE_TRIGGER_TOKEN}" \
+        -F "ref=main" \
+        -F "variables[CHART_NAME]=${CI_PROJECT_NAME}" \
+        -F "variables[PROJECT_CHART_REPO]=${CI_PROJECT_NAME}" \
+        -F "variables[PROJECT_OWNER]=${CI_PROJECT_NAMESPACE}" \
+        -F "variables[TAG_NAME]=${CI_BUILD_TAG}" \
+        https://gitlab.com/api/v4/projects/${HELM_REPO_PROJECT_ID}/trigger/pipeline
+  stage: publish

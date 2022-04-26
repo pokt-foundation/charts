@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: v1.10.14
+description: A decentralized blockchain platform that establishes a peer-to-peer network
+  that securely executes and verifies application code in smart contracts
+name: ethereum
+type: application
+version: 0.0.7

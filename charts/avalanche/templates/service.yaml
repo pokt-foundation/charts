@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avalanche.fullname" . }}-staking
+  labels:
+    {{- include "avalanche.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.staking.service.type }}
+  ports:
+    - port: {{ .Values.staking.service.port }}
+      targetPort: 9651
+      protocol: TCP
+      name: staking
+  selector:
+    {{- include "avalanche.selectorLabels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avalanche.fullname" . }}-http
+  labels:
+    {{- include "avalanche.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.http.service.type }}
+  ports:
+    - port: {{ .Values.http.service.port }}
+      targetPort: 9650
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "avalanche.selectorLabels" . | nindent 4 }}
