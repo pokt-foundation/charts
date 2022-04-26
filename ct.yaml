@@ -1,0 +1,7 @@
+remote: origin
+target-branch: master
+chart-dirs:
+  - charts
+chart-repos:
+  - pokt=https://charts.bitnami.com/bitnami
+helm-extra-args: --timeout 600s
