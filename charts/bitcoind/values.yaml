@@ -1,0 +1,160 @@
+# Default values for bitcoind.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: pokt-foundation/bitcoind
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  #tag: "0.19.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+rbac:
+  enabled: true
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  rpcPort: 18332
+  p2pPort: 18333
+  annotations: {}
+
+bitcoinData: /mnt/bitcoin
+
+configurationFile:
+    bitcoin.conf: |-
+        server=1
+        printtoconsole=1
+        rpcuser=rpcuser
+        rpcpassword=rpcpassword
+        testnet=1
+        blockfilterindex=basic
+        peerblockfilters=1
+        peerbloomfilters=0
+
+#pvcSnapShotName: "bitcoind-testnet-snap-7-7-2020"
+
+persistence:
+    enabled: true
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: standard
+    accessMode: ReadWriteOnce
+    size: 450Gi
+    annotations:
+      resize.topolvm.io/threshold: 20%
+      resize.topolvm.io/increase: 20Gi
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+  hosts:
+    - host: testnet.pokt.network
+      path: "/"
+      servicePort: 8080
+  tls:
+    - secretName: letsencrypt-prod-issuer
+      hosts:
+        - testnet.pokt.network
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+metrics:
+  image:
+    repository: pokt-foundation/bitcoind-exporter
+    tag: v0.2.0
+  port: 9439
+  # if this port is changed, change healthz-port: in extraArgs: accordingly
+  enabled: true
+
+  service:
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "10254"
+
+    # clusterIP: ""
+
+    ## List of IP addresses at which the stats-exporter service is available
+    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    ##
+    externalIPs: []
+
+    # loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    servicePort: 9435
+    type: ClusterIP
+    # externalTrafficPolicy: ""
+    # nodePort: ""
+
+  serviceMonitor:
+    enabled: true
+    additionalLabels: {}
+    namespace: ""
+    namespaceSelector:
+      any: true
+    # Default: scrape .Release.Namespace only
+    # To scrape all, use the following:
+    # namespaceSelector:
+    #   any: true
+    scrapeInterval: 30s
+    # honorLabels: true
+    targetLabels: []
+    metricRelabelings: []
