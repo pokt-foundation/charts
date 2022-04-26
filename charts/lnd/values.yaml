@@ -1,0 +1,132 @@
+# Default values for lnd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: WesleyCharlesBlake/lnd-docker
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v0.12.1-beta"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations:
+  reloader.stakater.com/auto: "true"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+network: "regtest"
+
+wallet:
+  autoUnlock: false
+
+configurationFile:
+  lnd.conf: |-
+    ; [Application Options]
+    ; debuglevel=debug
+    ; datadir=/data
+    ; restlisten=0.0.0.0:8080
+    ; rpclisten=0.0.0.0:10009
+    ; listen=0.0.0.0:9735
+    ; alias=LND
+
+    ; [Bitcoin]
+    ; bitcoin.node=bitcoind
+    ; bitcoin.regtest=1
+    ; bitcoin.active=1
+
+    ; [bitcoind]
+    ; bitcoind.rpchost=bitcoind-regtest:18443
+    ; bitcoind.rpcuser=rpcuser
+    ; bitcoind.rpcpass=rpcpassword
+    ; bitcoind.zmqpubrawblock=tcp://bitcoind-regtest:28332
+    ; bitcoind.zmqpubrawtx=tcp://bitcoind-regtest:28333
+    
+    ; [db]
+    ; db.backend=postgres
+    
+    ; [postgres]
+    ; db.postgres.dsn=postgres://<dbuser>:<dbpass>@<dbhost>:5432/<dbname>
+
+service:
+  type: ClusterIP
+  restPort: 8080
+  rpcPort: 10009
+  p2pPort: 9735 
+
+ingress:
+  enabled: false
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "28800"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "28800"
+
+  hosts:
+    - host: testnet-demo.mynode.com
+      path: "/"
+      servicePort: 80
+  tls:
+    - secretName: lnd-testnet-cert
+      hosts:
+        - testnet-demo.mynode.com
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+    enabled: true
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: standard-rwo
+    accessMode: ReadWriteOnce
+    size: 5Gi

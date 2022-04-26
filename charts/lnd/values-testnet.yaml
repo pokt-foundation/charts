@@ -1,0 +1,55 @@
+walletPassword: 
+  password.txt: |-
+    mywalletpassword
+
+wallet:
+  autoUnlock: false
+
+network: "testnet"
+
+configurationFile:
+  lnd.conf: |-
+    [Application Options]
+    ; debuglevel=debug
+    ; datadir=/data
+    restlisten=0.0.0.0:8080
+    rpclisten=0.0.0.0:10009
+    listen=0.0.0.0:9735
+    alias=LND Testnet    
+    maxpendingchannels=3
+    wallet-unlock-password-file=/secure/password.txt
+
+    [Bitcoin]
+    bitcoin.node=bitcoind
+    bitcoin.testnet=1
+    bitcoin.active=1
+
+    [bitcoind]
+    bitcoind.rpchost=bitcoind-testnet:18332
+    bitcoind.rpcuser=rpcuser
+    bitcoind.rpcpass=rpcpassword
+    bitcoind.zmqpubrawblock=tcp://bitcoind-testnet:28332
+    bitcoind.zmqpubrawtx=tcp://bitcoind-testnet:28333
+    
+    [db]
+    db.backend=postgres
+    
+    [postgres]
+    db.postgres.dsn=postgres://<dbuser>:<dbpass>@mydbsvc.default:5432/testnet
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "28800"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "28800"
+
+  hosts:
+    - host: testnet.mynode.com
+      path: "/"
+      servicePort: 80
+  tls:
+    - secretName: lnd-testnet-cert
+      hosts:
+        - testnet.mynode.com
