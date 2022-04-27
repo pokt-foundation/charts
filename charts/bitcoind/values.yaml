@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: pokt-foundation/bitcoind
+  repository: wesleycharlesblake/bitcoind
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  # tag: "0.19.1"
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -53,7 +53,7 @@ configurationFile:
     printtoconsole=1
     rpcuser=rpcuser
     rpcpassword=rpcpassword
-    testnet=1
+    regtest=1
     blockfilterindex=basic
     peerblockfilters=1
     peerbloomfilters=0
@@ -61,7 +61,7 @@ configurationFile:
 # pvcSnapShotName: "bitcoind-testnet-snap-7-7-2020"
 
 persistence:
-  enabled: true
+  enabled: false
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -72,15 +72,11 @@ persistence:
   storageClass: standard
   accessMode: ReadWriteOnce
   size: 450Gi
-  annotations:
-    resize.topolvm.io/threshold: 20%
-    resize.topolvm.io/increase: 20Gi
+  annotations: {}
 
 ingress:
   enabled: false
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  annotations: {}
 
   hosts:
     - host: testnet.pokt.network
@@ -123,7 +119,7 @@ metrics:
     tag: v0.2.0
   port: 9439
   # if this port is changed, change healthz-port: in extraArgs: accordingly
-  enabled: true
+  enabled: false
 
   service:
     annotations:
@@ -145,7 +141,7 @@ metrics:
     # nodePort: ""
 
   serviceMonitor:
-    enabled: true
+    enabled: false
     additionalLabels: {}
     namespace: ""
     namespaceSelector:
