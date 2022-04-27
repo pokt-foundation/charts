@@ -3,5 +3,5 @@ target-branch: master
 chart-dirs:
   - charts
 chart-repos:
-  - pokt=https://charts.bitnami.com/bitnami
+  - pokt=https://pokt-foundation.gitlab.io/charts
 helm-extra-args: --timeout 600s
