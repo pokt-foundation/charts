@@ -1,6 +1,9 @@
 apiVersion: v2
 name: lnd
 description: A Helm chart for Kubernetes
+maintainers:
+  - name: WesleyCharlesBlake
+  - name: pokt-foundation
 
 # A chart can be either an 'application' or a 'library' chart.
 #

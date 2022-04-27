@@ -4,3 +4,6 @@ description: A Helm chart for Kubernetes
 name: avalanche
 type: application
 version: 0.0.13
+maintainers:
+  - name: WesleyCharlesBlake
+  - name: pokt-foundation
