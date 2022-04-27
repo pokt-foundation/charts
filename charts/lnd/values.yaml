@@ -63,10 +63,10 @@ configurationFile:
     ; bitcoind.rpcpass=rpcpassword
     ; bitcoind.zmqpubrawblock=tcp://bitcoind-regtest:28332
     ; bitcoind.zmqpubrawtx=tcp://bitcoind-regtest:28333
-    
+
     ; [db]
     ; db.backend=postgres
-    
+
     ; [postgres]
     ; db.postgres.dsn=postgres://<dbuser>:<dbpass>@<dbhost>:5432/<dbname>
 
@@ -74,7 +74,7 @@ service:
   type: ClusterIP
   restPort: 8080
   rpcPort: 10009
-  p2pPort: 9735 
+  p2pPort: 9735
 
 ingress:
   enabled: false
@@ -119,14 +119,14 @@ tolerations: []
 affinity: {}
 
 persistence:
-    enabled: true
-    ## database data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    storageClass: standard-rwo
-    accessMode: ReadWriteOnce
-    size: 5Gi
+  enabled: true
+  ## database data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: standard-rwo
+  accessMode: ReadWriteOnce
+  size: 5Gi

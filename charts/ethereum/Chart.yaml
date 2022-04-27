@@ -5,3 +5,6 @@ description: A decentralized blockchain platform that establishes a peer-to-peer
 name: ethereum
 type: application
 version: 0.0.7
+maintainers:
+  - name: WesleyCharlesBlake
+  - name: pokt-foundation

@@ -1,7 +1,7 @@
 # Default values for avalanche.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
+---
 avalanche:
   # Network ID: mainnet, fuji, testnet, local or network-{id} where id must be in the range [0, 2^32) // --network-id=value
   networkID: testnet
@@ -11,10 +11,10 @@ avalanche:
   logLevel: Info
   # Extra/un-managed arguments
   extraArgs: []
-    #- name: avalancheflag
-    #- name: avalancheflag=some-value
-    #- name: avalancheflag-with-value
-    #  value: some-value
+    # - name: avalancheflag
+    # - name: avalancheflag=some-value
+    # - name: avalancheflag-with-value
+    #   value: some-value
 
 replicaCount: 1
 
@@ -57,7 +57,7 @@ http:
   ingress:
     enabled: false
     className: ""
-    annotations: { }
+    annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     hostname: chart-example.local
@@ -78,7 +78,7 @@ staking:
   ingress:
     enabled: false
     className: ""
-    annotations: { }
+    annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     hostname: chart-example.local
