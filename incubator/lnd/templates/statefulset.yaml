@@ -118,6 +118,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
+        {{- if .Values.existingSecretTls }}
         - name: certs
           secret:
             secretName: {{ .Values.existingSecretTls }}
@@ -126,6 +127,7 @@ spec:
               path: cert.pem
             - key: key.pem
               path: key.pem
+        {{- if .Values.existingSecretTls }}
         {{- if .Values.configurationFile }}
         - name: config
           configMap:
