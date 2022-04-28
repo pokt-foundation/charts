@@ -1,0 +1,31 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-events
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+
+spec:
+  destination:
+    namespace: argo-events
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: ''
+    repoURL: 'https://argoproj.github.io/argo-helm'
+    targetRevision: 1.*
+    chart: argo-events
+    helm:
+      parameters:
+      - name: "singleNamespace"
+        value: "false"
+      valueFiles:
+        - values.yaml
+  project: utils
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
