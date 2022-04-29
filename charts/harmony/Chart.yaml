@@ -1,6 +1,10 @@
 apiVersion: v2
 name: harmony
 description: A Helm chart for Kubernetes
+maintainers:
+  - name: okdas
+  - name: WesleyCharlesBlake
+  - name: pokt-foundation
 
 # A chart can be either an 'application' or a 'library' chart.
 #
