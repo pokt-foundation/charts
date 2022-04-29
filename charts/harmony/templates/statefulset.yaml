@@ -27,6 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
+      # Harmony does not provide the image, so we can grab the binary on init step until we (or they) start building the image.
         - name: {{ .Chart.Name }}-get-release
           image: curlimages/curl:7.80.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -61,7 +62,7 @@ spec:
 #             periodSeconds: 15
 # {{end}}
         - name: {{ .Chart.Name }}
-          image: debian:11-slim
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['sh', '-c']
           args: 
@@ -78,9 +79,11 @@ spec:
             - name: consensus
               containerPort: {{ .Values.harmony.ports.consensus }}
               protocol: TCP
+              hostPort: {{ .Values.harmony.ports.consensus }}
             - name: state-sync
               containerPort: {{ .Values.harmony.ports.stateSync }}
               protocol: TCP
+              hostPort: {{ .Values.harmony.ports.stateSync }}
           volumeMounts:
             - name: harmony-release
               mountPath: /harmony-bin/
