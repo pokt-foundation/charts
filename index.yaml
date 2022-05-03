@@ -15,4 +15,19 @@ entries:
     urls:
     - https://github.com/pokt-foundation/k8s/releases/download/ethereum-0.0.8/ethereum-0.0.8.tgz
     version: 0.0.8
-generated: "2022-04-27T16:49:56.12665037Z"
+  harmony:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-05-03T09:20:23.145222556Z"
+    description: A Helm chart for Kubernetes
+    digest: 58b7224783c07544a75cf5f4e948faaf65c7aed6bcd797dc1a93f02732328f59
+    maintainers:
+    - name: okdas
+    - name: WesleyCharlesBlake
+    - name: pokt-foundation
+    name: harmony
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-05-03T09:20:23.145226456Z"
