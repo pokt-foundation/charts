@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "harmony.fullname" . }}-configdir
+data:
+  harmony.conf: |
+    Version = "2.5.0"
+
+    [BLSKeys]
+      KMSConfigFile = ""
+      KMSConfigSrcType = "shared"
+      KMSEnabled = false
+      KeyDir = "{{ .Values.harmony.datadir }}/blskeys"
+      KeyFiles = []
+      MaxKeys = 10
+      PassEnabled = true
+      PassFile = ""
+      PassSrcType = "auto"
+      SavePassphrase = false
+
+    [DNSSync]
+      Client = true
+      LegacySyncing = false
+      Port = 6000
+      Server = true
+      ServerPort = {{ .Values.harmony.ports.stateSync }}
+      Zone = "t.hmny.io"
+
+    [General]
+      DataDir = "{{ .Values.harmony.datadir }}"
+      IsArchival = false
+      IsBackup = false
+      IsBeaconArchival = false
+      IsOffline = false
+      NoStaking = true
+      NodeType = "explorer"
+      ShardID = {{ .Values.harmony.shard }}
+
+    [HTTP]
+      AuthPort = 9501
+      Enabled = true
+      IP = "0.0.0.0"
+      Port = {{ .Values.harmony.ports.rpc }}
+      RosettaEnabled = false
+      RosettaPort = 9700
+
+    [Log]
+      FileName = "harmony.log"
+      Folder = "{{ .Values.harmony.datadir }}/logs"
+      RotateSize = 100
+      RotateMaxAge = 2
+      RotateCount = 10
+      Verbosity = 1 #  -v, --log.verb int              logging verbosity: 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=detail (default 3)
+
+      [Log.VerbosePrints]
+        Config = true
+
+    [Network]
+      BootNodes = ["/dnsaddr/bootstrap.t.hmny.io"]
+      NetworkType = "mainnet"
+
+    [P2P]
+      DiscConcurrency = 0
+      IP = "0.0.0.0"
+      KeyFile = "./.hmykey"
+      MaxConnsPerIP = 10
+      Port = {{ .Values.harmony.ports.consensus }}
+
+    [Pprof]
+      Enabled = false
+      Folder = "./profiles"
+      ListenAddr = "127.0.0.1:6060"
+      ProfileDebugValues = [0]
+      ProfileIntervals = [600]
+      ProfileNames = []
+
+    [RPCOpt]
+      DebugEnabled = false
+      RateLimterEnabled = true
+      RequestsPerSecond = 1000
+
+    [Sync]
+      Concurrency = 6
+      DiscBatch = 8
+      DiscHardLowCap = 6
+      DiscHighCap = 128
+      DiscSoftLowCap = 8
+      Downloader = false
+      Enabled = false
+      InitStreams = 8
+      MinPeers = 6
+
+    [TxPool]
+      BlacklistFile = "./.hmy/blacklist.txt"
+
+    [WS]
+      AuthPort = 9801
+      Enabled = true
+      IP = "0.0.0.0"
+      Port = 9800
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "harmony.fullname" . }}-scripts
+data:
+  #  --revert.to 21651686 --revert.do-before 21651688 --run.legacy --revert.beacon
+  #  --revert.to 21681128 --revert.do-before 21681129 --revert.beacon
+  start.sh: |
+    chmod +x /harmony-bin/harmony
+    /harmony-bin/harmony -c {{ .Values.harmony.datadir }}/configs/harmony.conf --prometheus
