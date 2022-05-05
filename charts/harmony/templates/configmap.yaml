@@ -109,3 +109,20 @@ data:
   start.sh: |
     chmod +x /harmony-bin/harmony
     /harmony-bin/harmony -c {{ .Values.harmony.datadir }}/configs/harmony.conf --prometheus
+{{- if .Values.rclone.enabled -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "harmony.fullname" . }}-rclone
+data:
+  rclone.conf: |
+    [release]
+    type = {{ .Values.rclone.type }}
+    provider = {{ .Values.rclone.provider }}
+    env_auth = {{ .Values.rclone.env_auth }}
+    region = {{ .Values.rclone.region }}
+    acl = {{ .Values.rclone.acl }}
+    server_side_encryption = {{ .Values.rclone.server_side_encryption }}
+    storage_class = {{ .Values.rclone.storage_class }}
+{{- end }}

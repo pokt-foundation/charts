@@ -42,6 +42,24 @@ spec:
             - name: harmony-release
               mountPath: /harmony-bin/
 
+        - name: {{ .Chart.Name }}-get-db
+          image: rclone/rclone:1.58.1
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          - -P 
+          - -L 
+          - --checksum 
+          - sync 
+          - release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} harmony_db_{{ .Values.harmony.shard }} 
+          - --multi-thread-streams 4 
+          - --transfers=32
+          - --config=/configs/rclone.conf
+          volumeMounts:
+            - name: harmony-datadir
+              mountPath: {{ .Values.harmony.datadir }}
+            - name: rclone-config
+              mountPath: /configs/rclone
+
       containers:
 # This helper is some software we built to verify wether harmony node is not far from the height of blockchain. Otherwise fail health check.
 # {{if .Values.helper.enabled }}
@@ -117,6 +135,11 @@ spec:
           configMap:
             name: {{ include "harmony.fullname" . }}-scripts
             defaultMode: 0777
+{{- if .Values.rclone.enabled -}}
+        - name: rclone-config
+          configMap:
+            name: {{ include "harmony.fullname" . }}-rclone
+{{- end -}}
 {{- if and .Values.persistence.enabled .Values.persistence.existingClaim  }}
         - name: harmony-datadir
           persistentVolumeClaim:
