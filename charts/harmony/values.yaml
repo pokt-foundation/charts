@@ -48,6 +48,16 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+rclone:
+  enabled: false
+  type: s3
+  provider: AWS
+  env_auth: false
+  region: us-west-1
+  acl: public-read
+  server_side_encryption: AES256
+  storage_class: REDUCED_REDUNDANCY
+
 harmony:
   version: v4.3.4
   ports:
@@ -78,7 +88,7 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
-  size: 2000Gi
+  size: 20000Gi
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
