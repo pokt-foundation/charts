@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "polygon-edge.fullname" . }}
+  labels:
+    {{- include "polygon-edge.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "polygon-edge.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "polygon-edge.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "polygon-edge.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "polygon-edge.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - polygon-edge
+          # args:
+          #   # Extra/un-managed arguments
+          #   {{- range .Values.polygonEdge.extraArgs }}
+          #   {{- if .name }}
+          #   - {{ printf "--%s" .name }}
+          #   {{- end }}
+          #   {{- if .value }}
+          #   - "{{ .value }}"
+          #   {{- end }}
+          #   {{- end }}
+          ports:
+            - name: p2p
+              containerPort: 1478
+              protocol: TCP
+            - name: jsonrpc
+              containerPort: 8545
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: jsonrpc
+          readinessProbe:
+            httpGet:
+              path: /
+              port: jsonrpc
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /root/polygon-edge-chain
+              name: polygon-edge-chain
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: polygon-edge-chain
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: {{ .Values.storageSize }}
+        {{- if .Values.storageClassName }}
+        storageClassName: {{ .Values.storageClassName }}
+        {{- end }}

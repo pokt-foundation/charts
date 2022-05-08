@@ -1,0 +1,173 @@
+{{- if .Values.jsonrpc.ingress.enabled -}}
+{{- $fullName := include "polygon-edge.fullname" . -}}
+{{- $svcName := printf "%s-http" $fullName  -}}
+{{- $svcPort := .Values.jsonrpc.service.port -}}
+{{- if and .Values.jsonrpc.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.jsonrpc.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.jsonrpc.ingress.annotations "kubernetes.io/ingress.class" .Values.jsonrpc.ingress.className}}
+  {{- end }}
+{{- end }}
+---
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $svcName }}
+  labels:
+    {{- include "polygon-edge.labels" . | nindent 4 }}
+  {{- with .Values.jsonrpc.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.jsonrpc.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.jsonrpc.ingress.className }}
+  {{- end }}
+  {{- if not .Values.jsonrpc.ingress.hostname }}
+  {{- if .Values.jsonrpc.ingress.tls }}
+  tls:
+    {{- range .Values.jsonrpc.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.jsonrpc.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
+  {{- else }}
+  tls:
+    - hosts:
+        - {{ .Values.jsonrpc.ingress.hostname }}
+      secretName: {{ .Values.jsonrpc.ingress.hostname }}-tls
+  rules:
+    - host: {{ .Values.jsonrpc.ingress.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.p2p.ingress.enabled -}}
+{{- $fullName := include "polygon-edge.fullname" . -}}
+{{- $svcName := printf "%s-p2p" $fullName  -}}
+{{- $svcPort := .Values.p2p.service.port -}}
+{{- if and .Values.p2p.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.p2p.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.p2p.ingress.annotations "kubernetes.io/ingress.class" .Values.p2p.ingress.className}}
+  {{- end }}
+{{- end }}
+---
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $svcName }}
+  labels:
+    {{- include "polygon-edge.labels" . | nindent 4 }}
+  {{- with .Values.p2p.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.p2p.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.p2p.ingress.className }}
+  {{- end }}
+  {{- if not .Values.p2p.ingress.hostname }}
+  {{- if .Values.p2p.ingress.tls }}
+  tls:
+    {{- range .Values.p2p.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.p2p.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $svcName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
+  {{- else }}
+  tls:
+    - hosts:
+        - {{ .Values.p2p.ingress.hostname }}
+      secretName: {{ .Values.p2p.ingress.hostname }}-tls
+  rules:
+      - host: {{ .Values.p2p.ingress.hostname }}
+        http:
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+              backend:
+                {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+                service:
+                  name: {{ $svcName }}
+                  port:
+                    number: {{ $svcPort }}
+                {{- else }}
+                serviceName: {{ $svcName }}
+                servicePort: {{ $svcPort }}
+                {{- end }}
+    {{- end }}
+{{- end }}

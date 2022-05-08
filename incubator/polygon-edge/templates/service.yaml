@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "polygon-edge.fullname" . }}-p2p
+  labels:
+    {{- include "polygon-edge.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.p2p.service.type }}
+  ports:
+    - port: {{ .Values.p2p.service.port }}
+      targetPort: 1478
+      protocol: TCP
+      name: p2p
+  selector:
+    {{- include "polygon-edge.selectorLabels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "polygon-edge.fullname" . }}-jsonrpc
+  labels:
+    {{- include "polygon-edge.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.jsonrpc.service.type }}
+  ports:
+    - port: {{ .Values.jsonrpc.service.port }}
+      targetPort: 8545
+      protocol: TCP
+      name: jsonrpc
+  selector:
+    {{- include "polygon-edge.selectorLabels" . | nindent 4 }}
