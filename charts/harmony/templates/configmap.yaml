@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -109,7 +110,8 @@ data:
   start.sh: |
     chmod +x /harmony-bin/harmony
     /harmony-bin/harmony -c {{ .Values.harmony.datadir }}/configs/harmony.conf --prometheus
-{{- if .Values.rclone.enabled -}}
+
+{{- if .Values.rclone.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap

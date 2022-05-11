@@ -32,26 +32,22 @@ spec:
           image: curlimages/curl:7.80.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-          - --output
-          - /harmony-bin/harmony
-          - -Ls
-          # - https://s3.us-west-1.amazonaws.com/pub.harmony.one/release/linux-x86_64/upgrade/static/harmony
-          # - https://harmony.one/binary_testnet
+          - -o
+          - /harmony-bin/harmony  
           - https://github.com/harmony-one/harmony/releases/download/{{ .Values.harmony.version }}/harmony-amd64
           volumeMounts:
             - name: harmony-release
               mountPath: /harmony-bin/
 
         - name: {{ .Chart.Name }}-get-db
-          image: rclone/rclone:1.58.1
+          image: bitnami/rclone:1.58.1
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
           - -P 
           - -L 
-          - --checksum 
           - sync 
           - release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} harmony_db_{{ .Values.harmony.shard }} 
-          - --multi-thread-streams 4 
+          - --checksum 
           - --transfers=32
           - --config=/configs/rclone.conf
           volumeMounts:
@@ -135,11 +131,11 @@ spec:
           configMap:
             name: {{ include "harmony.fullname" . }}-scripts
             defaultMode: 0777
-{{- if .Values.rclone.enabled -}}
+{{- if .Values.rclone.enabled }}
         - name: rclone-config
           configMap:
             name: {{ include "harmony.fullname" . }}-rclone
-{{- end -}}
+{{- end }}
 {{- if and .Values.persistence.enabled .Values.persistence.existingClaim  }}
         - name: harmony-datadir
           persistentVolumeClaim:

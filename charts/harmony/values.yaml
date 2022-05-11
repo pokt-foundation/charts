@@ -49,7 +49,7 @@ ingress:
   #      - chart-example.local
 
 rclone:
-  enabled: false
+  enabled: true
   type: s3
   provider: AWS
   env_auth: false
@@ -88,7 +88,7 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
-  size: 20000Gi
+  size: 2000Gi
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
@@ -105,6 +105,10 @@ persistence:
 
 nodeSelector: {}
 
-tolerations: []
+tolerations: {}
+  # - key: "storage"
+  #   operator: "Equal"
+  #   value: "nvme"
+  #   effect: "NoSchedule"
 
 affinity: {}
