@@ -43,18 +43,20 @@ spec:
           image: bitnami/rclone:1.58.1
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
+          - --checksum
           - -P 
           - -L 
           - sync 
-          - release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} harmony_db_{{ .Values.harmony.shard }} 
-          - --checksum 
+          - release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }}
+          - {{ .Values.harmony.datadir }}/harmony_db_{{ .Values.harmony.shard }} 
           - --transfers=32
           - --config=/configs/rclone.conf
+
           volumeMounts:
             - name: harmony-datadir
               mountPath: {{ .Values.harmony.datadir }}
             - name: rclone-config
-              mountPath: /configs/rclone
+              mountPath: /configs/
 
       containers:
 # This helper is some software we built to verify wether harmony node is not far from the height of blockchain. Otherwise fail health check.
@@ -104,7 +106,7 @@ spec:
             - name: harmony-datadir
               mountPath: {{ .Values.harmony.datadir }}
             - name: configs
-              mountPath: {{ .Values.harmony.datadir }}/configs/
+              mountPath: /configs/
             - name: scripts
               mountPath: /scripts/
           resources:
