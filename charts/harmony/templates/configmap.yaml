@@ -112,7 +112,7 @@ data:
     /harmony-bin/harmony -c {{ .Values.harmony.datadir }}/configs/harmony.conf --prometheus
   sync-db.sh: |
     apt update -y
-    apt install -y unzip
+    apt install -y unzip curl
     curl https://rclone.org/install.sh | bash
     rclone --checksum -P -L --log-level DEBUG sync  release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} /harmony/harmony_db_{{ .Values.harmony.shard }} --transfers=32 --config=/configs/rclone.conf
 

@@ -86,9 +86,10 @@ harmony:
 persistence:
   enabled: true
   annotations: {}
-  accessModes:
-    - ReadWriteOnce
+  accessMode: ReadWriteOnce
   size: 2000Gi
+
+  storageClass: "gp2"
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
@@ -99,9 +100,9 @@ persistence:
   ## If defined, host directory must be created manually before volume will be bound
   ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
   ##
-  hostPath:
-    path: /mnt/nvme1
-    type: DirectoryOrCreate
+  # hostPath:
+  #   path: /mnt/nvme1
+  #   type: DirectoryOrCreate
 
 nodeSelector: {}
 
