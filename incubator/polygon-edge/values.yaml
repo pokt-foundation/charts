@@ -2,15 +2,55 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Must be the same as the length of polygonEdge.validators array
 replicaCount: 1
 
 polygonEdge:
+  genesisFile: |-
+    {
+      "name": "polygon-edge",
+      "genesis": {
+          "nonce": "0x0000000000000000",
+          "timestamp": "0x0",
+          "extraData": "0x0000000000000000000000000000000000000000000000000000000000000000d8d5948ec1aa5385d1952400ffb519f958a749c45e3f1080c0",
+          "gasLimit": "0x500000",
+          "difficulty": "0x1",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "coinbase": "0x0000000000000000000000000000000000000000",
+          "alloc": {},
+          "number": "0x0",
+          "gasUsed": "0x70000",
+          "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "params": {
+          "forks": {
+              "homestead": 0,
+              "byzantium": 0,
+              "constantinople": 0,
+              "petersburg": 0,
+              "istanbul": 0,
+              "EIP150": 0,
+              "EIP158": 0,
+              "EIP155": 0
+          },
+          "chainID": 100,
+          "engine": {
+              "ibft": {
+                  "epochSize": 100000,
+                  "type": "PoA"
+              }
+          },
+          "blockGasTarget": 0
+      },
+      "bootnodes": [
+          "/ip4/127.0.0.1/tcp/1478/p2p/16Uiu2HAmQ1U8TAP62nc91nvZKWnrpzyniV23wu8NGR93bYJJHmYA"
+      ]
+    }
+  validators: 
+    - consensusValidatorKey: dfe83f0d105a42e7be598c7736e5050ec184ae0b260471bec919b250f4dccaef
+      libp2pKey: 0802122052f650cadde3fff57c4cada89100bb83e59c8aac928ab8de60252b8f9a8091e8
   # Extra/un-managed arguments
   extraArgs: []
-    # - name: avalancheflag
-    # - name: avalancheflag=some-value
-    # - name: avalancheflag-with-value
-    #   value: some-value
 
 image:
   repository: 0xpolygon/polygon-edge
@@ -45,6 +85,7 @@ securityContext: {}
   # runAsUser: 1000
 
 jsonrpc:
+  port: 8545
   service:
     type: ClusterIP
     port: 8545
@@ -66,6 +107,7 @@ jsonrpc:
     #      - chart-example.local
 
 p2p:
+  port: 1478
   service:
     type: ClusterIP
     port: 1478
@@ -98,17 +140,28 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+persistence:
+  enabled: true
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+
+  ## A manually managed Persistent Volume and Claim
+  ## If defined, PVC must be created manually before volume will be bound
+  ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+  ##
+  # existingClaim:
+  ## An existing directory in the node
+  ## If defined, host directory must be created manually before volume will be bound
+  ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+  ##
+  hostPath:
+    path: /run/desktop/mnt/host/wsl/polygon-edge-datadir
+    type: DirectoryOrCreate
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
-
-storageSize: 1Gi

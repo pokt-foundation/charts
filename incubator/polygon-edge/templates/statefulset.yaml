@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "polygon-edge.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "polygon-edge.selectorLabels" . | nindent 6 }}
@@ -28,44 +26,75 @@ spec:
       serviceAccountName: {{ include "polygon-edge.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-validator-config
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+          - sh
+          - -c
+          - |
+            set -ex
+            ordinal=${HOSTNAME##*-}
+            echo $ordinal
+            cd /root/polygon-edge-datadir
+            mkdir -p consensus libp2p
+            cp /root/validator-config/consensusValidatorKey-$ordinal consensus/validator.key
+            cp /root/validator-config/libp2pKey-$ordinal libp2p/libp2p.key
+            cp /root/validator-config/genesis.json ./genesis.json
+          volumeMounts:
+            - mountPath: /root/polygon-edge-datadir
+              name: polygon-edge-datadir
+            - mountPath: /root/validator-config
+              name: validator-config
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # command: ['sh', '-c']
+          # args:
+          #   - tail -f /dev/null
           command:
             - polygon-edge
-          # args:
-          #   # Extra/un-managed arguments
-          #   {{- range .Values.polygonEdge.extraArgs }}
-          #   {{- if .name }}
-          #   - {{ printf "--%s" .name }}
-          #   {{- end }}
-          #   {{- if .value }}
-          #   - "{{ .value }}"
-          #   {{- end }}
-          #   {{- end }}
+          args:
+            - server
+            - --data-dir
+            - /root/polygon-edge-datadir
+            - --chain
+            - /root/polygon-edge-datadir/genesis.json
+            - --libp2p
+            - 0.0.0.0:1478
+            - --seal
+            # Extra/un-managed arguments
+            {{- range .Values.polygonEdge.extraArgs }}
+            {{- if .name }}
+            - {{ printf "--%s" .name }}
+            {{- end }}
+            {{- if .value }}
+            - "{{ .value }}"
+            {{- end }}
+            {{- end }}
           ports:
             - name: p2p
-              containerPort: 1478
+              containerPort: {{ .Values.p2p.port }}
               protocol: TCP
             - name: jsonrpc
-              containerPort: 8545
+              containerPort: {{ .Values.jsonrpc.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: jsonrpc
-          readinessProbe:
-            httpGet:
-              path: /
-              port: jsonrpc
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: {{ .Values.jsonrpc.port }}
+          #   initialDelaySeconds: 25
+          #   periodSeconds: 10
+          volumeMounts:
+            - mountPath: /root/polygon-edge-datadir
+              name: polygon-edge-datadir
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /root/polygon-edge-chain
-              name: polygon-edge-chain
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -78,15 +107,41 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: validator-config
+          configMap:
+            name: {{ include "polygon-edge.fullname" . }}-validator-config
+{{- if and .Values.persistence.enabled .Values.persistence.existingClaim  }}
+        - name: polygon-edge-datadir
+          persistentVolumeClaim:
+{{- with .Values.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if and .Values.persistence.enabled .Values.persistence.hostPath }}
+        - name: polygon-edge-datadir
+          hostPath:
+            path: {{ .Values.persistence.hostPath.path }}
+            type: {{ .Values.persistence.hostPath.type }}
+{{- else if not .Values.persistence.enabled }}
+        - name: polygon-edge-datadir
+          emptyDir: {}
+{{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
-        name: polygon-edge-chain
+        name: polygon-edge-datadir
+      {{- with .Values.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+            {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
       spec:
         accessModes:
-          - "ReadWriteOnce"
+        {{- range .Values.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
         resources:
           requests:
-            storage: {{ .Values.storageSize }}
-        {{- if .Values.storageClassName }}
-        storageClassName: {{ .Values.storageClassName }}
-        {{- end }}
+            storage: {{ .Values.persistence.size | quote }}
+        {{ include "polygon-edge.storageClass" . }}
+{{- end }}
