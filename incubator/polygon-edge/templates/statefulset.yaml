@@ -5,7 +5,6 @@ metadata:
   labels:
     {{- include "polygon-edge.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "polygon-edge.selectorLabels" . | nindent 6 }}
@@ -26,38 +25,12 @@ spec:
       serviceAccountName: {{ include "polygon-edge.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: init-validator-config
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-          - sh
-          - -c
-          - |
-            set -ex
-            ordinal=${HOSTNAME##*-}
-            echo $ordinal
-            cd /root/polygon-edge-datadir
-            mkdir -p consensus libp2p
-            cp /root/validator-config/consensusValidatorKey-$ordinal consensus/validator.key
-            cp /root/validator-config/libp2pKey-$ordinal libp2p/libp2p.key
-            cp /root/validator-config/genesis.json ./genesis.json
-          volumeMounts:
-            - mountPath: /root/polygon-edge-datadir
-              name: polygon-edge-datadir
-            - mountPath: /root/validator-config
-              name: validator-config
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          # command: ['sh', '-c']
-          # args:
-          #   - tail -f /dev/null
           command:
             - polygon-edge
           args:
@@ -85,14 +58,23 @@ spec:
             - name: jsonrpc
               containerPort: {{ .Values.jsonrpc.port }}
               protocol: TCP
-          # livenessProbe:
-          #   tcpSocket:
-          #     port: {{ .Values.jsonrpc.port }}
-          #   initialDelaySeconds: 25
-          #   periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.jsonrpc.port }}
+            initialDelaySeconds: 25
+            periodSeconds: 10
           volumeMounts:
-            - mountPath: /root/polygon-edge-datadir
-              name: polygon-edge-datadir
+            - name: polygon-edge-datadir
+              mountPath: /root/polygon-edge-datadir
+            - name: validator-config
+              mountPath: /root/polygon-edge-datadir/consensus/validator.key
+              subPath: validator.key
+            - name: validator-config
+              mountPath: /root/polygon-edge-datadir/libp2p/libp2p.key
+              subPath: libp2p.key
+            - name: validator-config
+              mountPath: /root/polygon-edge-datadir/genesis.json
+              subPath: genesis.json
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

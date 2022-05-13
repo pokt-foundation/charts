@@ -2,10 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Must be the same as the length of polygonEdge.validators array
-replicaCount: 1
-
 polygonEdge:
+  # If you are unsure how to setup this information refer to https://edge-docs.polygon.technology/docs/get-started/set-up-ibft-on-the-cloud
   genesisFile: |-
     {
       "name": "polygon-edge",
@@ -46,9 +44,9 @@ polygonEdge:
           "/ip4/127.0.0.1/tcp/1478/p2p/16Uiu2HAmQ1U8TAP62nc91nvZKWnrpzyniV23wu8NGR93bYJJHmYA"
       ]
     }
-  validators: 
-    - consensusValidatorKey: dfe83f0d105a42e7be598c7736e5050ec184ae0b260471bec919b250f4dccaef
-      libp2pKey: 0802122052f650cadde3fff57c4cada89100bb83e59c8aac928ab8de60252b8f9a8091e8
+  validator: 
+    consensusValidatorKey: dfe83f0d105a42e7be598c7736e5050ec184ae0b260471bec919b250f4dccaef
+    libp2pKey: 0802122052f650cadde3fff57c4cada89100bb83e59c8aac928ab8de60252b8f9a8091e8
   # Extra/un-managed arguments
   extraArgs: []
 

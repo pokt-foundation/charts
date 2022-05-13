@@ -9,7 +9,7 @@ spec:
   type: {{ .Values.p2p.service.type }}
   ports:
     - port: {{ .Values.p2p.service.port }}
-      targetPort: 1478
+      targetPort: {{ .Values.p2p.port }}
       protocol: TCP
       name: p2p
   selector:
@@ -26,7 +26,7 @@ spec:
   type: {{ .Values.jsonrpc.service.type }}
   ports:
     - port: {{ .Values.jsonrpc.service.port }}
-      targetPort: 8545
+      targetPort: {{ .Values.jsonrpc.port }}
       protocol: TCP
       name: jsonrpc
   selector:

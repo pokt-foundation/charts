@@ -7,7 +7,5 @@ metadata:
 data:
   genesis.json: |
     {{ .Values.polygonEdge.genesisFile | nindent 4 }}
-  {{- range $index, $value := .Values.polygonEdge.validators }}
-  consensusValidatorKey-{{ $index }}: {{ $value.consensusValidatorKey }}
-  libp2pKey-{{ $index }}: {{ $value.libp2pKey }}
-  {{- end }}
+  validator.key: {{ .Values.polygonEdge.validator.consensusValidatorKey }}
+  libp2p.key: {{ .Values.polygonEdge.validator.libp2pKey }}
