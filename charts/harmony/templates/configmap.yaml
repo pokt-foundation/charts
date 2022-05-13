@@ -109,7 +109,7 @@ data:
   #  --revert.to 21681128 --revert.do-before 21681129 --revert.beacon
   start.sh: |
     chmod +x /harmony-bin/harmony
-    /harmony-bin/harmony -c {{ .Values.harmony.datadir }}/configs/harmony.conf --prometheus
+    /harmony-bin/harmony -c /configs/harmony.conf --prometheus
   sync-db.sh: |
     apt update -y
     apt install -y unzip curl
