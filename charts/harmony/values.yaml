@@ -49,7 +49,7 @@ ingress:
   #      - chart-example.local
 
 rclone:
-  enabled: true
+  enabled: false
   type: s3
   provider: AWS
   env_auth: false

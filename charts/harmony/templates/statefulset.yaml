@@ -29,15 +29,16 @@ spec:
       initContainers:
       # Harmony does not provide the image, so we can grab the binary on init step until we (or they) start building the image.
         - name: {{ .Chart.Name }}-get-release
-          image: curlimages/curl:7.80.0
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
           args:
-          - -o
-          - /harmony-bin/harmony  
-          - https://github.com/harmony-one/harmony/releases/download/{{ .Values.harmony.version }}/harmony-amd64
+          -  /scripts/get-binary.sh
           volumeMounts:
             - name: harmony-release
               mountPath: /harmony-bin/
+            - name: scripts
+              mountPath: /scripts/
 {{- if .Values.rclone.enabled }}
         - name: {{ .Chart.Name }}-get-db
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -76,7 +77,7 @@ spec:
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['sh', '-c']
-          args: 
+          args:
           - /scripts/start.sh
           livenessProbe:
             tcpSocket:
