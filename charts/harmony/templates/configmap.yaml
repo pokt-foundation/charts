@@ -111,10 +111,11 @@ data:
     chmod +x /harmony-bin/harmony
     /harmony-bin/harmony -c /configs/harmony.conf --prometheus
   sync-db.sh: |
+    rm -rf {{ .Values.harmony.datadir }}/explorer_storage_0.0.0.0_9000
     apt update -y
     apt install -y unzip curl
     curl https://rclone.org/install.sh | bash
-    rclone --checksum -P -L --log-level DEBUG sync  release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} /harmony/harmony_db_{{ .Values.harmony.shard }} --transfers=32 --config=/configs/rclone.conf
+    rclone --checksum -P -L --log-level DEBUG sync  release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} {{ .Values.harmony.datadir }}/harmony_db_{{ .Values.harmony.shard }} --transfers=32 --config=/configs/rclone.conf
   get-binary.sh: |
     apt update -y
     apt install -y unzip curl

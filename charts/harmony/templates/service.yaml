@@ -19,5 +19,13 @@ spec:
       targetPort: 9090
       protocol: TCP
       name: helper
+    - port: {{ .Values.harmony.ports.stateSync }}
+      targetPort: {{ .Values.harmony.ports.stateSync }}
+      protocol: TCP
+      name: statesync
+    - port: {{ .Values.harmony.ports.consensus }}
+      targetPort: {{ .Values.harmony.ports.consensus }}
+      protocol: TCP
+      name: consensus
   selector:
     {{- include "harmony.selectorLabels" . | nindent 4 }}
