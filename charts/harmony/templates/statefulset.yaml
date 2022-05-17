@@ -55,24 +55,25 @@ spec:
               mountPath: /scripts/
 {{- end }}
       containers:
-# This helper is some software we built to verify wether harmony node is not far from the height of blockchain. Otherwise fail health check.
-# {{if .Values.helper.enabled }}
-#         - name: helper
-#           image: okdas/harmony-helper:latest
-#           imagePullPolicy: Always
-#           ports:
-#           - containerPort: 9090
-#           env:
-#           - name: INTERVAL_SECONDS
-#             value: "15"
-#           - name: IGNORE_HEIGHT_DIFF_THRESHOLD
-#             value: "1000"
-#           readinessProbe:
-#             httpGet:
-#               path: /health/readiness
-#               port: 9090
-#             periodSeconds: 15
-# {{end}}
+{{if .Values.healthcheckSidecar.enabled }}
+        - name: chain-healthcheck-sidecar
+          image: {{ .Values.healthcheckSidecar.image.repository }}:{{ .Values.healthcheckSidecar.image.tag }}
+          imagePullPolicy: {{ .Values.healthcheckSidecar.image.pullPolicy }}
+          ports:
+          - containerPort: {{ .Values.healthcheckSidecar.port }}
+          env:
+          - name: LISTEN_PORT
+            value: {{ .Values.healthcheckSidecar.port | quote }}
+          - name: INTERVAL_SECONDS
+            value: {{ .Values.healthcheckSidecar.checkIntervalSeconds | quote }}
+          - name: HEIGHT_DIFF_THRESHOLD
+            value: {{ .Values.healthcheckSidecar.heightDiffThreshold | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: {{ .Values.healthcheckSidecar.port }}
+{{end}}
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}

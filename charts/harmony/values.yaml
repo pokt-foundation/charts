@@ -28,8 +28,15 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-helper:
+healthcheckSidecar:
   enabled: true
+  checkIntervalSeconds: 15
+  heightDiffThreshold: 150
+  port: 9090
+  image:
+    repository: eepokt/chain-healthcheck-sidecar
+    pullPolicy: IfNotPresent
+    tag: sha-a127023
 
 ingress:
   enabled: false
