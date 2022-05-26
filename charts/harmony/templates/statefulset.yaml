@@ -71,7 +71,7 @@ spec:
           - name: SIDECAR_CHAIN_ID
             value: {{ .Values.chainID | quote }}
           - name: LOCAL_RPC_ENDPOINT
-            value: "localhost:{{ .Values.harmony.ports.rpc }}"
+            value: "http://localhost:{{ .Values.harmony.ports.rpc }}"
           readinessProbe:
             httpGet:
               path: /health/readiness
