@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+chainID: "0040"
+
 image:
   repository: debian
   pullPolicy: IfNotPresent
@@ -50,7 +52,7 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: 
+  tls:
     - secretName: harmony-0-tls
       hosts:
         - eu-west-2.eks.rnd.pokt.network
@@ -113,7 +115,8 @@ persistence:
 
 nodeSelector: {}
 
-tolerations: {}
+tolerations:
+  {}
   # - key: "storage"
   #   operator: "Equal"
   #   value: "nvme"

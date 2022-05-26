@@ -21,7 +21,7 @@ spec:
         in_rotation: {{ .Values.harmony.in_rotation | quote }}
   
     spec:
-      terminationGracePeriodSeconds: 300
+      terminationGracePeriodSeconds: 60
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -68,6 +68,10 @@ spec:
             value: {{ .Values.healthcheckSidecar.checkIntervalSeconds | quote }}
           - name: HEIGHT_DIFF_THRESHOLD
             value: {{ .Values.healthcheckSidecar.heightDiffThreshold | quote }}
+          - name: SIDECAR_CHAIN_ID
+            value: {{ .Values.chainID | quote }}
+          - name: LOCAL_RPC_ENDPOINT
+            value: "localhost:{{ .Values.harmony.ports.rpc }}"
           readinessProbe:
             httpGet:
               path: /health/readiness
