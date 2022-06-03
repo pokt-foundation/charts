@@ -201,5 +201,10 @@ spec:
         resources:
           requests:
             storage: {{ .Values.persistence.size | quote }}
+        {{- if .Values.clonePersistentVolumeClaim }}
+        dataSource:
+          kind: PersistentVolumeClaim
+          name: {{ .Values.clonePersistentVolumeClaim }}
+        {{- end }}
       {{- end }}
 {{- end }}

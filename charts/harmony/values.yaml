@@ -31,7 +31,7 @@ securityContext:
   # runAsUser: 1000
 
 healthcheckSidecar:
-  enabled: true
+  enabled: false
   checkIntervalSeconds: 15
   heightDiffThreshold: 150
   port: 9090
@@ -48,17 +48,22 @@ ingress:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/issuer: "letsencrypt-prod"
   hosts:
-    - host: eu-west-2.eks.rnd.pokt.network
+    - host: harmony-0.eu-west-2.eks.rnd.pokt.network
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
     - secretName: harmony-0-tls
       hosts:
-        - eu-west-2.eks.rnd.pokt.network
+        - harmony-0.eu-west-2.eks.rnd.pokt.network
 
+
+# Existing pvc to clone from:
+#clonePersistentVolumeClaim: harmony-datadir-harmony-0-0
+
+# Must be disabled if you are cloning a PVC
 rclone:
-  enabled: false
+  enabled: true
   type: s3
   provider: AWS
   env_auth: false
@@ -96,9 +101,9 @@ persistence:
   enabled: true
   annotations: {}
   accessMode: ReadWriteOnce
-  size: 2000Gi
+  size: 3000Gi
 
-  storageClass: "gp2"
+  storageClass: "-"
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
