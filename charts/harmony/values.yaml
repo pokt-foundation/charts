@@ -59,7 +59,7 @@ ingress:
 
 
 # Existing pvc to clone from:
-#clonePersistentVolumeClaim: harmony-datadir-harmony-0-0
+# clonePersistentVolumeClaim: harmony-datadir-harmony-0-0
 
 # Must be disabled if you are cloning a PVC
 rclone:
