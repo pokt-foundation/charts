@@ -38,7 +38,7 @@ healthcheckSidecar:
   image:
     repository: eepokt/chain-healthcheck-sidecar
     pullPolicy: IfNotPresent
-    tag: sha-a127023
+    tag: sha-4c3058e
 
 ingress:
   enabled: false

@@ -76,7 +76,18 @@ spec:
             httpGet:
               path: /health/readiness
               port: {{ .Values.healthcheckSidecar.port }}
-            periodSeconds: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: 30
+            failureThreshold: 20
 {{end}}
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -111,6 +122,24 @@ spec:
               mountPath: /configs/
             - name: scripts
               mountPath: /scripts/
+{{if .Values.healthcheckSidecar.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: {{ .Values.healthcheckSidecar.port }}
+            periodSeconds: 30
+            failureThreshold: 20
+{{end}}
           resources:
             {{- toYaml .Values.harmony.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
