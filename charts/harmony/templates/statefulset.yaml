@@ -27,25 +27,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-      # Harmony does not provide the image, so we can grab the binary on init step until we (or they) start building the image.
-        - name: {{ .Chart.Name }}-get-release
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh", "-c"]
-          args:
-          -  /scripts/get-binary.sh
-          volumeMounts:
-            - name: harmony-release
-              mountPath: /harmony-bin/
-            - name: scripts
-              mountPath: /scripts/
 {{- if .Values.rclone.enabled }}
         - name: {{ .Chart.Name }}-get-db
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          image: debian:11-slim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ['sh', '-c']
-          args:
-          - /scripts/sync-db.sh
+          command: ['sleep', '99999']
+          #command: ['sh', '-c']
+          #args:
+          #- /scripts/sync-db.sh
           volumeMounts:
             - name: harmony-datadir
               mountPath: {{ .Values.harmony.datadir }}
@@ -93,6 +82,9 @@ spec:
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           # command: ['sleep', '99999']
+          # command: ['sh', '-c']
+          #args:
+          #- "-c /configs/harmony.conf"
           command: ['sh', '-c']
           args:
           - /scripts/start.sh
@@ -114,8 +106,8 @@ spec:
               protocol: TCP
               hostPort: {{ .Values.harmony.ports.stateSync }}
           volumeMounts:
-            - name: harmony-release
-              mountPath: /harmony-bin/
+            # - name: harmony-release
+            #   mountPath: /harmony-bin/
             - name: harmony-datadir
               mountPath: {{ .Values.harmony.datadir }}
             - name: configs
@@ -155,8 +147,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: harmony-release
-          emptyDir: {}
+        # - name: harmony-release
+        #   emptyDir: {}
         - name: configs
           configMap:
             name: {{ include "harmony.fullname" . }}-configdir

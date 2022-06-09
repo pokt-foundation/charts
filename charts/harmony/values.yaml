@@ -7,9 +7,9 @@ replicaCount: 1
 chainID: "0040"
 
 image:
-  repository: debian
+  repository: pocketfoundation/harmony
   pullPolicy: IfNotPresent
-  tag: 11-slim
+  tag: 4.3.9
 
 imagePullSecrets: []
 nameOverride: ""
@@ -31,7 +31,7 @@ securityContext:
   # runAsUser: 1000
 
 healthcheckSidecar:
-  enabled: false
+  enabled: true
   checkIntervalSeconds: 15
   heightDiffThreshold: 150
   port: 9090
@@ -63,7 +63,7 @@ ingress:
 
 # Must be disabled if you are cloning a PVC
 rclone:
-  enabled: true
+  enabled: false
   type: s3
   provider: AWS
   env_auth: false
@@ -73,7 +73,7 @@ rclone:
   storage_class: REDUCED_REDUNDANCY
 
 harmony:
-  version: v4.3.4
+  version: v4.3.9
   ports:
     consensus: 9000
     stateSync: 6000
@@ -81,7 +81,7 @@ harmony:
     ws: 9800
   shard: 0
   service:
-    type: LoadBalancer
+    type: ClusterIP
   datadir: /harmony
   resources:
     {}

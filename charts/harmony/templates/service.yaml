@@ -7,10 +7,14 @@ metadata:
 spec:
   type: {{ .Values.harmony.service.type }}
   ports:
-    - port: 80
-      targetPort: {{ .Values.harmony.ports.rpc }}
+    - port: 5000
+      targetPort: 5000
       protocol: TCP
-      name: http
+      name: explorer
+    - port: 9500
+      targetPort: 9500
+      protocol: TCP
+      name: rpc
     - port: 9900
       targetPort: 9900
       protocol: TCP

@@ -45,17 +45,6 @@ data:
       RosettaEnabled = false
       RosettaPort = 9700
 
-    [Log]
-      FileName = "harmony.log"
-      Folder = "{{ .Values.harmony.datadir }}/logs"
-      RotateSize = 100
-      RotateMaxAge = 2
-      RotateCount = 10
-      Verbosity = 1 #  -v, --log.verb int              logging verbosity: 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=detail (default 3)
-
-      [Log.VerbosePrints]
-        Config = true
-
     [Network]
       BootNodes = ["/dnsaddr/bootstrap.t.hmny.io"]
       NetworkType = "mainnet"
@@ -81,7 +70,7 @@ data:
       RequestsPerSecond = 1000
 
     [Sync]
-      Concurrency = 6
+      Concurrency = 20
       DiscBatch = 8
       DiscHardLowCap = 6
       DiscHighCap = 128
@@ -108,8 +97,7 @@ data:
   #  --revert.to 21651686 --revert.do-before 21651688 --run.legacy --revert.beacon
   #  --revert.to 21681128 --revert.do-before 21681129 --revert.beacon
   start.sh: |
-    chmod +x /harmony-bin/harmony
-    /harmony-bin/harmony -c /configs/harmony.conf --prometheus
+    /bin/harmony -c /configs/harmony.conf --prometheus
   sync-db.sh: |
     rm -rf {{ .Values.harmony.datadir }}/explorer_storage_0.0.0.0_9000
     apt update -y
