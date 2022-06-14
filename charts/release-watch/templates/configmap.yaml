@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}
+data:
+  repos.yml: |
+    {{- toYaml .Values.repos | nindent 4 }}
