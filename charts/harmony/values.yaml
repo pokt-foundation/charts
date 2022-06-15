@@ -31,7 +31,7 @@ securityContext:
   # runAsUser: 1000
 
 healthcheckSidecar:
-  enabled: true
+  enabled: false
   checkIntervalSeconds: 15
   heightDiffThreshold: 150
   port: 9090
