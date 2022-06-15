@@ -23,7 +23,7 @@ data:
     echo "Downloading genesis.json"
     wget -O genesis.json https://media.githubusercontent.com/media/osmosis-labs/networks/main/osmosis-1/genesis.json
     echo "Downloading latest snapshot"
-    URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-pruned")|select (.mirror=="Netherlands")|.url'`
+    URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-{{ .Values.osmosis.pruning }}")|select (.mirror=="Netherlands")|.url'`
     wget -O - $URL | lz4 -d | tar -xvf -
 
     if [ "$?" -eq "0" ]
@@ -53,7 +53,7 @@ data:
     # nothing: all historic states will be saved, nothing will be deleted (i.e. archiving node)
     # everything: 10 latest states will be kept; pruning at 10 block intervals.
     # custom: allow pruning options to be manually specified through 'pruning-keep-recent', and 'pruning-interval'
-    pruning = "everything"
+    pruning = "{{ .Values.osmosis.pruning }}"
 
     # These are applied if and only if the pruning strategy is custom.
     # pruning-keep-recent = N means keep all of the last N states

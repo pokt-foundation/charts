@@ -47,6 +47,7 @@ ingress:
 
 osmosis:
   genesisUrl: https://github.com/osmosis-labs/networks/raw/main/osmosis-1/genesis.json
+  pruning: default
   ports:
     consensus: 26656
     rpc: 26657
