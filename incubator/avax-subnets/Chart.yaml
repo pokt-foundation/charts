@@ -1,0 +1,4 @@
+apiVersion: v2
+description: A Helm chart for avax-subnets network client
+name: avax-subnets
+version: 0.0.1

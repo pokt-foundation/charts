@@ -1,0 +1,68 @@
+image:
+  repository: pocketfoundation/avalanchego
+  pullPolicy: IfNotPresent
+  tag: v1.7.13-subnets
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "1"
+  limits:
+    memory: "12Gi"
+    cpu: "6"
+staking:
+  enabled: false
+  secretName: ""
+nodeSelector: {}
+whitelisted_subnets:
+  []
+  # - subnet: Vn3aX6hNRstj5VHHm63TCgPNaeGnRSqCYXQqemSqDd2TQH4qJ
+  #   name: defi
+  #   feeRecipient: "0xED6dC9FD092190C08e4afF8611496774Ded19D54"
+  # - subnet: 2e3CqLY8thW1WKS89WQ7WR9Qy2bCrrP5mv7psqMRGCHGXuQ1Uj
+  #   name: swimmers
+  #   # FIXME: should be different for swimmers validator!
+  #   feeRecipient: "0xED6dC9FD092190C08e4afF8611496774Ded19D54"
+validatorIP: "-"
+publicIpResolutionService: "-"
+healthcheckSidecar:
+  enabled: true
+  strategies:
+    heightCheck: evm
+    startup: localRpcAvailable
+    readiness: customAvax
+    liveness: heightNotClimbing
+  remoteRpcEndpoints:
+    - https://api.avax.network/ext/bc/C/rpc
+  checkIntervalSeconds: 15
+  heightDiffThreshold: 50
+  staleHeightCheckHistoryLength: 70
+  port: 9090
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "20m"
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
+  image:
+    repository: eepokt/chain-healthcheck-sidecar
+    pullPolicy: Always
+    tag: master
+
+ports:
+  consensus: 9651
+  http: 9650
+scripts_volume_mount: /scripts
+config_volume_mount: /home
+persistence:
+  enabled: true
+  annotations: {}
+  accessMode: ReadWriteOnce
+  size: 3000Gi
+
+  storageClass: "-"
+
+  # dataSource:
+  #   name: avax-jun17
+  #   kind: VolumeSnapshot
+  #   apiGroup: snapshot.storage.k8s.io
