@@ -1,7 +1,43 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "osmosis.fullname" . }}-config-tomls
+  name: {{ include "osmosis.fullname" . }}-scripts
+data:
+  init-node.sh: |
+    #!/bin/bash
+    apt-get update -y
+    apt-get install wget liblz4-tool curl jq -y
+
+    cd {{ .Values.osmosis.datadir }}
+
+    echo "Copying configs"
+    rm -r config/ | true
+    cp -r /configs/ config/
+
+    if [[ -f ".node-initialized" ]]; then
+        echo "Node was already initialized"
+        exit 0
+    fi
+
+    mkdir -p wasm
+    echo "Downloading genesis.json"
+    wget -O genesis.json https://media.githubusercontent.com/media/osmosis-labs/networks/main/osmosis-1/genesis.json
+    echo "Downloading latest snapshot"
+    URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-pruned")|select (.mirror=="Netherlands")|.url'`
+    wget -O - $URL | lz4 -d | tar -xvf -
+
+    if [ "$?" -eq "0" ]
+    then
+      touch .node-initialized
+      echo "Node initiliazed succesfully"
+    else
+      echo "Failed to initialize node"
+    fi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "osmosis.fullname" . }}-configs
 data:
   app.toml: |
     ###############################################################################
@@ -17,7 +53,7 @@ data:
     # nothing: all historic states will be saved, nothing will be deleted (i.e. archiving node)
     # everything: 10 latest states will be kept; pruning at 10 block intervals.
     # custom: allow pruning options to be manually specified through 'pruning-keep-recent', and 'pruning-interval'
-    pruning = "nothing"
+    pruning = "everything"
 
     # These are applied if and only if the pruning strategy is custom.
     # pruning-keep-recent = N means keep all of the last N states
@@ -290,7 +326,7 @@ data:
     ##### additional base config options #####
 
     # Path to the JSON file containing the initial validator set and other meta data
-    genesis_file = "genesis/genesis.json"
+    genesis_file = "genesis.json"
 
     # Path to the JSON file containing the private key to use as a validator in the consensus protocol
     priv_validator_key_file = "config/priv_validator_key.json"

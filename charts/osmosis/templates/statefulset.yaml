@@ -27,18 +27,19 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        # Download mainnet genesis.json
-        - name: {{ .Chart.Name }}-get-genesis
-          image: curlimages/curl:7.80.0
+        - name: {{ .Chart.Name }}-init-node
+          image: debian:11-slim
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['sh', '-c']
           args:
-          - --output
-          - {{ .Values.osmosis.datadir }}/genesis/
-          - -Ls
-          - {{ .Values.osmosis.genesisUrl }}
+          - /scripts/init-node.sh
           volumeMounts:
-            - name: osmosis-genesis
-              mountPath: {{ .Values.osmosis.datadir }}/genesis/
+            - name: scripts
+              mountPath: /scripts/
+            - name: configs
+              mountPath: /configs/
+            - name: datadir
+              mountPath: {{ .Values.osmosis.datadir }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -59,19 +60,9 @@ spec:
               containerPort: {{ .Values.osmosis.ports.consensus }}
               protocol: TCP
               hostPort: {{ .Values.osmosis.ports.consensus }}
-            - name: state-sync
-              containerPort: {{ .Values.osmosis.ports.stateSync }}
-              protocol: TCP
-              hostPort: {{ .Values.osmosis.ports.stateSync }}
           volumeMounts:
-            - name: osmosis-genesis
-              mountPath: {{ .Values.osmosis.datadir }}/genesis/
-            - name: osmosis-datadir
+            - name: datadir
               mountPath: {{ .Values.osmosis.datadir }}
-            - name: configs
-              mountPath: {{ .Values.osmosis.datadir }}/configs/
-            - name: wasm
-              mountPath: {{ .Values.osmosis.datadir }}/wasm/
           resources:
             {{- toYaml .Values.osmosis.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -87,29 +78,31 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: osmosis-genesis
-          emptyDir: {}
+        - name: scripts
+          configMap:
+            name: {{ include "osmosis.fullname" . }}-scripts
+            defaultMode: 0777
         - name: configs
           configMap:
             name: {{ include "osmosis.fullname" . }}-configs
 {{- if and .Values.persistence.enabled .Values.persistence.existingClaim  }}
-        - name: osmosis-datadir
+        - name: datadir
           persistentVolumeClaim:
 {{- with .Values.persistence.existingClaim }}
             claimName: {{ tpl . $ }}
 {{- end }}
 {{- else if and .Values.persistence.enabled .Values.persistence.hostPath }}
-        - name: osmosis-datadir
+        - name: datadir
           hostPath:
             path: {{ .Values.persistence.hostPath.path }}
             type: {{ .Values.persistence.hostPath.type }}
 {{- else if not .Values.persistence.enabled }}
-        - name: osmosis-datadir
+        - name: datadir
           emptyDir: {}
 {{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
-        name: osmosis-datadir
+        name: datadir
       {{- with .Values.persistence.annotations }}
         annotations:
         {{- range $key, $value := . }}
