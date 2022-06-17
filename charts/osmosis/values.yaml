@@ -9,6 +9,8 @@ image:
   pullPolicy: IfNotPresent
   tag: 10.0.0
 
+ci: false
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

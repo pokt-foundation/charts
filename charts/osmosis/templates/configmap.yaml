@@ -15,16 +15,21 @@ data:
     cp -r /configs/ config/
 
     if [[ -f ".node-initialized" ]]; then
-        echo "Node was already initialized"
-        exit 0
+      echo "Node was already initialized"
+      exit 0
     fi
 
     mkdir -p wasm
     echo "Downloading genesis.json"
     wget -O genesis.json https://media.githubusercontent.com/media/osmosis-labs/networks/main/osmosis-1/genesis.json
-    echo "Downloading latest snapshot"
-    URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-{{ .Values.osmosis.pruning }}")|select (.mirror=="Netherlands")|.url'`
-    wget -O - $URL | lz4 -d | tar -xvf -
+
+    if {{ .Values.ci }}; then
+      echo "Running on CI. Skipping snapshot download"
+    else
+      echo "Downloading latest snapshot"
+      URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-{{ .Values.osmosis.pruning }}")|select (.mirror=="Netherlands")|.url'`
+      wget -O - $URL | lz4 -d | tar -xvf -
+    fi
 
     if [ "$?" -eq "0" ]
     then
