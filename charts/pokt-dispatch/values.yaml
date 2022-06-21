@@ -1,0 +1,131 @@
+# Configures the docker image repository and tag.
+image:
+  repository: poktnetwork/pocket-core
+  tag: "RC-0.8.3"
+  pullPolicy: IfNotPresent
+
+healthcheck_image:
+  repository: eepokt/chain-healthcheck-sidecar
+  tag: "pr-8"
+
+# The number of identical replica pods that will be spun up.
+replicas: 1
+
+# The name of the AWS node group the pods should run in.
+node_group: pokt-dispatch-ng-20220708081257889900000005
+
+#
+in_rotation: true
+
+# Configuration relating to the blockchain settings.
+blockchain:
+  # Forces the initialization portion of the init container to run, normally it will only run once and not again.
+  force_initialization: false
+  # Enables the snapshot download portion of the init container to run. This takes hours to complete.
+  snapshot_download: false
+  # Configures the service and container ports
+  ports:
+    rpc: 8081
+
+healthcheck_env:
+  - name: LOG_LEVEL
+    value: "debug"
+  - name: SIDECAR_CHAIN_ID
+    value: "0001"
+  - name: HEIGHT_CHECK_STRATEGY
+    value: "pocket"
+  - name: LOCAL_RPC_ENDPOINT
+    value: "http://localhost:{{ .Values.blockchain.ports.rpc }}"
+  - name: REMOTE_RPC_ENDPOINTS
+    value: "https://mainnet-1-instance.nodes.pokt.network:4201"
+  - name: STARTUP_PROBE_STRATEGY
+    value: "localRpcAvailable"
+  - name: LIVENESS_PROBE_STRATEGY
+    value: "heightNotClimbing"
+  - name: STALE_HEIGHT_CHECK_HISTORY_LENGTH
+    value: "240"
+  - name: COUNT_LOCAL_RPC_FAILS_AS_STALE_HEIGHT
+    value: "true"
+  - name: READINESS_PROBE_STRATEGY
+    value: "localVsRemote"
+  - name: HEIGHT_DIFF_THRESHOLD
+    value: "1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+helper:
+  enabled: true
+
+service:
+  type: ClusterIP
+  port: 8081
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: pokt-dispatch-snapshot.nodes.pokt.network
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+
+persistence:
+  enabled: false
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+  size: 500Gi
+
+  ## A manually managed Persistent Volume and Claim
+  ## If defined, PVC must be created manually before volume will be bound
+  ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+  ##
+  # existingClaim:
+  ## An existing directory in the node
+  ## If defined, host directory must be created manually before volume will be bound
+  ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+  ##
+  hostPath:
+    path: /mnt/{{ .Chart.Name }}
+    type: DirectoryOrCreate
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

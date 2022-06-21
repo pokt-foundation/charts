@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "pokt-dispatch.fullname" . }}
+  labels:
+    {{- include "pokt-dispatch.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pokt-dispatch.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "pokt-dispatch.fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pokt-dispatch.selectorLabels" . | nindent 8 }}
+        in_rotation: {{ .Values.in_rotation | quote }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: {{ .Values.node_group }}
+      terminationGracePeriodSeconds: 5
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init-container
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh","-c"]
+          args: ["/configmap/init.sh"]
+          env:
+            - name: snapshot_download
+              value: {{ .Values.blockchain.snapshot_download | quote }}
+            - name: force_initialization
+              value: {{ .Values.blockchain.force_initialization | quote }}
+          volumeMounts:
+            - name: configmap
+              mountPath: /configmap
+            - name: data
+              mountPath: /home/app/.pocket
+      containers:
+        - name: {{ .Chart.Name }}
+          command: ["/bin/sh","-c"]
+          args: ["ls -al /home/app/.pocket && pocket start --mainnet --useCache"]
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.blockchain.ports.rpc }}
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 9090
+            failureThreshold: 60
+            periodSeconds: 60
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 9090
+            failureThreshold: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 9090
+            failureThreshold: 1
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /home/app/.pocket
+        - name: chain-healthcheck-sidecar
+          command: ["/bin/sh","-c"]
+          args: ["node dist/index.js"]
+          image: "{{ .Values.healthcheck_image.repository }}:{{ .Values.healthcheck_image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- tpl (toYaml .Values.healthcheck_env) . | nindent 12 }}
+          ports:
+            - name: healthcheck
+              containerPort: 9090
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: healthcheck
+            failureThreshold: 60
+            periodSeconds: 60
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: healthcheck
+            failureThreshold: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: healthcheck
+            failureThreshold: 1
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: configmap
+          configMap:
+            name: {{ include "pokt-dispatch.fullname" . }}-config-files
+            defaultMode: 0777
+#        {{ if not .Values.persistence.enabled }}
+#        - name: data
+#          emptyDir: { }
+#        {{ else if and .Values.persistence.enabled .Values.persistence.hostPath }}
+#        - name: data
+#          hostPath:
+#            {{- tpl (toYaml .Values.persistence.hostPath) . | nindent 12 }}
+#        {{ end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}
+      storageClassName: gp3
+#      dataSource:
+#        name: pocket-dispatch-data-snapshot
+#        kind: VolumeSnapshot
+#        apiGroup: snapshot.storage.k8s.io
+      dataSource:
+        kind: PersistentVolumeClaim
+        name: data-pokt-dispatch-0
