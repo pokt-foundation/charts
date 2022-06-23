@@ -47,7 +47,7 @@ ingress:
 osmosis:
   moniker: pokt-network
   snapshot:
-    download: true
+    download: false
     name: osmosis-1-pruned
     mirror: Netherlands
   genesis:
