@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "harmony.fullname" . }}
+  labels:
+    {{- include "harmony.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "harmony.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "harmony.fullname" . }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "harmony.selectorLabels" . | nindent 8 }}
+        in_rotation: {{ .Values.harmony.in_rotation | quote }}
+  
+    spec:
+      terminationGracePeriodSeconds: 300
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+      # Harmony does not provide the image, so we can grab the binary on init step until we (or they) start building the image.
+        - name: {{ .Chart.Name }}-get-release
+          image: curlimages/curl:7.80.0
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          - --output
+          - /harmony-bin/harmony
+          - -Ls
+          # - https://s3.us-west-1.amazonaws.com/pub.harmony.one/release/linux-x86_64/upgrade/static/harmony
+          # - https://harmony.one/binary_testnet
+          - https://github.com/harmony-one/harmony/releases/download/{{ .Values.harmony.version }}/harmony-amd64
+          volumeMounts:
+            - name: harmony-release
+              mountPath: /harmony-bin/
+
+      containers:
+# This helper is some software we built to verify wether harmony node is not far from the height of blockchain. Otherwise fail health check.
+# {{if .Values.helper.enabled }}
+#         - name: helper
+#           image: okdas/harmony-helper:latest
+#           imagePullPolicy: Always
+#           ports:
+#           - containerPort: 9090
+#           env:
+#           - name: INTERVAL_SECONDS
+#             value: "15"
+#           - name: IGNORE_HEIGHT_DIFF_THRESHOLD
+#             value: "1000"
+#           readinessProbe:
+#             httpGet:
+#               path: /health/readiness
+#               port: 9090
+#             periodSeconds: 15
+# {{end}}
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['sh', '-c']
+          args: 
+          - /scripts/start.sh
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.harmony.ports.rpc }}
+            initialDelaySeconds: 25
+            periodSeconds: 10
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.harmony.ports.rpc }}
+              protocol: TCP
+            - name: consensus
+              containerPort: {{ .Values.harmony.ports.consensus }}
+              protocol: TCP
+              hostPort: {{ .Values.harmony.ports.consensus }}
+            - name: state-sync
+              containerPort: {{ .Values.harmony.ports.stateSync }}
+              protocol: TCP
+              hostPort: {{ .Values.harmony.ports.stateSync }}
+          volumeMounts:
+            - name: harmony-release
+              mountPath: /harmony-bin/
+            - name: harmony-datadir
+              mountPath: {{ .Values.harmony.datadir }}
+            - name: configs
+              mountPath: {{ .Values.harmony.datadir }}/configs/
+            - name: scripts
+              mountPath: /scripts/
+          resources:
+            {{- toYaml .Values.harmony.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: harmony-release
+          emptyDir: {}
+        - name: configs
+          configMap:
+            name: {{ include "harmony.fullname" . }}-configdir
+        - name: scripts
+          configMap:
+            name: {{ include "harmony.fullname" . }}-scripts
+            defaultMode: 0777
+{{- if and .Values.persistence.enabled .Values.persistence.existingClaim  }}
+        - name: harmony-datadir
+          persistentVolumeClaim:
+{{- with .Values.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else if and .Values.persistence.enabled .Values.persistence.hostPath }}
+        - name: harmony-datadir
+          hostPath:
+            path: {{ .Values.persistence.hostPath.path }}
+            type: {{ .Values.persistence.hostPath.type }}
+{{- else if not .Values.persistence.enabled }}
+        - name: harmony-datadir
+          emptyDir: {}
+{{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: harmony-datadir
+      {{- with .Values.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+            {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+        {{ include "harmony.storageClass" . }}
+{{- end }}
