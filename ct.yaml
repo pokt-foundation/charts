@@ -5,4 +5,3 @@ chart-dirs:
 #chart-repos:
 #  - pokt=https://pokt-foundation.gitlab.io/charts
 helm-extra-args: --timeout 600s
-helm-extra-set-args: --set ci=true
