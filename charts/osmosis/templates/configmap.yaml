@@ -14,21 +14,26 @@ data:
     rm -r config/ | true
     cp -r /configs/ config/
 
+    mkdir -p wasm
+
     if [[ -f ".node-initialized" ]]; then
       echo "Node was already initialized"
       exit 0
     fi
 
-    mkdir -p wasm
-    echo "Downloading genesis.json"
-    wget -O genesis.json https://media.githubusercontent.com/media/osmosis-labs/networks/main/osmosis-1/genesis.json
-
-    if {{ .Values.ci }}; then
-      echo "Running on CI. Skipping snapshot download"
+    if [[ -f "genesis.json" ]]; then
+      echo "Genesis file already downloaded"
     else
+      echo "Downloading genesis.json"
+      wget -O genesis.json {{ .Values.osmosis.genesis.url }}
+    fi
+
+    if {{ .Values.osmosis.snapshot.download }}; then
       echo "Downloading latest snapshot"
-      URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="osmosis-1-{{ .Values.osmosis.pruning }}")|select (.mirror=="Netherlands")|.url'`
+      URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="{{ .Values.osmosis.snapshot.name }}")|select (.mirror=="{{ .Values.osmosis.snapshot.mirror }}")|.url'`
       wget -O - $URL | lz4 -d | tar -xvf -
+    else
+      echo "Skipping snapshot download"
     fi
 
     if [ "$?" -eq "0" ]
@@ -291,7 +296,7 @@ data:
     proxy_app = "tcp://127.0.0.1:26658"
 
     # A custom human readable name for this node
-    moniker = "pokt-network"
+    moniker = "{{ .Values.osmosis.moniker }}"
 
     # If this node is many blocks behind the tip of the chain, FastSync
     # allows them to catchup quickly by downloading blocks in parallel
@@ -485,7 +490,7 @@ data:
     external_address = ""
 
     # Comma separated list of seed nodes to connect to
-    seeds = "21d7539792ee2e0d650b199bf742c56ae0cf499e@162.55.132.230:2000,44ff091135ef2c69421eacfa136860472ac26e60@65.21.141.212:2000,ec4d3571bf709ab78df61716e47b5ac03d077a1a@65.108.43.26:2000,4cb8e1e089bdf44741b32638591944dc15b7cce3@65.108.73.18:2000,f515a8599b40f0e84dfad935ba414674ab11a668@osmosis.blockpane.com:26656,6bcdbcfd5d2c6ba58460f10dbcfde58278212833@osmosis.artifact-staking.io:26656,24841abfc8fbd401d8c86747eec375649a2e8a7e@osmosis.pbcups.org:26656,77bb5fb9b6964d6e861e91c1d55cf82b67d838b5@bd-osmosis-seed-mainnet-us-01.bdnodes.net:26656,3243426ab56b67f794fa60a79cc7f11bc7aa752d@bd-osmosis-seed-mainnet-eu-02.bdnodes.net:26656,6fc23ee451a5969853825d861532676b84d7bf0c@osmosis.mainnet.seed.blockngine.io:26716,7c66126b64cd66bafd9ccfc721f068df451d31a3@osmosis-seed.sunshinevalidation.io:9393"
+    seeds = "2308bed9e096a8b96d2aa343acc1147813c59ed2@3.225.38.25:26656,1b077d96ceeba7ef503fb048f343a538b2dcdf1b@136.243.218.244:26656,902bdfe51b6a97cc9369664a21c87ed61d471d2a@136.243.218.243:26656,f515a8599b40f0e84dfad935ba414674ab11a668@osmosis.blockpane.com:26656,83adaa38d1c15450056050fd4c9763fcc7e02e2c@ec2-44-234-84-104.us-west-2.compute.amazonaws.com:26656"
 
     # Comma separated list of nodes to keep persistent connections to
     persistent_peers = ""
@@ -586,18 +591,15 @@ data:
     # the network to take and serve state machine snapshots. State sync is not attempted if the node
     # has any local state (LastBlockHeight > 0). The node will have a truncated block history,
     # starting from the height of the snapshot.
+    {{- if not .Values.osmosis.snapshot.download  }}
+    enable = true
+    rpc_servers = "http://osmosis-mainnet-statesync.allthatnode.com:26657,http://osmosis-mainnet-statesync.allthatnode.com:26657"
+    trust_height = 4863000
+    trust_hash = "82176476C2AA880F1EE7F845A72F173BDA2AC3D83922BF640414282EE5548A9B"
+    trust_period = "120h"
+    {{ else }}
     enable = false
-
-    # RPC servers (comma-separated) for light client verification of the synced state machine and
-    # retrieval of state data for node bootstrapping. Also needs a trusted height and corresponding
-    # header hash obtained from a trusted source, and a period during which validators can be trusted.
-    #
-    # For Cosmos SDK-based chains, trust_period should usually be about 2/3 of the unbonding time (~2
-    # weeks) during which they can be financially punished (slashed) for misbehavior.
-    rpc_servers = ""
-    trust_height = 0
-    trust_hash = ""
-    trust_period = "112h0m0s"
+    {{ end }}
 
     # Time to spend discovering snapshots before initiating a restore.
     discovery_time = "15s"
