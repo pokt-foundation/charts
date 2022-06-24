@@ -47,14 +47,14 @@ ingress:
   #      - chart-example.local
 
 arbitrum:
-  l1.url: <Layer 1 Ethereum RPC URL>
+  l1_url: https://pnfblockchains:UEnJdyW23ch92rf@shared-use2.nodes.pokt.network:18545
   ports:
     sequencerfeeder: 9642
     rpc: 8547
-    websocket: 8548
+    # websocket: 8548
   service:
     type: ClusterIP
-  datadir: /arbitrum-mainnet
+  datadir: /home/user/.arbitrum/mainnet
   resources:
     {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -74,7 +74,7 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
-  size: 2000Gi
+  size: 100Gi
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
@@ -86,7 +86,7 @@ persistence:
   ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
   ##
   hostPath:
-    path: /arbitrum-mainnet
+    path: /home/shai/arbitrum-mainnet
     type: DirectoryOrCreate
 
 nodeSelector: {}
