@@ -44,7 +44,25 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+healthcheckSidecar:
+  remoteRpcEndpoints: https://rpc.osmosis.zone
+  enabled: false
+  checkIntervalSeconds: 15
+  heightDiffThreshold: 10
+  heightCheckStrategy: evm
+  startupProbeStrategy: localVsRemote
+  readinessProbeStrategy: localVsRemote
+  livenessProbeStrategy: heightNotClimbing
+  evmBlockNumberMethodName: abci_info
+  evmBlockNumberFieldPath: result.response.last_block_height
+  port: 9090
+  image:
+    repository: eepokt/chain-healthcheck-sidecar
+    pullPolicy: IfNotPresent
+    tag: sha-2023038
+
 osmosis:
+  chainId: osmosis-1
   moniker: pokt-network
   snapshot:
     download: false

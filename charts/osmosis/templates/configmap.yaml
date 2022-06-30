@@ -5,9 +5,6 @@ metadata:
 data:
   init-node.sh: |
     #!/bin/bash
-    apt-get update -y
-    apt-get install wget liblz4-tool curl jq -y
-
     cd {{ .Values.osmosis.datadir }}
 
     echo "Copying configs"
@@ -17,9 +14,12 @@ data:
     mkdir -p wasm
 
     if [[ -f ".node-initialized" ]]; then
-      echo "Node was already initialized"
+      echo "Node already initialized"
       exit 0
     fi
+
+    apt-get update -y
+    apt-get install wget liblz4-tool curl jq -y
 
     if [[ -f "genesis.json" ]]; then
       echo "Genesis file already downloaded"
@@ -276,7 +276,7 @@ data:
     ###############################################################################
 
     # The network chain ID
-    chain-id = "osmosis-1"
+    chain-id = "{{ .Values.osmosis.chainId }}"
     # The keyring's backend, where the keys are stored (os|file|kwallet|pass|test|memory)
     keyring-backend = "os"
     # CLI output format (text|json)
