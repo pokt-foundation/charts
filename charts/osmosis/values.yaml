@@ -59,15 +59,15 @@ healthcheckSidecar:
   image:
     repository: eepokt/chain-healthcheck-sidecar
     pullPolicy: IfNotPresent
-    tag: sha-2023038
+    tag: sha-55b035b
 
 osmosis:
   chainId: osmosis-1
   moniker: pokt-network
   snapshot:
     download: false
-    name: osmosis-1-pruned
-    mirror: Netherlands
+    name: osmosis-1-default
+    mirror: SanFrancisco
   genesis:
     url: https://github.com/osmosis-labs/networks/raw/main/osmosis-1/genesis.json
   pruning: default
@@ -96,6 +96,7 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
+  storageClassName: gp3-common
   size: 1500Gi
 
   ## A manually managed Persistent Volume and Claim
@@ -107,9 +108,9 @@ persistence:
   ## If defined, host directory must be created manually before volume will be bound
   ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
   ##
-  hostPath:
-    path: /run/desktop/mnt/host/c/osmosis-datadir
-    type: DirectoryOrCreate
+  # hostPath:
+  #   path: /run/desktop/mnt/host/c/osmosis-datadir
+  #   type: DirectoryOrCreate
 
 nodeSelector: {}
 
