@@ -92,7 +92,7 @@ osmosis:
   in_rotation: true
 
 persistence:
-  enabled: true
+  enabled: false
   annotations: {}
   accessModes:
     - ReadWriteOnce
