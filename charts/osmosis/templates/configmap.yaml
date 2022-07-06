@@ -7,6 +7,11 @@ data:
     #!/bin/bash
     cd {{ .Values.osmosis.datadir }}
 
+    if {{ .Values.osmosis.forceInitialization }}; then
+      echo "osmosis.forceInitialization set to true, deleting all node data"
+      rm -rf .
+    fi
+
     echo "Copying configs"
     rm -r config/ | true
     cp -r /configs/ config/
@@ -30,7 +35,7 @@ data:
 
     if {{ .Values.osmosis.snapshot.download }}; then
       echo "Downloading latest snapshot"
-      URL=`curl https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="{{ .Values.osmosis.snapshot.name }}")|select (.mirror=="{{ .Values.osmosis.snapshot.mirror }}")|.url'`
+      URL=`curl -L https://quicksync.io/osmosis.json|jq -r '.[] |select(.file=="{{ .Values.osmosis.snapshot.name }}")|select (.mirror=="{{ .Values.osmosis.snapshot.mirror }}")|.url'`
       wget -O - $URL | lz4 -d | tar -xvf -
     else
       echo "Skipping snapshot download"
