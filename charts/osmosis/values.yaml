@@ -59,15 +59,16 @@ healthcheckSidecar:
   image:
     repository: eepokt/chain-healthcheck-sidecar
     pullPolicy: IfNotPresent
-    tag: sha-55b035b
+    tag: sha-921cfa9
 
 osmosis:
   chainId: osmosis-1
   moniker: pokt-network
+  forceInitialization: false
   snapshot:
     download: false
     name: osmosis-1-default
-    mirror: SanFrancisco
+    mirror: Netherlands
   genesis:
     url: https://github.com/osmosis-labs/networks/raw/main/osmosis-1/genesis.json
   pruning: default
@@ -96,7 +97,7 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
-  storageClassName: gp3-common
+  storageClassName: gp3
   size: 1500Gi
 
   ## A manually managed Persistent Volume and Claim

@@ -79,16 +79,19 @@ spec:
             httpGet:
               path: /health/readiness
               port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
             periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
           livenessProbe:
             httpGet:
               path: /health/liveness
               port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
             periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
           startupProbe:
             httpGet:
               path: /health/startup
               port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
             periodSeconds: 30
             failureThreshold: 20
         {{end}}
@@ -102,8 +105,8 @@ spec:
           livenessProbe:
             tcpSocket:
               port: {{ .Values.osmosis.ports.rpc }}
-            initialDelaySeconds: 25
-            periodSeconds: 10
+            initialDelaySeconds: 300
+            periodSeconds: 15
           ports:
             - name: rpc
               containerPort: {{ .Values.osmosis.ports.rpc }}
