@@ -153,7 +153,6 @@ spec:
             type: {{ .Values.persistence.hostPath.type }}
 {{- else if not .Values.persistence.enabled }}
         - name: datadir
-          defaultMode: 0777
           emptyDir: {}
 {{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
   volumeClaimTemplates:
