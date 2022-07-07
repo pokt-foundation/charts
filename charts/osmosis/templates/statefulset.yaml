@@ -26,9 +26,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        fsGroup: 1001
-        runAsUser: 1001
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
         - name: {{ .Chart.Name }}-init-node
           image: debian:11-slim
@@ -152,6 +153,7 @@ spec:
             type: {{ .Values.persistence.hostPath.type }}
 {{- else if not .Values.persistence.enabled }}
         - name: datadir
+          defaultMode: 0777
           emptyDir: {}
 {{- else if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
   volumeClaimTemplates:
