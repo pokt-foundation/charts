@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: offchainlabs/arb-node
   pullPolicy: IfNotPresent
-  tag: v1.4.0-f4bbe91
+  tag: v1.4.1-h9180527
 
 imagePullSecrets: []
 nameOverride: ""
@@ -46,6 +46,23 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+healthcheckSidecar:
+  remoteRpcEndpoints: https://arb1.arbitrum.io/rpc
+  enabled: false
+  checkIntervalSeconds: 15
+  heightDiffThreshold: 10
+  heightCheckStrategy: evm
+  startupProbeStrategy: localVsRemote
+  readinessProbeStrategy: localVsRemote
+  livenessProbeStrategy: heightNotClimbing
+  evmBlockNumberMethodName: abci_info
+  evmBlockNumberFieldPath: result.response.last_block_height
+  port: 9090
+  image:
+    repository: eepokt/chain-healthcheck-sidecar
+    pullPolicy: IfNotPresent
+    tag: sha-921cfa9
+
 arbitrum:
   l1_url: https://pnfblockchains:UEnJdyW23ch92rf@shared-use2.nodes.pokt.network:18545
   ports:
@@ -54,7 +71,7 @@ arbitrum:
     # websocket: 8548
   service:
     type: ClusterIP
-  datadir: /home/user/.arbitrum/mainnet
+  datadir: /root/.arbitrum/mainnet/
   resources:
     {}
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -74,7 +91,8 @@ persistence:
   annotations: {}
   accessModes:
     - ReadWriteOnce
-  size: 100Gi
+  size: 1000Gi
+  storageClassName: gp3
 
   ## A manually managed Persistent Volume and Claim
   ## If defined, PVC must be created manually before volume will be bound
@@ -85,11 +103,12 @@ persistence:
   ## If defined, host directory must be created manually before volume will be bound
   ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
   ##
-  hostPath:
-    path: /home/shai/arbitrum-mainnet
-    type: DirectoryOrCreate
+  #hostPath:
+  #  path: /mnt/hosthome/
+  #  type: DirectoryOrCreate
 
-nodeSelector: {}
+nodeSelector:
+  eks.amazonaws.com/nodegroup: arbitrum-ng-20220708183756454400000005
 
 tolerations: []
 

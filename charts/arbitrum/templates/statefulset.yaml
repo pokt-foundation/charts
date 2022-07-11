@@ -41,21 +41,89 @@ spec:
       #     volumeMounts:
       #       - name: data-dir
       #         mountPath: {{ .Values.arbitrum.datadir }}
+      # initContainers:
+      #   - name: {{ .Chart.Name }}-init-node
+      #     image: debian:11-slim
+      #     imagePullPolicy: {{ .Values.image.pullPolicy }}
+      #     securityContext:
+      #       runAsUser: 0
+      #     #command: ['sh', '-c', 'apt-get -y update; apt-get install -y wget; wget -c https://snapshot.arbitrum.io/mainnet/db-archive.tar -O /root/.arbitrum/mainnet/da.tar; tar -xf /root/.arbitrum/mainnet/da.tar -C /root/.arbitrum/mainnet/ --checkpoint=.1000']
+      #     #command: ['sh', '-c', 'apt-get -y update; apt-get install -y wget; wget -c https://snapshot.arbitrum.io/mainnet/dbhelm.tar -O -| tar -xf -C /root/.arbitrum/mainnet/ --checkpoint=.100']
+
+      #     volumeMounts:
+      #       - name: arbitrum-datadir
+      #         mountPath: {{ .Values.arbitrum.datadir }}
 
       containers:
+        {{if .Values.healthcheckSidecar.enabled }}
+        - name: chain-healthcheck-sidecar
+          image: {{ .Values.healthcheckSidecar.image.repository }}:{{ .Values.healthcheckSidecar.image.tag }}
+          imagePullPolicy: {{ .Values.healthcheckSidecar.image.pullPolicy }}
+          ports:
+          - containerPort: {{ .Values.healthcheckSidecar.port }}
+          env:
+          - name: LISTEN_PORT
+            value: {{ .Values.healthcheckSidecar.port | quote }}
+          - name: INTERVAL_SECONDS
+            value: {{ .Values.healthcheckSidecar.checkIntervalSeconds | quote }}
+          - name: HEIGHT_DIFF_THRESHOLD
+            value: {{ .Values.healthcheckSidecar.heightDiffThreshold | quote }}
+          - name: SIDECAR_CHAIN_ID
+            value: {{ .Values.osmosis.chainId | quote }}
+          - name: LOCAL_RPC_ENDPOINT
+            value: "http://localhost:{{ .Values.osmosis.ports.rpc }}"
+          - name: REMOTE_RPC_ENDPOINTS
+            value: {{ .Values.healthcheckSidecar.remoteRpcEndpoints | quote }}
+          - name: HEIGHT_CHECK_STRATEGY
+            value: {{ .Values.healthcheckSidecar.heightCheckStrategy | quote }}
+          - name: STARTUP_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.startupProbeStrategy | quote }}
+          - name: READINESS_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.readinessProbeStrategy | quote }}
+          - name: LIVENESS_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.livenessProbeStrategy | quote }}
+          - name: EVM_BLOCK_NUMBER_METHOD_NAME
+            value: {{ .Values.healthcheckSidecar.evmBlockNumberMethodName | quote }}
+          - name: EVM_BLOCK_NUMBER_FIELD_PATH
+            value: {{ .Values.healthcheckSidecar.evmBlockNumberFieldPath | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: 30
+            failureThreshold: 20
+        {{end}}
+
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
           #command: ['sh', '-c']
+          #command: [ "/bin/bash", "-c", "--" ]
+          #args: [ "while true; do sleep 30; done;" ]
           args: 
           - --node.cache.allow-slow-lookup 
           - --core.checkpoint-gas-frequency=156250000
           - --l1.url={{.Values.arbitrum.l1_url }}
-          livenessProbe:
-            tcpSocket:
-              port: {{ .Values.arbitrum.ports.rpc }}
-            initialDelaySeconds: 25
-            periodSeconds: 10
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: {{ .Values.arbitrum.ports.rpc }}
+          #   initialDelaySeconds: 25
+          #   periodSeconds: 10
           ports:
             - name: rpc
               containerPort: {{ .Values.arbitrum.ports.rpc }}
@@ -110,8 +178,8 @@ spec:
         {{- range .Values.persistence.accessModes }}
           - {{ . | quote }}
         {{- end }}
+        storageClassName: {{.Values.persistence.storageClassName }}
         resources:
           requests:
             storage: {{ .Values.persistence.size | quote }}
-        {{ include "arbitrum.storageClass" . }}
 {{- end }}
