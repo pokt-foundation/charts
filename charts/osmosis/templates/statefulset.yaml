@@ -104,7 +104,7 @@ spec:
             tcpSocket:
               port: {{ .Values.osmosis.ports.rpc }}
             initialDelaySeconds: 300
-            periodSeconds: 15
+            periodSeconds: 30
           ports:
             - name: rpc
               containerPort: {{ .Values.osmosis.ports.rpc }}

@@ -284,7 +284,7 @@ data:
     # The network chain ID
     chain-id = "{{ .Values.osmosis.chainId }}"
     # The keyring's backend, where the keys are stored (os|file|kwallet|pass|test|memory)
-    keyring-backend = "os"
+    keyring-backend = "test"
     # CLI output format (text|json)
     output = "text"
     # <host>:<port> to Tendermint RPC interface for this chain
@@ -542,7 +542,7 @@ data:
     # peers. If another node asks it for addresses, it responds and disconnects.
     #
     # Does not work if the peer-exchange reactor is disabled.
-    seed_mode = false
+    seed_mode = true
 
     # Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
     private_peer_ids = ""
