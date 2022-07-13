@@ -1,0 +1,85 @@
+# Default values for aptos.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: aptoslabs/validator
+  pullPolicy: IfNotPresent
+  tag: devnet
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+aptos:
+  forceInitialization: false
+  genesis:
+    url: https://devnet.aptoslabs.com/genesis.blob
+  waypoint:
+    url: https://devnet.aptoslabs.com/waypoint.txt
+  ports:
+    consensus: 9101
+    api: 8080
+  service:
+    type: ClusterIP
+    port: 80
+  home: /opt/aptos/data
+  resources:
+    {}
+    # requests:
+    #   cpu: "2000m"
+    #   memory: "8Gi"
+
+persistence:
+  enabled: false
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3
+  size: 100Gi
+
+  ## A manually managed Persistent Volume and Claim
+  ## If defined, PVC must be created manually before volume will be bound
+  ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+  ##
+  # existingClaim:
+  ## An existing directory in the node
+  ## If defined, host directory must be created manually before volume will be bound
+  ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+  ##
+  # hostPath:
+  #   path: /run/desktop/mnt/host/c/aptos-datadir
+  #   type: DirectoryOrCreate
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
