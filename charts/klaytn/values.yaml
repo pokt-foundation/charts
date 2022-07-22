@@ -1,0 +1,85 @@
+# Default values for aptos.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: klaytn/klaytn
+  pullPolicy: IfNotPresent
+  tag: v1.8.4
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+klaytn:
+  forceInitialization: false
+  snapshot:
+    download: false
+    url: https://s3.ap-northeast-2.amazonaws.com/klaytn-chaindata/cypress/klaytn-cypress-chaindata-20220721010711.tar.gz
+  ports:
+    consensus: 32323
+    rpc: 8551
+  service:
+    type: ClusterIP
+    port: 80
+  datadir: /var/kend/data
+  resources:
+    {}
+    # requests:
+    #   cpu: "2000m"
+    #   memory: "8Gi"
+  in_rotation: true
+
+persistence:
+  enabled: false
+  annotations: {}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: gp3
+  size: 2500Gi
+
+  ## A manually managed Persistent Volume and Claim
+  ## If defined, PVC must be created manually before volume will be bound
+  ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+  ##
+  # existingClaim:
+  ## An existing directory in the node
+  ## If defined, host directory must be created manually before volume will be bound
+  ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
+  ##
+  # hostPath:
+  #   path: /run/desktop/mnt/host/c/klaytn-datadir
+  #   type: DirectoryOrCreate
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
