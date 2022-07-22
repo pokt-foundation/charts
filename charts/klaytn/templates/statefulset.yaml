@@ -44,17 +44,73 @@ spec:
               mountPath: {{ .Values.klaytn.datadir }}
 
       containers:
+      {{if .Values.healthcheckSidecar.enabled }}
+        - name: chain-healthcheck-sidecar
+          image: {{ .Values.healthcheckSidecar.image.repository }}:{{ .Values.healthcheckSidecar.image.tag }}
+          imagePullPolicy: {{ .Values.healthcheckSidecar.image.pullPolicy }}
+          ports:
+          - containerPort: {{ .Values.healthcheckSidecar.port }}
+          env:
+          - name: LISTEN_PORT
+            value: {{ .Values.healthcheckSidecar.port | quote }}
+          - name: INTERVAL_SECONDS
+            value: {{ .Values.healthcheckSidecar.checkIntervalSeconds | quote }}
+          - name: HEIGHT_DIFF_THRESHOLD
+            value: {{ .Values.healthcheckSidecar.heightDiffThreshold | quote }}
+          - name: SIDECAR_CHAIN_ID
+            value: {{ .Values.osmosis.chainId | quote }}
+          - name: LOCAL_RPC_ENDPOINT
+            value: "http://localhost:{{ .Values.osmosis.ports.rpc }}"
+          - name: REMOTE_RPC_ENDPOINTS
+            value: {{ .Values.healthcheckSidecar.remoteRpcEndpoints | quote }}
+          - name: HEIGHT_CHECK_STRATEGY
+            value: {{ .Values.healthcheckSidecar.heightCheckStrategy | quote }}
+          - name: STARTUP_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.startupProbeStrategy | quote }}
+          - name: READINESS_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.readinessProbeStrategy | quote }}
+          - name: LIVENESS_PROBE_STRATEGY
+            value: {{ .Values.healthcheckSidecar.livenessProbeStrategy | quote }}
+          - name: EVM_BLOCK_NUMBER_METHOD_NAME
+            value: {{ .Values.healthcheckSidecar.evmBlockNumberMethodName | quote }}
+          - name: STALE_HEIGHT_CHECK_HISTORY_LENGTH
+            value: {{ .Values.healthcheckSidecar.staleHeightCheckHistoryLength | quote }}
+          - name: COUNT_LOCAL_RPC_FAILS_AS_STALE_HEIGHT
+            value: {{ .Values.healthcheckSidecar.countLocalRpcFailsAsStaleHeight | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: 30
+            failureThreshold: 20
+        {{end}}
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["kend"]
           args: 
           - start-docker
+          {{if .Values.healthcheckSidecar.enabled }}
           livenessProbe:
-            tcpSocket:
-              port: {{ .Values.klaytn.ports.rpc }}
-            initialDelaySeconds: 60
-            periodSeconds: 30
+            httpGet:
+              path: /health/liveness
+              port: {{ .Values.healthcheckSidecar.port }}
+            initialDelaySeconds: 300
+            periodSeconds: {{ .Values.healthcheckSidecar.checkIntervalSeconds }}
+          {{end}}
           ports:
             - name: rpc
               containerPort: {{ .Values.klaytn.ports.rpc }}

@@ -38,6 +38,24 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+healthcheckSidecar:
+  enabled: false
+  remoteRpcEndpoints: https://public-node-api.klaytnapi.com/v1/cypress,https://klaytn01.fandom.finance,https://klaytn-mainnet-rpc.allthatnode.com:8551
+  checkIntervalSeconds: 15
+  heightDiffThreshold: 10
+  heightCheckStrategy: evm
+  startupProbeStrategy: localVsRemote
+  readinessProbeStrategy: localVsRemote
+  livenessProbeStrategy: heightNotClimbing
+  evmBlockNumberMethodName: klay_blockNumber
+  staleHeightCheckHistoryLength: 240
+  countLocalRpcFailsAsStaleHeight: true
+  port: 9090
+  image:
+    repository: eepokt/chain-healthcheck-sidecar
+    pullPolicy: IfNotPresent
+    tag: sha-921cfa9
+
 klaytn:
   forceInitialization: false
   snapshot:
