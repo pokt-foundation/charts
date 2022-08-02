@@ -1,7 +1,7 @@
 image:
   repository: pocketfoundation/avalanchego
   pullPolicy: IfNotPresent
-  tag: v1.7.13-subnets
+  tag: v1.7.16-subnets
 resources:
   requests:
     memory: "1Gi"
