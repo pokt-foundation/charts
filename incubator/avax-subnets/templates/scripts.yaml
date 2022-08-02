@@ -55,4 +55,3 @@ data:
         "api-max-blocks-per-request": 0,
         "allow-unfinalized-queries": false
     }
-    
