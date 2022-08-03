@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "avax_subnets.fullname" . }}-scripts
+data:
+  init.sh: |
+    #!/bin/sh
+
+    # exit script on any error
+    set -e
+
+    SCRIPTS_VOLUME={{ .Values.scripts_volume_mount }}
+    CONFIGS_VOLUME={{ .Values.config_volume_mount }}
+
+    # copy configs to the dir service expects to find configs at
+    cp $SCRIPTS_VOLUME/config.json $CONFIGS_VOLUME/config.json
+
+    # todo: if we need more subnets, make this dynamic
+
+    {{- range .Values.whitelisted_subnets }}
+    mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
+    cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
+    {{- end }}
+    
+    # todo: bootstrap logic
+
+{{- range .Values.whitelisted_subnets }}
+  {{ .name }}_config.json: |
+    {
+      "feeRecipient": "{{ .feeRecipient }}"
+    }
+{{- end }}
+
+  config.json: |
+    { 
+        "network-id":"mainnet",
+        "health-check-frequency":"2s",
+        "log-display-level":"INFO",
+        "log-level":"INFO",
+        "chain-config-dir":"{{ .Values.config_volume_mount }}",
+        "whitelisted-subnets": "{{- include "avax_subnets.subnets" . | trimSuffix "," }}",
+        "snowman-api-enabled": false,
+        "coreth-admin-api-enabled": false,
+        "net-api-enabled": true,
+        "rpc-gas-cap": 2500000000,
+        "rpc-tx-fee-cap": 100,
+        "eth-api-enabled": true,
+        "personal-api-enabled": false,
+        "tx-pool-api-enabled": false,
+        "debug-api-enabled": false,
+        "web3-api-enabled": true,
+        "local-txs-enabled": false,
+        "pruning-enabled": true,
+        "api-max-duration": 0,
+        "api-max-blocks-per-request": 0,
+        "allow-unfinalized-queries": false
+    }

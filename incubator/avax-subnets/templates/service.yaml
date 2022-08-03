@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avax_subnets.fullname" . }}-rpc
+  labels:
+    {{- include "avax_subnets.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: {{ .Values.ports.http }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "avax_subnets.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "avax_subnets.fullname" . }}-consensus
+  labels:
+    {{- include "avax_subnets.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.ports.consensus }}
+      targetPort: {{ .Values.ports.consensus }}
+      protocol: TCP
+      name: consensus
+  selector:
+    {{- include "avax_subnets.selectorLabels" . | nindent 4 }}
