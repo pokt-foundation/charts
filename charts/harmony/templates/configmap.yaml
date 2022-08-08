@@ -104,10 +104,6 @@ data:
     apt install -y unzip curl
     curl https://rclone.org/install.sh | bash
     rclone --checksum -P -L --log-level DEBUG sync  release:pub.harmony.one/mainnet.min/harmony_db_{{ .Values.harmony.shard }} {{ .Values.harmony.datadir }}/harmony_db_{{ .Values.harmony.shard }} --transfers=32 --config=/configs/rclone.conf
-  get-binary.sh: |
-    apt update -y
-    apt install -y unzip curl
-    curl -LO https://harmony.one/binary && mv binary /harmony-bin/harmony && chmod +x /harmony-bin/harmony
 
 {{- if .Values.rclone.enabled }}
 ---
@@ -120,9 +116,8 @@ data:
     [release]
     type = {{ .Values.rclone.type }}
     provider = {{ .Values.rclone.provider }}
-    env_auth = {{ .Values.rclone.env_auth }}
     region = {{ .Values.rclone.region }}
-    acl = {{ .Values.rclone.acl }}
-    server_side_encryption = {{ .Values.rclone.server_side_encryption }}
-    storage_class = {{ .Values.rclone.storage_class }}
+    access_key_id = {{ .Values.rclone.access_key_id }}
+    secret_access_key = {{ .Values.rclone.secret_access_key }}
+    endpoint = {{ .Values.rclone.endpoint }}
 {{- end }}
