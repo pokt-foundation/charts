@@ -11,10 +11,6 @@ healthcheck_image:
 # The number of identical replica pods that will be spun up.
 replicas: 1
 
-# The name of the AWS node group the pods should run in.
-node_group: pokt-dispatch-ng-20220708081257889900000005
-
-#
 in_rotation: true
 
 # Configuration relating to the blockchain settings.
@@ -127,6 +123,7 @@ persistence:
     type: DirectoryOrCreate
 
 nodeSelector: {}
+  ## eks.amazonaws.com/nodegroup: pokt-dispatch-ng-20220708081257889900000005
 
 tolerations: []
 
