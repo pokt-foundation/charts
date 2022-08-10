@@ -76,7 +76,7 @@ service:
   port: 8081
 
 ingress:
-  enabled: true
+  enabled: false
   className: "nginx"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -116,6 +116,8 @@ persistence:
   ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
   ##
   # existingClaim:
+  ## If using CSI Volume Cloning, set the PVC to clone from here:
+  # clonePVC:
   ## An existing directory in the node
   ## If defined, host directory must be created manually before volume will be bound
   ## See https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
