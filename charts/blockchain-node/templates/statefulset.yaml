@@ -1,0 +1,123 @@
+{{- range $ksts, $sts := $.Values.statefulset }}
+{{- $volumeName := printf "%s-data" $sts.name }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $sts.name }}
+  labels:
+    {{- include "blockchain-node.labels" $ | nindent 4 }}
+    {{- with $sts.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: {{ template "blockchain-node.fullname" $ }}-{{ $sts.name }}
+  podManagementPolicy: {{ default "Parallel" $.Values.global.podManagementPolicy }}
+  updateStrategy:
+    type: {{ default "RollingUpdate" $.Values.global.updateStrategy.type }}
+    {{- if (eq "Recreate" $.Values.global.updateStrategy.type) }}
+    rollingUpdate: null
+    {{- end }}
+  selector:
+    matchLabels:
+      statefulsetname: {{ $sts.name }}
+  replicas: {{ $sts.replicas }}
+  template:
+    metadata:
+      name: {{ template "blockchain-node.fullname" $ }}
+      labels:
+        {{- include "blockchain-node.labels" $ | nindent 8 }}
+        {{- with $sts.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        statefulsetname: {{ $sts.name }}
+      {{- with $sts.podAnnotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      terminationGracePeriodSeconds: {{ default 180 $.Values.global.terminationGracePeriodSeconds }}
+      {{- with $sts.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.global.securityContext }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.global.serviceAccount.name }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+
+      {{- with $sts.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        {{- range $kcntnr, $cntnr := $sts.containers }}
+        - name: {{ $cntnr.name }}
+          image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
+
+          {{- with $cntnr.env }}
+          env: {{- toYaml . | nindent 12}}
+          {{- end }}
+
+          {{- with $cntnr.workingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- with $cntnr.command }}
+          command:
+            - /bin/sh
+            - -c
+            - {{ . }}
+          {{- end }}
+
+          {{- with $cntnr.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          ports:
+          {{- range $kprt, $prt := $cntnr.ports }}
+            - name:  {{ $prt.name}}
+              protocol: {{ $prt.protocol }}
+              containerPort: {{ $prt.port }}
+          {{- end }}
+
+          {{- with $cntnr.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          volumeMounts:
+            - name: {{ $volumeName }}
+              mountPath: {{ default "/data" $sts.persistence.dataMountPath}}
+
+        {{ end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
+
+      volumes:
+  {{- if $sts.persistence.hostPath.path }}
+        - name: {{ $volumeName }}
+          hostPath:
+            path: {{ $sts.persistence.hostPath.path }}
+            type: {{ default "DirectoryOrCreate" $sts.persistence.hostPath.type }}
+  {{- else if $sts.persistence.existingClaims }}
+        - name: {{ $volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ $sts.persistence.existingClaims }}
+  {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ $volumeName }}
+      spec:
+        {{- if $sts.persistence.storageClassName }}
+        storageClassName: {{ $sts.persistence.storageClassName }}
+        {{- end }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ $sts.persistence.size | quote }}
+  {{- end }}
+
+{{ end }} #--- {{/* range $ksts, $sts := $.Values.statefulset */}}
