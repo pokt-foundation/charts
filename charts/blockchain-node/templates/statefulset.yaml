@@ -14,8 +14,8 @@ spec:
   serviceName: {{ template "blockchain-node.fullname" $ }}-{{ $sts.name }}
   podManagementPolicy: {{ default "Parallel" $.Values.global.podManagementPolicy }}
   updateStrategy:
-    type: {{ default "RollingUpdate" $.Values.global.updateStrategy.type }}
-    {{- if (eq "Recreate" $.Values.global.updateStrategy.type) }}
+    type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
+    {{- if (eq "Recreate" $.Values.global.updateStrategy) }}
     rollingUpdate: null
     {{- end }}
   selector:
