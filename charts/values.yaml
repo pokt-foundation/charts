@@ -74,6 +74,25 @@ statefulset:
 
 # Additional manifests to deploy as an array
 additionalManifests:
+  - kind: SecretStore
+    apiVersion: external-secrets.io/v1beta1
+    metadata:
+      name: vault-backend
+    spec:
+      controller: ""
+      provider:
+        vault:
+          auth:
+            kubernetes:
+              mountPath: k8s-tooling-us-east-1
+              role: seeds
+              serviceAccountRef:
+                name: seed10
+          namespace: admin/engineering/
+          path: /devops/seed10
+          server: https://hcp-vault-cluster-a-public-vault-72230702.bb94b393.z1.hashicorp.cloud:8200
+          version: v1
+      refreshInterval: 0
   - kind: ExternalSecret
     apiVersion: external-secrets.io/v1beta1
     metadata:
