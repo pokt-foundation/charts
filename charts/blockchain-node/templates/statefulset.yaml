@@ -21,7 +21,7 @@ spec:
   selector:
     matchLabels:
       statefulsetname: {{ $sts.name }}
-  replicas: {{ $sts.replicas }}
+  replicas: {{ default 1 $sts.replicas }}
   template:
     metadata:
       name: {{ template "blockchain-node.fullname" $ }}
@@ -46,8 +46,48 @@ spec:
       serviceAccountName: {{ . }}
       {{- end }}
 
-      {{- with $sts.initContainers }}
+
       initContainers:
+      {{- if $sts.persistence.dataSnapshotURL }}
+
+      #
+      # If this container will be broadly used we can move it to the helm,
+      #   eg: If .Values.dataSnaphotURL is set then add this container
+      - name: download-data-snapshot
+        image: alpine:latest
+        workingDir: {{ $sts.persistence.dataMountPath }}
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -exu
+            if [[ -f {{ $sts.persistence.dataMountPath }}/init-completed ]]; then
+              echo "Account already initialized. Skipping."
+              echo "If you wish to run the init again, delete the file '{{ $sts.persistence.dataMountPath }}/init-completed'"
+            else
+              echo "Downloading snapshot."
+              rm -rf {{ $sts.persistence.dataMountPath }}/data
+              mkdir -p {{ $sts.persistence.dataMountPath }}/data
+              cd {{ $sts.persistence.dataMountPath }}/data
+              wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
+              echo "Snapshot download completed."
+            fi
+
+        volumeMounts:
+          - name: {{ $volumeName }}
+            mountPath: {{ $sts.persistence.dataMountPath }}
+        securityContext:
+          runAsUser: 0
+        # resources:
+        #   requests:
+        #     cpu: 1
+        #     memory: 2Gi
+        #   limits:
+        #     cpu: 2
+        #     memory: 2Gi
+
+      {{- end }}
+      {{- with $sts.initContainers }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
@@ -96,16 +136,7 @@ spec:
         {{ end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       volumes:
-  {{- if $sts.persistence.hostPath.path }}
-        - name: {{ $volumeName }}
-          hostPath:
-            path: {{ $sts.persistence.hostPath.path }}
-            type: {{ default "DirectoryOrCreate" $sts.persistence.hostPath.type }}
-  {{- else if $sts.persistence.existingClaims }}
-        - name: {{ $volumeName }}
-          persistentVolumeClaim:
-            claimName: {{ $sts.persistence.existingClaims }}
-  {{- else }}
+
   volumeClaimTemplates:
     - metadata:
         name: {{ $volumeName }}
@@ -118,6 +149,5 @@ spec:
         resources:
           requests:
             storage: {{ $sts.persistence.size | quote }}
-  {{- end }}
 
 {{ end }} #--- {{/* range $ksts, $sts := $.Values.statefulset */}}
