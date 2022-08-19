@@ -49,10 +49,7 @@ spec:
 
       initContainers:
       {{- if $sts.persistence.dataSnapshotURL }}
-
-      #
-      # If this container will be broadly used we can move it to the helm,
-      #   eg: If .Values.dataSnaphotURL is set then add this container
+      # Init container to download and extract given snapshot
       - name: download-data-snapshot
         image: alpine:latest
         workingDir: {{ $sts.persistence.dataMountPath }}
@@ -69,6 +66,7 @@ spec:
               rm -rf {{ $sts.persistence.dataMountPath }}/data
               mkdir -p {{ $sts.persistence.dataMountPath }}/data
               cd {{ $sts.persistence.dataMountPath }}/data
+              # TODO: To make it more general need to define extract command based on the extension            
               wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
               echo "Snapshot download completed."
             fi
