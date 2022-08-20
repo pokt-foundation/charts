@@ -29,7 +29,7 @@ statefulset:
             type: ClusterIP
             port: 26657
             protocol: TCP
-          - name: pocket
+          - name: rpc
             type: ClusterIP
             port: 8081
             protocol: TCP
@@ -48,24 +48,44 @@ statefulset:
           - name: pocket-core-config-json   #  TODO: iterate through all available keys in the CM and create mounts for each of them      
             mountPath: /home/app/.pocket/config
         resources:
-          # limits:           
-          #   cpu:
-          #   memory: 15Gi
+          limits:
+            cpu: 8
+            memory: 15Gi
           requests:
-            cpu: 6
+            cpu: 4
             memory: 12Gi
-        livenessProbe:
-          tcpSocket:
-            port: 8081
-          initialDelaySeconds: 120
-          periodSeconds: 30
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 3
+        healthProbes:
+          # Can be given as env eg. ??????                         
+          # env:
+          #   SIDECAR_CHAIN_ID: 0001
+          #   ...
+
+          SIDECAR_CHAIN_ID: 0001
+          HEIGHT_CHECK_STRATEGY: pocket
+          REMOTE_RPC_ENDPOINTS: "https://SOME_PUBLIC_RPC"            
+          STARTUP_PROBE_STRATEGY: localRpcAvailable
+          READINESS_PROBE_STRATEGY: localVsRemote
+          LIVENESS_PROBE_STRATEGY: heightNotClimbing
+          LOCAL_RPC_ENDPOINT: "http://localhost:8081"
+          initialDelaySeconds: 120 # defaults
+          periodSeconds: 30        # defaults
+          timeoutSeconds: 1        # defaults
+          successThreshold: 1      # defaults
+          failureThreshold: 3      # defaults
+
+
         # TODO: Will be done with https://github.com/pokt-foundation/chain-healthcheck-sidecar                
         # readinessProbe:
         #   tcpSocket:
         #     port: 8545
+        #   initialDelaySeconds: 120
+        #   periodSeconds: 30
+        #   timeoutSeconds: 1
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 8081
         #   initialDelaySeconds: 120
         #   periodSeconds: 30
         #   timeoutSeconds: 1
@@ -289,6 +309,9 @@ additionalManifests:
         }
 
 global:
+  chainHealthcheckSidecar:
+    repository: eepokt/chain-healthcheck-sidecar
+    tag: master
   serviceAccount:
     create: true
     name: "pokt"

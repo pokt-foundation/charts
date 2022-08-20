@@ -50,6 +50,7 @@ spec:
       initContainers:
       {{- if $sts.persistence.dataSnapshotURL }}
       # Init container to download and extract given snapshot
+      # UTILS image with downloaders and extracters installed                                 
       - name: download-data-snapshot
         image: alpine:latest
         workingDir: {{ $sts.persistence.dataMountPath }}
@@ -74,8 +75,8 @@ spec:
         volumeMounts:
           - name: {{ $volumeName }}
             mountPath: {{ $sts.persistence.dataMountPath }}
-        securityContext:
-          runAsUser: 0
+        # securityContext:
+        #   runAsUser: 0
         # resources:
         #   requests:
         #     cpu: 1
@@ -84,7 +85,7 @@ spec:
         #     cpu: 2
         #     memory: 2Gi
 
-      {{- end }}
+      {{- end }} #{{/* if $sts.persistence.dataSnapshotURL */}}
       {{- with $sts.initContainers }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -120,18 +121,58 @@ spec:
               containerPort: {{ $prt.port }}
           {{- end }}
 
-          {{- with $cntnr.livenessProbe }}
-          livenessProbe: {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with $cntnr.readinessProbe }}
-          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- if $sts.healthProbes }}
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: healthcheck
+            failureThreshold: 60
+            periodSeconds: 60
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: healthcheck
+            failureThreshold: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: healthcheck
+            failureThreshold: 1
+            periodSeconds: 10
           {{- end }}
 
           volumeMounts:
             - name: {{ $volumeName }}
               mountPath: {{ default "/data" $sts.persistence.dataMountPath}}
 
-        {{ end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
+        {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
+
+        {{- if $sts.healthProbes }}
+        - name: chain-healthcheck-sidecar
+          image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
+          imagePullPolicy: Always
+          # env:
+          #   {{- tpl (toYaml .Values.healthcheck_env) . | nindent 12 }}
+          ports:
+            - name: healthcheck
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/liveness               
+              port: healthcheck
+            failureThreshold: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/readiness             
+              port: healthcheck
+            failureThreshold: 1
+            periodSeconds: 10
+          # resources: TODO                         
+        {{- end }}
+
 
       volumes:
 
