@@ -33,6 +33,7 @@ statefulset:
             type: ClusterIP
             port: 8081
             protocol: TCP
+            ingress: Nginx
           - name: tendermintpeers
             type: ClusterIP
             port: 26656
@@ -55,10 +56,6 @@ statefulset:
             cpu: 4
             memory: 12Gi
         healthProbes:
-          # Can be given as env eg. ??????                         
-          # env:
-          #   SIDECAR_CHAIN_ID: 0001
-          #   ...
           env:
             SIDECAR_CHAIN_ID: 0001
             HEIGHT_CHECK_STRATEGY: pocket
@@ -295,7 +292,7 @@ global:
     repository: eepokt/chain-healthcheck-sidecar
     tag: master
   serviceAccount:
-    create: true
+    create: true # Can be deleted, Just create at any case                
     name: "pokt"
   securityContext:
     fsGroup: 1001
