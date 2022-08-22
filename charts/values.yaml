@@ -33,7 +33,8 @@ statefulset:
             type: ClusterIP
             port: 8081
             protocol: TCP
-            ingress: Nginx
+            ingressNginx:
+              host: pokt-seed10.nodes.pokt.network
           - name: tendermintpeers
             type: ClusterIP
             port: 26656
@@ -288,11 +289,7 @@ additionalManifests:
         }
 
 global:
-  chainHealthcheckSidecar:
-    repository: eepokt/chain-healthcheck-sidecar
-    tag: master
   serviceAccount:
-    create: true # Can be deleted, Just create at any case                
     name: "pokt"
   securityContext:
     fsGroup: 1001
