@@ -22,6 +22,5 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
 
 maintainers:
-  - name: Gustavo Belfort
+  - name: GustavoBelfort
   - name: pokt-foundation
-
