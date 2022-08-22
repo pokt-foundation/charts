@@ -8,7 +8,7 @@ global:
     tag: master
   serviceAccount:
     create: true
-    # name: "pokt"
+    # name: ""
   securityContext:
     fsGroup: 1001
     runAsUser: 1001
