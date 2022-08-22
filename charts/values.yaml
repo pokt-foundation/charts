@@ -59,41 +59,24 @@ statefulset:
           # env:
           #   SIDECAR_CHAIN_ID: 0001
           #   ...
-
-          SIDECAR_CHAIN_ID: 0001
-          HEIGHT_CHECK_STRATEGY: pocket
-          REMOTE_RPC_ENDPOINTS: "https://SOME_PUBLIC_RPC"            
-          STARTUP_PROBE_STRATEGY: localRpcAvailable
-          READINESS_PROBE_STRATEGY: localVsRemote
-          LIVENESS_PROBE_STRATEGY: heightNotClimbing
-          LOCAL_RPC_ENDPOINT: "http://localhost:8081"
-          initialDelaySeconds: 120 # defaults
-          periodSeconds: 30        # defaults
-          timeoutSeconds: 1        # defaults
-          successThreshold: 1      # defaults
-          failureThreshold: 3      # defaults
-
-
-        # TODO: Will be done with https://github.com/pokt-foundation/chain-healthcheck-sidecar                
-        # readinessProbe:
-        #   tcpSocket:
-        #     port: 8545
-        #   initialDelaySeconds: 120
-        #   periodSeconds: 30
-        #   timeoutSeconds: 1
-        #   successThreshold: 1
-        #   failureThreshold: 3
-        # livenessProbe:
-        #   tcpSocket:
-        #     port: 8081
-        #   initialDelaySeconds: 120
-        #   periodSeconds: 30
-        #   timeoutSeconds: 1
-        #   successThreshold: 1
-        #   failureThreshold: 3
+          env:
+            SIDECAR_CHAIN_ID: 0001
+            HEIGHT_CHECK_STRATEGY: pocket
+            REMOTE_RPC_ENDPOINTS: "https://SOME_PUBLIC_RPC"            
+            STARTUP_PROBE_STRATEGY: localRpcAvailable
+            READINESS_PROBE_STRATEGY: localVsRemote
+            LIVENESS_PROBE_STRATEGY: heightNotClimbing
+            LOCAL_RPC_ENDPOINT: "http://localhost:8081"
+          # # Folowing is only for readyness
+          # initialDelaySeconds: 120 # defaults
+          # periodSeconds: 30        # defaults
+          # timeoutSeconds: 1        # defaults
+          # successThreshold: 1      # defaults
+          # failureThreshold: 3      # defaults
 
 # Additional manifests to deploy as an array
-additionalManifests:
+additionalManifests: []
+additionalManifestsDEB:
   - kind: SecretStore
     apiVersion: external-secrets.io/v1beta1
     metadata:
