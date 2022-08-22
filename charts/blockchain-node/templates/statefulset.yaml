@@ -121,7 +121,7 @@ spec:
               containerPort: {{ $prt.port }}
           {{- end }}
 
-          {{- if $sts.healthProbes }}
+          {{- if $cntnr.healthProbes }}
           startupProbe:
             httpGet:
               path: /health/startup
@@ -133,48 +133,50 @@ spec:
               path: /health/liveness
               port: healthcheck
             failureThreshold: 2
-            periodSeconds: 10
+            periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /health/readiness
               port: healthcheck
             failureThreshold: 1
-            periodSeconds: 10
+            periodSeconds: 15
           {{- end }}
 
           volumeMounts:
             - name: {{ $volumeName }}
               mountPath: {{ default "/data" $sts.persistence.dataMountPath}}
 
-        {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
-
-        {{- if $sts.healthProbes }}
+        {{- if $cntnr.healthProbes }}
         - name: chain-healthcheck-sidecar
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
           imagePullPolicy: Always
-          # env:
-          #   {{- tpl (toYaml .Values.healthcheck_env) . | nindent 12 }}
+          env:
+            {{- range $k, $v := $cntnr.healthProbes.env }}
+            - name: {{$k}}
+              value: {{$v}}
+            {{- end }}
           ports:
             - name: healthcheck
               containerPort: 9090
               protocol: TCP
           livenessProbe:
-            httpGet:
-              path: /health/liveness               
-              port: healthcheck
+            tcpSocket:
+              port: 9090
+            initialDelaySeconds: 15
             failureThreshold: 2
             periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health/readiness             
-              port: healthcheck
-            failureThreshold: 1
-            periodSeconds: 10
-          # resources: TODO                         
+          resources: # TODO resources should be set in accordance with usage                         
+            requests:
+              cpu: 50
+              memory: 128Mi
+            requests:
+              cpu: 100
+              memory: 256Mi
         {{- end }}
 
+        {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
-      volumes:
+      # volumes:
 
   volumeClaimTemplates:
     - metadata:
