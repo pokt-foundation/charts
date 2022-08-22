@@ -75,8 +75,7 @@ statefulset:
           # failureThreshold: 3      # defaults
 
 # Additional manifests to deploy as an array
-additionalManifests: []
-additionalManifestsDEB:
+additionalManifests:
   - kind: SecretStore
     apiVersion: external-secrets.io/v1beta1
     metadata:
