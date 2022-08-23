@@ -7,8 +7,8 @@ global:
     repository: eepokt/chain-healthcheck-sidecar
     tag: master
   serviceAccount:
-    create: true
-    # name: ""
+    name: change-me
+    # annotations: []
   securityContext:
     fsGroup: 1001
     runAsUser: 1001
