@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: k8s
+  annotations:
+    github.com/project-slug: pokt-foundation/k8s
+spec:
+  type: other
+  lifecycle: unknown
+  owner: devops
