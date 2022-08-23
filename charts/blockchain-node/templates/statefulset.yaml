@@ -64,7 +64,7 @@ spec:
       initContainers:
       {{- if $sts.persistence.dataSnapshotURL }}
       # Init container to download and extract given snapshot
-      # UTILS image with downloaders and extracters installed                                 
+      # UTILS image with downloaders and extracters installed
       - name: download-data-snapshot
         image: alpine:latest
         workingDir: {{ $sts.persistence.dataMountPath }}
@@ -73,18 +73,14 @@ spec:
           - '-c'
           - |
             set -exu
-            if [[ -f {{ $sts.persistence.dataMountPath }}/init-completed ]]; then
-              echo "Account already initialized. Skipping."
-              echo "If you wish to run the init again, delete the file '{{ $sts.persistence.dataMountPath }}/init-completed'"
-            else
-              echo "Downloading snapshot."
-              rm -rf {{ $sts.persistence.dataMountPath }}/data
-              mkdir -p {{ $sts.persistence.dataMountPath }}/data
-              cd {{ $sts.persistence.dataMountPath }}/data
-              # TODO: To make it more general need to define extract command based on the extension            
-              wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
-              echo "Snapshot download completed."
-            fi
+            find {{ $sts.persistence.dataMountPath }}/data/ -maxdepth 0 -empty -exec echo {} is empty. \; | grep "empty" && echo "Downloading blockchain data" || exit 0
+
+            rm -rf {{ $sts.persistence.dataMountPath }}/data
+            mkdir -p {{ $sts.persistence.dataMountPath }}/data
+            cd {{ $sts.persistence.dataMountPath }}/data
+            # TODO: To make it more general need to define extract command based on the extension
+            wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
+            echo "Snapshot download completed."
 
         volumeMounts:
           - name: {{ $volumeName }}
