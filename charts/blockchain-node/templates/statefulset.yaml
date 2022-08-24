@@ -63,6 +63,9 @@ spec:
 
       initContainers:
       {{- if $sts.persistence.dataSnapshotURL }}
+      # TODO: rename dataSnapshotURL -> something POKT specific, this container works only for POKT data
+      # TODO: instead of wget use `uplink cp ...`
+      # TODO: If dataSnapshotURL not given flag dataSnapshotURL must be created, to avoid case when initialy the flag not set, and then was added
       # Init container to download and extract given snapshot
       # UTILS image with downloaders and extracters installed
       - name: download-data-snapshot
@@ -73,15 +76,17 @@ spec:
           - '-c'
           - |
             set -exu
-            find {{ $sts.persistence.dataMountPath }}/data/ -maxdepth 0 -empty -exec echo {} is empty. \; | grep "empty" && echo "Downloading blockchain data" || exit 0
-
-            rm -rf {{ $sts.persistence.dataMountPath }}/data
-            mkdir -p {{ $sts.persistence.dataMountPath }}/data
-            cd {{ $sts.persistence.dataMountPath }}/data
-            # TODO: To make it more general need to define extract command based on the extension
-            wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
-            echo "Snapshot download completed."
-
+            if [[ -f {{ $sts.persistence.dataMountPath }}/data-initialized ]]; then
+              echo "Data initialized. Skipping."
+              echo "If you wish to re-download data, delete the file '{{ $sts.persistence.dataMountPath }}/data-initialized'"
+            else
+              rm -rf {{ $sts.persistence.dataMountPath }}/data
+              mkdir -p {{ $sts.persistence.dataMountPath }}/data
+              cd {{ $sts.persistence.dataMountPath }}/data
+              wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
+              touch {{ $sts.persistence.dataMountPath }}/data-initialized
+              echo "Snapshot download completed."
+            fi
         volumeMounts:
           - name: {{ $volumeName }}
             mountPath: {{ $sts.persistence.dataMountPath }}
@@ -166,7 +171,7 @@ spec:
             initialDelaySeconds: 15
             failureThreshold: 2
             periodSeconds: 10
-          resources: # TODO resources should be set in accordance with usage                         
+          resources:
             requests:
               cpu: 50m
               memory: 128Mi
