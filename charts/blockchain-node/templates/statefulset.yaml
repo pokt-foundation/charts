@@ -154,7 +154,7 @@ spec:
           env:
             {{- range $k, $v := $cntnr.healthProbes.env }}
             - name: {{$k}}
-              value: {{$v}}
+              value: {{$v | quote}}
             {{- end }}
           ports:
             - name: healthcheck
