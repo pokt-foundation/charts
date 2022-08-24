@@ -168,10 +168,10 @@ spec:
             periodSeconds: 10
           resources: # TODO resources should be set in accordance with usage                         
             requests:
-              cpu: 50
+              cpu: 50m
               memory: 128Mi
-            requests:
-              cpu: 100
+            limits:
+              cpu: 100m
               memory: 256Mi
         {{- end }}
 
