@@ -151,6 +151,17 @@ spec:
           volumeMounts:
             - name: {{ $volumeName }}
               mountPath: {{ default "/data" $sts.persistence.dataMountPath}}
+            # Volume mounts from mountConfigMaps
+            {{- range $cm := $cntnr.mountConfigMaps }}
+            - name: {{$cm.name}}
+              mountPath: {{$cm.mountPath}}
+            {{- end }}
+            # Volume mounts from mountSecrets
+            {{- range $sec := $cntnr.mountSecrets }}
+            - name: {{$sec.name}}
+              mountPath: {{$sec.mountPath}}
+              readOnly: true
+            {{- end }}
 
         {{- if $cntnr.healthProbes }}
         - name: chain-healthcheck-sidecar
@@ -180,18 +191,6 @@ spec:
               memory: 256Mi
         {{- end }}
 
-          volumeMounts:
-            # Volume mounts from mountConfigMaps
-            {{- range $cm := $cntnr.mountConfigMaps }}
-            - name: {{$cm.name}}
-              mountPath: {{$cm.mountPath}}
-            {{- end }}
-            # Volume mounts from mountSecrets
-            {{- range $sec := $cntnr.mountSecrets }}
-            - name: {{$sec.name}}
-              mountPath: {{$sec.mountPath}}
-              readOnly: true
-            {{- end }}
         {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       volumes:
