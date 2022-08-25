@@ -64,27 +64,11 @@ See https://github.com/helm/helm/issues/3920#issuecomment-686913512
 {{ printf "%s-%s" .Release.Name .Values.postgresql.nameOverride }}
 {{- end -}}
 
-
 {{/*
-Create the name of the service account to use for the app
+Create the name of the service account to use for the applications
 */}}
-{{- define "backstage.app.serviceAccountName" -}}
-{{- if .Values.app.serviceAccount.create -}}
-    {{ default "default" .Values.app.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.app.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create the name of the service account to use for the backend
-*/}}
-{{- define "backstage.backend.serviceAccountName" -}}
-{{- if .Values.backend.serviceAccount.create -}}
-    {{ default default .Values.backend.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.backend.serviceAccount.name }}
-{{- end -}}
+{{- define "backstage.serviceAccountName" -}}
+    {{ default "backstage" .Values.serviceAccount.name }}
 {{- end -}}
 
 {{/*
@@ -282,5 +266,5 @@ Postgres password for lighthouse
 app-config file name
 */}}
 {{- define "backstage.appConfigFilename" -}}
-{{- "app-config.development.yaml" -}}
+{{- "app-config.values.yaml" -}}
 {{- end -}}

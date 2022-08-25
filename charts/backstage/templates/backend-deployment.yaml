@@ -30,23 +30,15 @@ spec:
           args:
             - "packages/backend"
             - "--config"
-            - "app-config.yaml"
+            - "/secret/app-config.yaml"
             - "--config"
-            - {{ printf "/usr/src/app/%s" (include "backstage.appConfigFilename" .) | quote }}
+            - {{ printf "/configmap/%s" (include "backstage.appConfigFilename" .) | quote }}
           image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.backend.containerPort }}
           resources:
           {{- toYaml .Values.backend.resources | nindent 12 }}
-
-          envFrom:
-            - secretRef:
-                name: {{ include "backstage.fullname" . }}-backend
-            - configMapRef:
-                name: {{ include "backstage.fullname" . }}-app-env
-            - configMapRef:
-                name: {{ include "backstage.fullname" . }}-auth
           env:
             - name: NODE_ENV
               value: {{ .Values.backend.nodeEnv | default "development" }}
@@ -54,16 +46,16 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ include "backend.postgresql.passwordSecret" .}}
-                  key: postgresql-password
+                  key: postgres-password
           volumeMounts:
             {{- if .Values.backend.postgresCertMountEnabled }}
             - name: postgres-ca
               mountPath: {{ include "backstage.backend.postgresCaDir" . }}
             {{- end }}
             - name: app-config
-              mountPath: {{ printf "/usr/src/app/%s" (include "backstage.appConfigFilename" .) }}
-              subPath: {{ include "backstage.appConfigFilename" . }}
-
+              mountPath: /secret/
+            - name: app-config-values
+              mountPath: /configmap/
       volumes:
         {{- if .Values.backend.postgresCertMountEnabled }}
         - name: postgres-ca
@@ -71,9 +63,11 @@ spec:
             name: {{ include "backstage.fullname" . }}-postgres-ca
         {{- end }}
         - name: app-config
+          secret:
+            secretName: {{ .Values.externalSecrets.targetName }}
+        - name: app-config-values
           configMap:
             name: {{ include "backstage.fullname" . }}-app-config
-
       {{- if .Values.global.nodeSelector }}
       nodeSelector: {{- toYaml .Values.global.nodeSelector | nindent 8 }}
       {{- end }}

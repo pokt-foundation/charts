@@ -27,8 +27,10 @@ backend:
     tag: 20210423T1550
     pullPolicy: IfNotPresent
   containerPort: 7007
+  postgresql:
+    passwordSecret: postgresql-password   
   serviceType: ClusterIP
-  postgresCertMountEnabled: true
+  postgresCertMountEnabled: false
   resources:
     requests:
       memory: 512Mi
@@ -62,6 +64,24 @@ lighthouse:
 nameOverride: ''
 fullnameOverride: ''
 
+serviceAccount:
+  create: true
+  name: backstage
+
+externalSecrets:
+  enabled: false
+  targetName: backstage
+  secretKey: backstage/app-config.yaml
+  controller: ""
+  deletionPolicy: Delete
+  authMountPath: k8s-tooling-us-east-1
+  role: backstage
+  namespace: admin/engineering/
+  secretStoretPath: devops/
+  vaultServer: https://hcp-vault-cluster-a-public-vault-72230702.bb94b393.z1.hashicorp.cloud:8200
+  version: v1
+  refreshInterval: "0"
+
 ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -72,7 +92,7 @@ issuer:
 
 global:
   postgresql:
-    postgresqlUsername: backend-user
+    postgresqlUsername: postgres
     caFilename: ca.crt
   nodeSelector: {}
 
@@ -82,7 +102,7 @@ postgresql:
   service:
     port: 5432
   tls:
-    enabled: true
+    enabled: false
     certificatesSecret: backstage-postgresql-certs
     certFilename: tls.crt
     certKeyFilename: tls.key
@@ -92,15 +112,15 @@ postgresql:
 
 appConfig:
   app:
-    baseUrl: https://demo.example.com
+    baseUrl: https://backstage.tooling.pokt.network
     title: Backstage
     googleAnalyticsTrackingId:
   backend:
-    baseUrl: https://demo.example.com
+    baseUrl: https://backstage.tooling.pokt.network
     listen:
       port: 7007
     cors:
-      origin: https://demo.example.com
+      origin: https://backstage.tooling.pokt.network
     database:
       client: pg
       connection:
@@ -115,10 +135,10 @@ appConfig:
   sentry:
     organization: example-org-name
   techdocs:
-    storageUrl: https://demo.example.com/api/techdocs/static/docs
-    requestUrl: https://demo.example.com/api/techdocs
+    storageUrl: https://backstage.tooling.pokt.network/api/techdocs/static/docs
+    requestUrl: https://backstage.tooling.pokt.network/api/techdocs
   lighthouse:
-    baseUrl: https://demo.example.com/lighthouse-api
+    baseUrl: https://backstage.tooling.pokt.network/lighthouse-api
   rollbar:
     organization: example-org-name
 

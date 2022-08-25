@@ -39,11 +39,11 @@ spec:
             backend:
               {{- if  .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
               service:
-                name: {{ include "frontend.serviceName" . }}
+                name: {{ include "backend.serviceName" . }}
                 port:
                   number: 80
               {{- else -}}
-              serviceName: {{ include "frontend.serviceName" . }}
+              serviceName: {{ include "backend.serviceName" . }}
               servicePort: 80
               {{- end }}
     {{/* Route the backend inside the same hostname as the frontend when they are the same */}}
