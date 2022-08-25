@@ -150,7 +150,7 @@ spec:
 
           volumeMounts:
             - name: {{ $volumeName }}
-              mountPath: {{ default "/data" $sts.persistence.dataMountPath}}
+              mountPath: {{ $sts.persistence.dataMountPath }}
             # Volume mounts from mountConfigMaps
             {{- range $cm := $cntnr.mountConfigMaps }}
             - name: {{$cm.name}}
