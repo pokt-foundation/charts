@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: myservicea.foo.org
+  - host: {{ $prt.ingressNginx.host }}
     http:
       paths:
       - path: /
