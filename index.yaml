@@ -1,5 +1,19 @@
 apiVersion: v1
 entries:
+  blockchain-node:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-08-30T23:05:11.120586366Z"
+    description: A Helm chart to deploy a blockchain node
+    digest: 7f52f44a8e37f04987c133e033d21e11cdc4cc6ae69454abdc7b3cea42aa43da
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    name: blockchain-node
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.0.1/blockchain-node-0.0.1.tgz
+    version: 0.0.1
   ethereum:
   - apiVersion: v2
     appVersion: v1.10.14
@@ -30,4 +44,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
     version: 0.1.0
-generated: "2022-05-03T09:20:23.145226456Z"
+generated: "2022-08-30T23:05:11.120592866Z"
