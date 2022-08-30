@@ -30,7 +30,7 @@ spec:
   podManagementPolicy: {{ default "Parallel" $.Values.global.podManagementPolicy }}
   updateStrategy:
     type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
-    {{- if (eq "Recreate" $.Values.global.updateStrategy) }}
+    {{- if (eq "Recreate" (default "RollingUpdate" $.Values.global.updateStrategy)) }}
     rollingUpdate: null
     {{- end }}
   selector:
@@ -62,42 +62,115 @@ spec:
       {{- end }}
 
       initContainers:
-      {{- if $sts.persistence.dataSnapshotURL }}
-      # TODO: rename dataSnapshotURL -> something POKT specific, this container works only for POKT data
-      # TODO: instead of wget use `uplink cp ...`
+      {{- if $sts.persistence.pocketDataSnapshotURL }}
       # TODO: If dataSnapshotURL not given flag dataSnapshotURL must be created, to avoid case when initialy the flag not set, and then was added
       # Init container to download and extract given snapshot
-      # UTILS image with downloaders and extracters installed
       - name: download-data-snapshot
-        image: alpine:latest
-        workingDir: {{ $sts.persistence.dataMountPath }}
+        image: storjlabs/uplink:latest
+        env:
+          - name: UPLINK_ACCESS_TOKEN
+            value: {{ $.Values.global.uplinkAccessToken | quote}}
+          - name: FLAG
+            value: "{{ $sts.persistence.volumeMountPath }}/snapshot-extracted"
+          - name: DATA_DIR
+            value: "{{ $sts.persistence.volumeMountPath }}/data"
+          - name: UPLINK
+            value: "/app/uplink"
+        workingDir: {{ $sts.persistence.volumeMountPath }}
         command:
           - 'sh'
           - '-c'
           - |
             set -exu
-            if [[ -f {{ $sts.persistence.dataMountPath }}/data-initialized ]]; then
-              echo "Data initialized. Skipping."
-              echo "If you wish to re-download data, delete the file '{{ $sts.persistence.dataMountPath }}/data-initialized'"
+            if [[ -f $FLAG ]]; then
+              echo "Data already extracted. Skipping."
+              echo "If you wish to re-download data, delete the file '$FLAG'"
             else
-              rm -rf {{ $sts.persistence.dataMountPath }}/data
-              mkdir -p {{ $sts.persistence.dataMountPath }}/data
-              cd {{ $sts.persistence.dataMountPath }}/data
-              wget --quiet --tries=30 --continue --output-document=- {{ $sts.persistence.dataSnapshotURL }} | tar xvzf -
-              touch {{ $sts.persistence.dataMountPath }}/data-initialized
+              rm -rf $DATA_DIR
+              mkdir -p $DATA_DIR
+              cd $DATA_DIR
+              SJ_FILENAME="$(wget --server-response --spider {{  $sts.persistence.pocketDataSnapshotURL }} 2>&1 | grep -iroh -m1 'location:[[:space:]]\+https\?://[a-zA-Z0-9~#%&_+=,.?/-]\+' | cut -d" " -f2 | rev | cut -d'/' -f1|rev|cut -d'?' -f1)"
+              $UPLINK cp --access="$UPLINK_ACCESS_TOKEN" sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
               echo "Snapshot download completed."
+              echo "$SJ_FILENAME" > $FLAG
             fi
+
         volumeMounts:
           - name: {{ $volumeName }}
-            mountPath: {{ $sts.persistence.dataMountPath }}
+            mountPath: {{ $sts.persistence.volumeMountPath }}
       {{- end }} #{{/* if $sts.persistence.dataSnapshotURL */}}
+
+      {{- range $kcntnr, $cntnr := $sts.containers }}
+      {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}                    
+      {{ $cmPref := "/cm" }}
+      {{ $secPref := "/sec" }}
+      - name: cp-configs
+        image: alpine:latest
+        workingDir: {{ $sts.persistence.volumeMountPath }}
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -exu
+          {{- range $cm := (concat (default (list ) $cntnr.mountConfigMaps) (default (list ) $cntnr.mountSecrets)) }}
+            mkdir -p {{$cm.targetPath}}
+            cp -f /{{$cm.name}}/* {{$cm.targetPath}}
+          {{- end }}
+        volumeMounts:
+          - name: {{ $volumeName }}
+            mountPath: {{ $sts.persistence.volumeMountPath }}
+
+          # Volume mounts from mountConfigMaps
+          {{- range $cm := $cntnr.mountConfigMaps }}
+          - name: {{$cm.name}}
+            mountPath: /{{ $cm.name }}
+          {{- end }}
+
+          # Volume mounts from mountSecrets
+          {{- range $sec := $cntnr.mountSecrets }}
+          - name: {{$sec.name}}
+            mountPath: /{{ $sec.name }}
+            readOnly: true
+          {{- end }}
+
+
+      {{- end }}
+      {{- end }} #{{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       {{- with $sts.initContainers }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
       containers:
-        {{- range $kcntnr, $cntnr := $sts.containers }}
+      {{- range $kcntnr, $cntnr := $sts.containers }}
+        {{- if $cntnr.healthProbes }}
+        - name: chain-healthcheck-sidecar
+          image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
+          imagePullPolicy: Always
+          env:
+            {{- range $k, $v := $cntnr.healthProbes.env }}
+            - name: {{$k}}
+              value: {{$v | quote}}
+            {{- end }}
+          ports:
+            - name: healthcheck
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9090
+            initialDelaySeconds: 15
+            failureThreshold: 2
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+        {{- end }}
+
         - name: {{ $cntnr.name }}
           image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
@@ -150,48 +223,9 @@ spec:
 
           volumeMounts:
             - name: {{ $volumeName }}
-              mountPath: {{ $sts.persistence.dataMountPath }}
-            # Volume mounts from mountConfigMaps
-            {{- range $cm := $cntnr.mountConfigMaps }}
-            - name: {{$cm.name}}
-              mountPath: {{$cm.mountPath}}
-            {{- end }}
-            # Volume mounts from mountSecrets
-            {{- range $sec := $cntnr.mountSecrets }}
-            - name: {{$sec.name}}
-              mountPath: {{$sec.mountPath}}
-              readOnly: true
-            {{- end }}
+              mountPath: {{ $sts.persistence.volumeMountPath }}
 
-        {{- if $cntnr.healthProbes }}
-        - name: chain-healthcheck-sidecar
-          image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
-          imagePullPolicy: Always
-          env:
-            {{- range $k, $v := $cntnr.healthProbes.env }}
-            - name: {{$k}}
-              value: {{$v | quote}}
-            {{- end }}
-          ports:
-            - name: healthcheck
-              containerPort: 9090
-              protocol: TCP
-          livenessProbe:
-            tcpSocket:
-              port: 9090
-            initialDelaySeconds: 15
-            failureThreshold: 2
-            periodSeconds: 10
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 256Mi
-        {{- end }}
-
-        {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
+      {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       volumes:
         {{- range $cmn := $stsCMNames }}
@@ -199,6 +233,7 @@ spec:
           configMap:
             name: {{$cmn}}
         {{- end }}
+
         {{- range $secn := $stsSecNames }}
         - name: {{$secn}}
           secret:
