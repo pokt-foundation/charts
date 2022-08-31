@@ -5,7 +5,7 @@
 Add the Helm repository locally and update.
 
 ```bash
-helm repo add pokt https://pokt-foundation.gitlab.io/charts
+helm repo add pokt https://pokt-foundation.github.io/charts/
 helm repo update pokt
 ```
 
