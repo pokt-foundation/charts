@@ -1,0 +1,26 @@
+{{- range $ksts, $sts := $.Values.statefulset }}
+{{- if $sts.persistence.awsSnapshotID }}
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotContent
+metadata:
+  name: snapcontent-{{ $sts.persistence.awsSnapshotID }}
+spec:
+  deletionPolicy: Retain
+  driver: ebs.csi.aws.com
+  source:
+    snapshotHandle: {{ $sts.persistence.awsSnapshotID }}
+  volumeSnapshotRef:
+    name: {{ $sts.persistence.awsSnapshotID }}
+    namespace: {{ $.Release.Namespace }}
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: {{ $sts.persistence.awsSnapshotID }}
+  namespace: seed6
+spec:
+  source:
+    volumeSnapshotContentName: snapcontent-{{ $sts.persistence.awsSnapshotID }}
+  volumeSnapshotClassName: {{$.Values.global.volumeSnapshotClassName}}
+{{- end }}
+{{- end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
