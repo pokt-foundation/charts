@@ -14,7 +14,10 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
-
+# Input validation
+{{- if and $sts.persistence.pocketDataSnapshotURL $sts.persistence.awsSnapshotID }}
+{{- fail "ERROR: persistence.pocketDataSnapshotURL and persistence.awsSnapshotID Cannot be given simultaneously." }}
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -101,7 +104,7 @@ spec:
       {{- end }} #{{/* if $sts.persistence.dataSnapshotURL */}}
 
       {{- range $kcntnr, $cntnr := $sts.containers }}
-      {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}                    
+      {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}
       {{ $cmPref := "/cm" }}
       {{ $secPref := "/sec" }}
       - name: cp-configs
@@ -253,5 +256,11 @@ spec:
         resources:
           requests:
             storage: {{ $sts.persistence.size | quote }}
+        {{- if $sts.persistence.awsSnapshotID }}
+        dataSource:
+          name: {{ $sts.persistence.awsSnapshotID | quote }}
+          kind: VolumeSnapshot
+          apiGroup: snapshot.storage.k8s.io
+        {{- end }}
 
 {{ end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
