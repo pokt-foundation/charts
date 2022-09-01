@@ -1,10 +1,13 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: k8s
+  name: helm-charts
+  description: POKT Helm charts repository.
   annotations:
-    github.com/project-slug: pokt-foundation/k8s
+    github.com/project-slug: pokt-foundation/charts
+    backstage.io/techdocs-ref: dir:.
 spec:
-  type: other
-  lifecycle: unknown
+  type: service
+  lifecycle: experimental
   owner: devops
+  system: gitops
