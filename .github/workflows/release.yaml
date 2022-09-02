@@ -30,7 +30,7 @@ jobs:
           git config user.name "POKT_CI"
           git config user.email "helm-maintainers@users.noreply.github.com"
 
-          git merge origin/main
+          git merge origin/master
 
           echo '>> Building charts...'
 
