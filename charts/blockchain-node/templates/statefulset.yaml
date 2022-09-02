@@ -65,6 +65,28 @@ spec:
       {{- end }}
 
       initContainers:
+      {{- if $sts.persistence.awsSnapshotID }}
+      - name: init-ebs-disk
+        image: alpine:latest
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -exu
+
+            echo "Warming up data from EBS snapshot"
+            # time dd if=/hostdev/$(mount | grep "{{ $sts.persistence.volumeMountPath }}"| cut -d" " -f1 | cut -d"/" -f3) of=/dev/null bs=1M
+            time ls -alR {{ $sts.persistence.volumeMountPath }}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+          - mountPath: /hostdev
+            name: host-dev
+          - name: {{ $volumeName }}
+            mountPath: {{ $sts.persistence.volumeMountPath }}
+      {{- end }}
+
       {{- if $sts.persistence.pocketDataSnapshotURL }}
       # TODO: If dataSnapshotURL not given flag dataSnapshotURL must be created, to avoid case when initialy the flag not set, and then was added
       # Init container to download and extract given snapshot
@@ -244,6 +266,11 @@ spec:
             optional: false
         {{- end }}
 
+        {{- if $sts.persistence.awsSnapshotID }}
+        - name: host-dev
+          hostPath:
+            path: /dev
+        {{ end }}
   volumeClaimTemplates:
     - metadata:
         name: {{ $volumeName }}
