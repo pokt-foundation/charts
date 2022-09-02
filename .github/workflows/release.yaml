@@ -8,44 +8,52 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      HELM_CHARTS_SOURCE: "./charts"
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: "helm-repo"
           fetch-depth: 0
 
+      - name: Configure Git
+        run: |
+          git config user.name "POKT_CI"
+          git config user.email "helm-maintainers@users.noreply.github.com"
       - name: Install Helm
         uses: azure/setup-helm@v3.3
         with:
           version: v3.8.1
 
-      - name: Packaging hlms and push to gh-pages
-        run: |
-          set -eu -o pipefail
+      # Optional step if GPG signing is used
+#      - name: Prepare GPG key
+#        run: |
+#          gpg_dir=.cr-gpg
+#          mkdir "$gpg_dir"
+#
+#          keyring="$gpg_dir/secring.gpg"
+#          base64 -d <<< "$GPG_KEYRING_BASE64" > "$keyring"
+#
+#          passphrase_file="$gpg_dir/passphrase"
+#          echo "$GPG_PASSPHRASE" > "$passphrase_file"
+#
+#          echo "CR_PASSPHRASE_FILE=$passphrase_file" >> "$GITHUB_ENV"
+#          echo "CR_KEYRING=$keyring" >> "$GITHUB_ENV"
+#        env:
+#          GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
+#          GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
 
-          git config user.name "POKT_CI"
-          git config user.email "helm-maintainers@users.noreply.github.com"
+      #- name: Add dependency chart repos
+      #  run: |
+      #    helm repo add bitnami https://charts.bitnami.com/bitnami
 
-          git merge origin/master
-
-          echo '>> Building charts...'
-
-          find "$HELM_CHARTS_SOURCE" -mindepth 2 -maxdepth 2 -type f -iname Chart.yaml | \
-          while read chartyaml; do
-            chart=$(dirname $chartyaml)
-            helm dependency update "$chart"
-            helm lint "$chart"
-            chart_name="$(basename "$chart")"
-            mkdir -p "$chart_name"
-            helm package -d "$chart_name" "$chart"
-          done
-          helm repo index .
-
-          git status
-          git add .
-          git commit -m "Published by GH actions"
-          git push
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.4.0
+        with:
+          charts_dir: charts
+          charts_repo_url: https://pokt-foundation.github.io/charts
+          #config: cr.yaml
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
