@@ -18,6 +18,10 @@
 {{- if and $sts.persistence.pocketDataSnapshotURL $sts.persistence.awsSnapshotID }}
 {{- fail "ERROR: persistence.pocketDataSnapshotURL and persistence.awsSnapshotID Cannot be given simultaneously." }}
 {{- end }}
+{{- if and $sts.persistence.pocketDataSnapshotURL (not $.Values.global.uplinkAccessToken ) }}
+{{- fail "ERROR: persistence.pocketDataSnapshotURL and no global.uplinkAccessToken given. Won't be able to access STORJ without access token." }}
+{{- end }}
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -100,6 +104,7 @@ spec:
       {{- end }}
 
       {{- if $sts.persistence.pocketDataSnapshotURL }}
+
       # TODO: If dataSnapshotURL not given flag dataSnapshotURL must be created, to avoid case when initialy the flag not set, and then was added
       # Init container to download and extract given snapshot
       - name: download-data-snapshot
@@ -134,15 +139,21 @@ spec:
               mkdir -p $DATA_DIR
               cd $DATA_DIR
               SJ_FILENAME="$(wget --server-response --spider {{  $sts.persistence.pocketDataSnapshotURL }} 2>&1 | grep -iroh -m1 'location:[[:space:]]\+https\?://[a-zA-Z0-9~#%&_+=,.?/-]\+' | cut -d" " -f2 | rev | cut -d'/' -f1|rev|cut -d'?' -f1)"
-              # parallel download breaks tar
-              $UPLINK cp --config-dir=/tmp \
-                --parallelism 1 \
-                --access="$UPLINK_ACCESS_TOKEN" \
-                sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
-              echo "Snapshot download completed. Took: $(($(date +%s)-${START_TIME})) sec."
+
+              #Configuring UPLINK
+              UPLINK_CONFIG_DIR="/tmp"
+              echo -e "[metrics]\naddr =\n" > $UPLINK_CONFIG_DIR/config.ini
+              $UPLINK --config-dir=$UPLINK_CONFIG_DIR access import main $UPLINK_ACCESS_TOKEN
+
+              $UPLINK cp --config-dir=$UPLINK_CONFIG_DIR --parallelism 8 --parallelism-chunk-size 0 \
+                --access main sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
               echo "$SJ_FILENAME" > $FLAG
 
+              # Remove uplink
               rm $UPLINK $(dirname $UPLINK)/uplink_linux_amd64.zip
+
+              echo "Snapshot download completed. Took: $(( ($(date +%s)-${START_TIME})/60 )) min."
+
             fi
         volumeMounts:
           - name: {{ $volumeName }}
