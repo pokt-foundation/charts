@@ -68,20 +68,27 @@ spec:
       {{- if $sts.persistence.awsSnapshotID }}
       - name: init-ebs-disk
         image: alpine:latest
+        env:
+          - name: FLAG
+            value: "{{ $sts.persistence.volumeMountPath }}/ebs-initialised"
         command:
           - 'sh'
           - '-c'
           - |
             set -exu
 
-            echo "Warming up data from EBS snapshot"
-            START_TIME="$(date +%s)"
-            DISK=$(mount | grep "{{ $sts.persistence.volumeMountPath }}"| cut -d" " -f1 | cut -d"/" -f3)
+            if [[ -f $FLAG ]]; then
+              echo "Disk initialised. Skipping."
+            else
+              echo "Warming up data from EBS snapshot"
+              START_TIME="$(date +%s)"
+              DISK=$(mount | grep "{{ $sts.persistence.volumeMountPath }}"| cut -d" " -f1 | cut -d"/" -f3)
 
-            seq 0 $(($(cat /sys/block/$DISK/size) / (1 << 10))) | \
-              xargs -n1 -P$(nproc --all) -I {} dd if=/hostdev/$DISK of=/dev/null skip={}k count=1 bs=512 > /dev/null 2>&1
-            echo "Warmup took: $(($(date +%s)-${START_TIME})) sec."
-
+              seq 0 $(($(cat /sys/block/$DISK/size) / (1 << 10))) | \
+                xargs -n1 -P$(nproc --all) -I {} dd if=/hostdev/$DISK of=/dev/null skip={}k count=1 bs=512 > /dev/null 2>&1
+              echo "Warmup took: $(($(date +%s)-${START_TIME})) sec."
+              touch $FLAG
+            fi
         securityContext:
           privileged: true
           runAsUser: 0
