@@ -23,8 +23,8 @@ statefulset:
           - |
             set -exu
 
-            mkdir -p $(dirname $GENESIS)
-            wget $GENESIS_URL -O $GENESIS
+            mkdir -p $(dirname $GENESIS_FILE)
+            wget $GENESIS_URL -O $GENESIS_FILE
         volumeMounts:
           - name: pokt-data
             mountPath: /home/app/.pocket
