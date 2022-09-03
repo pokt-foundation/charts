@@ -134,8 +134,9 @@ spec:
               mkdir -p $DATA_DIR
               cd $DATA_DIR
               SJ_FILENAME="$(wget --server-response --spider {{  $sts.persistence.pocketDataSnapshotURL }} 2>&1 | grep -iroh -m1 'location:[[:space:]]\+https\?://[a-zA-Z0-9~#%&_+=,.?/-]\+' | cut -d" " -f2 | rev | cut -d'/' -f1|rev|cut -d'?' -f1)"
+              # parallel download breaks tar
               $UPLINK cp --config-dir=/tmp \
-                --parallelism 8 --parallelism-chunk-size 0 \
+                --parallelism 1 \
                 --access="$UPLINK_ACCESS_TOKEN" \
                 sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
               echo "Snapshot download completed. Took: $(($(date +%s)-${START_TIME})) sec."
