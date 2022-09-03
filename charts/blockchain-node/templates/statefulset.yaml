@@ -167,7 +167,7 @@ spec:
       {{- end }} #{{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       {{- with $sts.initContainers }}
-        {{ toYaml . | nindent 6 }}
+        {{- toYaml . | nindent 6 }}
       {{- end }}
 
       containers:
