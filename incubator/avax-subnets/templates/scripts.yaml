@@ -20,6 +20,9 @@ data:
     {{- range .Values.whitelisted_subnets }}
     mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
     cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
+    {{- if eq .subnet "2e3CqLY8thW1WKS89WQ7WR9Qy2bCrrP5mv7psqMRGCHGXuQ1Uj" }}
+    cp $SCRIPTS_VOLUME/{{ .name }}_upgrade.json $CONFIGS_VOLUME/{{ .subnet }}/upgrade.json
+    {{- end }}
     {{- end }}
     
     # todo: bootstrap logic
@@ -30,6 +33,17 @@ data:
       "feeRecipient": "{{ .feeRecipient }}"
     }
 {{- end }}
+  2e3CqLY8thW1WKS89WQ7WR9Qy2bCrrP5mv7psqMRGCHGXuQ1Uj_upgrade.json: |
+    {
+      "precompileUpgrades": [
+        {
+          "feeManagerConfig": {
+            "blockTimestamp": 1662447600,
+            "adminAddresses": ["0x4Cf7D2434631a2a58597F8C615bde0Adc1639f2D"]
+          }
+        }
+      ]
+    }
 
   config.json: |
     { 
