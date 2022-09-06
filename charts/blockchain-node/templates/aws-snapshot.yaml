@@ -3,7 +3,7 @@
 apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotContent
 metadata:
-  name: snapcontent-{{ $sts.persistence.awsSnapshotID }}
+  name: snapcontent-{{ $.Release.Namespace }}-{{ $sts.persistence.awsSnapshotID }}
 spec:
   deletionPolicy: Retain
   driver: ebs.csi.aws.com
@@ -20,7 +20,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 spec:
   source:
-    volumeSnapshotContentName: snapcontent-{{ $sts.persistence.awsSnapshotID }}
+    volumeSnapshotContentName: snapcontent-{{ $.Release.Namespace }}-{{ $sts.persistence.awsSnapshotID }}
   volumeSnapshotClassName: {{$.Values.global.volumeSnapshotClassName}}
 {{- end }}
 {{- end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
