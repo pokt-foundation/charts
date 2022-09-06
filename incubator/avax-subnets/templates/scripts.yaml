@@ -19,7 +19,9 @@ data:
 
     {{- range .Values.whitelisted_subnets }}
     mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
+    mkdir -p $CONFIGS_VOLUME/{{ .blockchainId }}
     cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
+    curl https://github.com/ava-labs/subnet-evm/blob/master/networks/mainnet/{{ .ethChainId }}/upgrade.json -o $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json
     {{- end }}
     
     # todo: bootstrap logic
