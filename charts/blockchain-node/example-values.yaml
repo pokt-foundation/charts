@@ -1,14 +1,17 @@
 # Example values to show all the available options
 # WIP
-
 statefulset:
   - name: pokt
+    nodeSelector:
+      node.kubernetes.io/instance-type: XXXXXXXX
     persistence:
       size: 500Gi
       storageClassName: gp3
       volumeMountPath: /home/app/.pocket
       # pocketDataSnapshotURL Storj URL to POKT data archive - will be downloaded and extracted
       pocketDataSnapshotURL: https://snapshot.nodes.pokt.network/latest.tar.gz
+      # awsSnapshotID - EC2 snapshot id to create volume from
+      # awsSnapshotID: snap-xxxxxxxxxxx
     initContainers:
       - name: download-genesis
         image: "alpine:latest"
@@ -32,7 +35,7 @@ statefulset:
       - name: pocket-core
         image:
           repository: poktnetwork/pocket
-          tag: "RC-0.8.3"
+          tag: "latest"
         workingDir: /home/app/.pocket
         command: "pocket start \
           --datadir=/home/app/.pocket \
