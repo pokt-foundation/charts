@@ -21,7 +21,7 @@ data:
     mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
     mkdir -p $CONFIGS_VOLUME/{{ .blockchainId }}
     cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
-    curl https://github.com/ava-labs/subnet-evm/blob/master/networks/mainnet/{{ .ethChainId }}/upgrade.json -o $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json
+    wget -O $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json https://github.com/ava-labs/subnet-evm/blob/master/networks/mainnet/{{ .ethChainId }}/upgrade.json
     {{- end }}
     
     # todo: bootstrap logic
