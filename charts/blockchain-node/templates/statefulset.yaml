@@ -14,14 +14,6 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
-# Input validation
-{{- if and $sts.persistence.pocketDataSnapshotURL $sts.persistence.awsSnapshotID }}
-{{- fail "ERROR: persistence.pocketDataSnapshotURL and persistence.awsSnapshotID Cannot be given simultaneously." }}
-{{- end }}
-{{- if and $sts.persistence.pocketDataSnapshotURL (not $.Values.global.uplinkAccessToken ) }}
-{{- fail "ERROR: persistence.pocketDataSnapshotURL and no global.uplinkAccessToken given. Won't be able to access STORJ without access token." }}
-{{- end }}
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -61,6 +53,9 @@ spec:
       {{- with $sts.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $sts.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with $.Values.global.securityContext }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -69,97 +64,6 @@ spec:
       {{- end }}
 
       initContainers:
-      {{- if $sts.persistence.awsSnapshotID }}
-      - name: init-ebs-disk
-        image: alpine:latest
-        env:
-          - name: FLAG
-            value: "{{ $sts.persistence.volumeMountPath }}/ebs-initialised"
-        command:
-          - 'sh'
-          - '-c'
-          - |
-            set -exu
-
-            if [[ -f $FLAG ]]; then
-              echo "Disk initialised. Skipping."
-            else
-              echo "Warming up data from EBS snapshot"
-              START_TIME="$(date +%s)"
-              DISK=$(mount | grep "{{ $sts.persistence.volumeMountPath }}"| cut -d" " -f1 | cut -d"/" -f3)
-
-              seq 0 $(($(cat /sys/block/$DISK/size) / (1 << 10))) | \
-                xargs -n1 -P$(nproc --all) -I {} dd if=/hostdev/$DISK of=/dev/null skip={}k count=1 bs=512 > /dev/null 2>&1
-              echo "Warmup took: $(($(date +%s)-${START_TIME})) sec."
-              touch $FLAG
-            fi
-        securityContext:
-          privileged: true
-          runAsUser: 0
-        volumeMounts:
-          - mountPath: /hostdev
-            name: host-dev
-          - name: {{ $volumeName }}
-            mountPath: {{ $sts.persistence.volumeMountPath }}
-      {{- end }}
-
-      {{- if $sts.persistence.pocketDataSnapshotURL }}
-
-      # TODO: If dataSnapshotURL not given flag dataSnapshotURL must be created, to avoid case when initialy the flag not set, and then was added
-      # Init container to download and extract given snapshot
-      - name: download-data-snapshot
-        image: alpine:latest
-        env:
-          - name: UPLINK_ACCESS_TOKEN
-            value: {{ $.Values.global.uplinkAccessToken | quote}}
-          - name: FLAG
-            value: "{{ $sts.persistence.volumeMountPath }}/snapshot-extracted"
-          - name: DATA_DIR
-            value: "{{ $sts.persistence.volumeMountPath }}/data"
-          - name: UPLINK_RELEASE
-            value: "https://github.com/storj/storj/releases/latest/download/uplink_linux_amd64.zip"
-          - name: UPLINK
-            value: "{{ $sts.persistence.volumeMountPath }}/uplink"
-        workingDir: {{ $sts.persistence.volumeMountPath }}
-        command:
-          - 'sh'
-          - '-c'
-          - |
-            set -exu
-
-            if [[ -f $FLAG ]]; then
-              echo "Data already extracted. Skipping."
-              echo "If you wish to re-download data, delete the file '$FLAG'"
-            else
-              wget $UPLINK_RELEASE -O $(dirname $UPLINK)/uplink_linux_amd64.zip
-              unzip -o $(dirname $UPLINK)/uplink_linux_amd64.zip -d $(dirname $UPLINK)
-
-              START_TIME="$(date +%s)"
-              rm -rf $DATA_DIR
-              mkdir -p $DATA_DIR
-              cd $DATA_DIR
-              SJ_FILENAME="$(wget --server-response --spider {{  $sts.persistence.pocketDataSnapshotURL }} 2>&1 | grep -iroh -m1 'location:[[:space:]]\+https\?://[a-zA-Z0-9~#%&_+=,.?/-]\+' | cut -d" " -f2 | rev | cut -d'/' -f1|rev|cut -d'?' -f1)"
-
-              #Configuring UPLINK
-              UPLINK_CONFIG_DIR="/tmp"
-              echo -e "[metrics]\naddr =\n" > $UPLINK_CONFIG_DIR/config.ini
-              $UPLINK --config-dir=$UPLINK_CONFIG_DIR access import main $UPLINK_ACCESS_TOKEN
-
-              $UPLINK cp --config-dir=$UPLINK_CONFIG_DIR --parallelism 8 --parallelism-chunk-size 0 \
-                --access main sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
-              echo "$SJ_FILENAME" > $FLAG
-
-              # Remove uplink
-              rm $UPLINK $(dirname $UPLINK)/uplink_linux_amd64.zip
-
-              echo "Snapshot download completed. Took: $(( ($(date +%s)-${START_TIME})/60 )) min."
-
-            fi
-        volumeMounts:
-          - name: {{ $volumeName }}
-            mountPath: {{ $sts.persistence.volumeMountPath }}
-      {{- end }} #{{/* if $sts.persistence.dataSnapshotURL */}}
-
       {{- range $kcntnr, $cntnr := $sts.containers }}
       {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}
       {{ $cmPref := "/cm" }}
@@ -192,8 +96,6 @@ spec:
             mountPath: /{{ $sec.name }}
             readOnly: true
           {{- end }}
-
-
       {{- end }}
       {{- end }} #{{/* range $kcntnr, $cntnr := $sts.containers */}}
 
@@ -220,8 +122,6 @@ spec:
             tcpSocket:
               port: 9090
             initialDelaySeconds: 15
-            failureThreshold: 2
-            periodSeconds: 10
           resources:
             requests:
               cpu: 50m
@@ -301,11 +201,6 @@ spec:
             optional: false
         {{- end }}
 
-        {{- if $sts.persistence.awsSnapshotID }}
-        - name: host-dev
-          hostPath:
-            path: /dev
-        {{ end }}
   volumeClaimTemplates:
     - metadata:
         name: {{ $volumeName }}
@@ -318,11 +213,4 @@ spec:
         resources:
           requests:
             storage: {{ $sts.persistence.size | quote }}
-        {{- if $sts.persistence.awsSnapshotID }}
-        dataSource:
-          name: {{ $sts.persistence.awsSnapshotID | quote }}
-          kind: VolumeSnapshot
-          apiGroup: snapshot.storage.k8s.io
-        {{- end }}
-
 {{ end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
