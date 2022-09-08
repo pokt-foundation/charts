@@ -161,6 +161,7 @@ spec:
           {{- end }}
 
           {{- if $cntnr.healthProbes }}
+          # TODO(@okdas): add ability to override startupProbe,livenessProbe,readinessProbe in the values.yaml independently from the healthcheck sidecar
           startupProbe:
             httpGet:
               path: /health/startup
