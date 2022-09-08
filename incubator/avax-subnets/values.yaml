@@ -1,7 +1,7 @@
 image:
   repository: pocketfoundation/avalanchego
   pullPolicy: IfNotPresent
-  tag: v1.7.18-subnets
+  tag: v1.8.4-subnets
 resources:
   requests:
     memory: "1Gi"
@@ -16,9 +16,13 @@ nodeSelector: {}
 whitelisted_subnets:
   []
   # - subnet: Vn3aX6hNRstj5VHHm63TCgPNaeGnRSqCYXQqemSqDd2TQH4qJ
+  #   blockchainId: q2aTwKuyzgs8pynF7UXBZCU7DejbZbZ6EUyHr3JQzYgwNPUPi
+  #   ethChainId: 53935
   #   name: defi
   #   feeRecipient: "0xED6dC9FD092190C08e4afF8611496774Ded19D54"
   # - subnet: 2e3CqLY8thW1WKS89WQ7WR9Qy2bCrrP5mv7psqMRGCHGXuQ1Uj
+  #   blockchainId: 2K33xS9AyP9oCDiHYKVrHe7F54h2La5D8erpTChaAhdzeSu2RX
+  #   ethChainId: 73772
   #   name: swimmers
   #   # FIXME: should be different for swimmers validator!
   #   feeRecipient: "0xED6dC9FD092190C08e4afF8611496774Ded19D54"
