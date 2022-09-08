@@ -1,17 +1,14 @@
 # Example values to show all the available options
 # WIP
 statefulset:
-  - name: pokt
+  - name: pokt  # <- STATEFULSET_NAME
     nodeSelector:
       node.kubernetes.io/instance-type: XXXXXXXX
     persistence:
       size: 500Gi
-      storageClassName: gp3
+      storageClassName: XXXXX
       volumeMountPath: /home/app/.pocket
-      # pocketDataSnapshotURL Storj URL to POKT data archive - will be downloaded and extracted
-      pocketDataSnapshotURL: https://snapshot.nodes.pokt.network/latest.tar.gz
-      # awsSnapshotID - EC2 snapshot id to create volume from
-      # awsSnapshotID: snap-xxxxxxxxxxx
+
     initContainers:
       - name: download-genesis
         image: "alpine:latest"
@@ -24,13 +21,64 @@ statefulset:
           - 'sh'
           - '-c'
           - |
-            set -exu
-
             mkdir -p $(dirname $GENESIS_FILE)
             wget $GENESIS_URL -O $GENESIS_FILE
         volumeMounts:
-          - name: pokt-data
+          - name: STATEFULSET_NAME-data
             mountPath: /home/app/.pocket
+### Some useful init containers ##########################
+      ### Download lates POKT data snapshot
+      ### It takes 4-5 hours to download the snapshot
+      # - name: download-data-snapshot
+      #   image: alpine:latest
+      #   env:
+      #     - name: UPLINK_ACCESS_TOKEN
+      #       value: "XXXXXXXXXXXXXXXXXXXXXXXX"
+      #     - name: FLAG
+      #       value: .../snapshot-extracted"
+      #     - name: DATA_DIR
+      #       value: ".../data"
+      #     - name: UPLINK_RELEASE
+      #       value: "https://github.com/storj/storj/releases/latest/download/uplink_linux_amd64.zip"
+      #     - name: UPLINK
+      #       value: "/tmp/uplink"
+      #     - name: DATA_SNAPSHOT
+      #       value: "https://snapshot.nodes.pokt.network/latest.tar.gz"
+      #   workingDir: /path/to/workingdir
+      #   command:
+      #     - 'sh'
+      #     - '-c'
+      #     - |
+      #       set -exu
+
+      #       if [[ -f $FLAG ]]; then
+      #         echo "Data already extracted. Skipping."
+      #         echo "If you wish to re-download data, delete the file '$FLAG'"
+      #       else
+      #         wget $UPLINK_RELEASE -O $(dirname $UPLINK)/uplink_linux_amd64.zip
+      #         unzip -o $(dirname $UPLINK)/uplink_linux_amd64.zip -d $(dirname $UPLINK)
+
+      #         START_TIME="$(date +%s)"
+      #         rm -rf $DATA_DIR
+      #         mkdir -p $DATA_DIR
+      #         cd $DATA_DIR
+      #         SJ_FILENAME="$(wget --server-response --spider $DATA_SNAPSHOT 2>&1 | grep -iroh -m1 'location:[[:space:]]\+https\?://[a-zA-Z0-9~#%&_+=,.?/-]\+' | cut -d" " -f2 | rev | cut -d'/' -f1|rev|cut -d'?' -f1)"
+
+      #         #Configuring UPLINK
+      #         UPLINK_CONFIG_DIR="/tmp"
+      #         echo -e "[metrics]\naddr =\n" > $UPLINK_CONFIG_DIR/config.ini
+      #         $UPLINK --config-dir=$UPLINK_CONFIG_DIR access import main $UPLINK_ACCESS_TOKEN
+
+      #         $UPLINK cp --config-dir=$UPLINK_CONFIG_DIR --parallelism 4 --parallelism-chunk-size 0 \
+      #           --access main sj://pocket-public-blockchains/$SJ_FILENAME - | tar xvzf -
+      #         echo "$SJ_FILENAME" > $FLAG
+
+      #         rm $UPLINK $(dirname $UPLINK)/uplink_linux_amd64.zip
+      #       fi
+      #   volumeMounts:
+      #     - name: STATEFULSET_NAME-data
+      #       mountPath: /home/app/.pocket
+###########################################
     containers:
       - name: pocket-core
         image:
