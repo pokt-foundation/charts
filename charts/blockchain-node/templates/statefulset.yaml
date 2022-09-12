@@ -14,6 +14,14 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
+
+# Add prometheus annotations
+{{- $podAnnotations := (default (dict ) $sts.podAnnotations) }}
+{{- range $kcntnr, $cntnr := $sts.containers }}
+  {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
+    {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" ($cntnr.healthProbes.portToMonitor|quote)) }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -45,7 +53,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         statefulsetname: {{ $sts.name }}
-      {{- with $sts.podAnnotations }}
+      {{- with $podAnnotations }}
       annotations: {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
@@ -105,15 +113,20 @@ spec:
 
       containers:
       {{- range $kcntnr, $cntnr := $sts.containers }}
-        {{- if $cntnr.healthProbes }}
+        {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
         - name: chain-healthcheck-sidecar
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
           imagePullPolicy: Always
           env:
             {{- range $k, $v := $cntnr.healthProbes.env }}
+            {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
+            {{- fail "LOCAL_RPC_ENDPOINT - is generated as http://localhost:_healthProbes.portToMonitor_. Remove it from the config." }}
+            {{- end }}
             - name: {{$k}}
               value: {{$v | quote}}
             {{- end }}
+            - name: LOCAL_RPC_ENDPOINT
+              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}"
           ports:
             - name: healthcheck
               containerPort: 9090
