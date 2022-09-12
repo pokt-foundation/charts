@@ -1,0 +1,37 @@
+{{- range $kstfs, $sts := .Values.statefulset }}
+{{- range $kcntnr, $cntnr := $sts.containers }}
+
+{{- if $cntnr.healthProbes.portToMonitor }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "blockchain-node.fullname" $ }}-monitoring{{ $cntnr.healthProbes.portToMonitor }}
+  labels:
+    {{- include "blockchain-node.labels" $ | nindent 4 }}
+spec:
+  selector:
+    statefulsetname: {{ $sts.name }}
+  ports:
+    - port: {{ $cntnr.healthProbes.portToMonitor }}
+      targetPort: {{ $cntnr.healthProbes.portToMonitor }}
+      name: monitoring{{ $cntnr.healthProbes.portToMonitor }}
+
+---
+kind: ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: {{ include "blockchain-node.fullname" $ }}-monitoring{{ $cntnr.healthProbes.portToMonitor }}
+spec:
+  endpoints:
+  - interval: 60s
+    port: "9090"
+    path: /metrics
+  selector:
+    matchLabels:
+      {{- include "blockchain-node.labels" $ | nindent 6 }}
+
+{{- end }}
+
+{{- end -}}
+{{- end -}}
