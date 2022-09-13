@@ -2,6 +2,6 @@ remote: origin
 target-branch: master
 chart-dirs:
   - charts
-#chart-repos:
-#  - pokt=https://pokt-foundation.gitlab.io/charts
+chart-repos:
+ - pokt=https://charts.external-secrets.io
 helm-extra-args: --timeout 600s
