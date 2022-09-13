@@ -3,5 +3,5 @@ target-branch: master
 chart-dirs:
   - charts
 chart-repos:
- - pokt=https://charts.external-secrets.io
+ - external-secrets=https://charts.external-secrets.io
 helm-extra-args: --timeout 600s
