@@ -37,14 +37,18 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             {{- toYaml .Values.env | nindent 12 }}
+          {{- if .Values.repos }}
           volumeMounts:
           - name: "configmap"
             mountPath: "/src/repos.yml"
             subPath: "repos.yml"
+          {{ end }}
       volumes:
+        {{- if .Values.repos }}
         - name: "configmap"
           configMap:
             name: "{{ .Chart.Name }}"
+        {{ end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

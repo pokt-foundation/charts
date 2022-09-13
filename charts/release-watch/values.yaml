@@ -59,10 +59,11 @@ additionalManifests: []
   #     - extract:
   #         key: prod
 
-repos: |
-  algorand:
-    channels:
-      - 931305730080915526
-      - 1008823719273177178
-    critical: true
-    repo: https://github.com/algorand/go-algorand
+repos: ""
+  # |
+  # algorand:
+  #   channels:
+  #     - 931305730080915526
+  #     - 1008823719273177178
+  #   critical: true
+  #   repo: https://github.com/algorand/go-algorand
