@@ -44,7 +44,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Install pre-requisits into the cluster
-        run: helm install external-secrets
+        run: helm install -n external-secrets --create-namespace external-secret external-secrets/external-secrets
 
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
