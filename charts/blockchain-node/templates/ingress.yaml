@@ -1,0 +1,31 @@
+{{- range $kstfs, $sts := .Values.statefulset }}
+{{- range $kcntnr, $cntnr := $sts.containers }}
+{{- range $kprt, $prt := $cntnr.ports }}
+
+{{- if $prt.ingressNginx }}{{- if $prt.ingressNginx.host }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
+  labels:
+    {{- include "blockchain-node.labels" $ | nindent 4 }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ $prt.ingressNginx.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
+            port:
+              number: {{ $prt.port }}
+  tls: []
+{{- end -}}{{- end -}}
+
+{{- end -}}
+{{- end -}}
+{{- end -}}
