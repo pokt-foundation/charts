@@ -2,6 +2,6 @@ remote: origin
 target-branch: master
 chart-dirs:
   - charts
-chart-repos:
- - external-secrets=https://charts.external-secrets.io
+# chart-repos:
+#  - external-secrets=https://charts.external-secrets.io
 helm-extra-args: --timeout 600s
