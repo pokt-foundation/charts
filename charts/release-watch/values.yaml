@@ -44,22 +44,23 @@ env: []
   #       optional: false
 
 additionalManifests: []
-# - apiVersion: external-secrets.io/v1beta1
-#   kind: ExternalSecret
-#   metadata:
-#     name: release-watch
-#   spec:
-#     refreshInterval: "15s"
-#     secretStoreRef:
-#       name: vault-backend
-#       kind: SecretStore
-#     target:
-#       name: release-watch
-#     dataFrom:
-#     - extract:
-#         key: prod
+  # - apiVersion: external-secrets.io/v1beta1
+  #   kind: ExternalSecret
+  #   metadata:
+  #     name: release-watch
+  #   spec:
+  #     refreshInterval: "15s"
+  #     secretStoreRef:
+  #       name: vault-backend
+  #       kind: SecretStore
+  #     target:
+  #       name: release-watch
+  #     dataFrom:
+  #     - extract:
+  #         key: prod
 
-repos: "" # |
+repos: ""
+  # |
   # algorand:
   #   channels:
   #     - 931305730080915526
