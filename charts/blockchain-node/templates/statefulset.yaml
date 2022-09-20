@@ -18,9 +18,9 @@
 # Add prometheus annotations
 {{- $podAnnotations := (default (dict ) $sts.podAnnotations) }}
 {{- range $kcntnr, $cntnr := $sts.containers }}
-  {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
+  {{- if $cntnr.healthProbes }}{{if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
     {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" ($cntnr.healthProbes.portToMonitor|quote)) }}
-  {{- end }}
+  {{- end }}{{- end }}
 {{- end }}
 ---
 apiVersion: apps/v1
@@ -113,6 +113,7 @@ spec:
 
       containers:
       {{- range $kcntnr, $cntnr := $sts.containers }}
+        {{- if $cntnr.healthProbes }}
         {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
         - name: chain-healthcheck-sidecar
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
@@ -142,6 +143,7 @@ spec:
             limits:
               cpu: 100m
               memory: 256Mi
+        {{- end }}
         {{- end }}
 
         - name: {{ $cntnr.name }}

@@ -3,6 +3,7 @@ global:
     repository: eepokt/chain-healthcheck-sidecar
     tag: master
   serviceAccount:
+    create: true
     name: change-me
     # annotations: []
   securityContext:
