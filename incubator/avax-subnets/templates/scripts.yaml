@@ -9,6 +9,8 @@ data:
     # exit script on any error
     set -e
 
+    apt-get install wget
+
     SCRIPTS_VOLUME={{ .Values.scripts_volume_mount }}
     CONFIGS_VOLUME={{ .Values.config_volume_mount }}
 
@@ -21,7 +23,7 @@ data:
     mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
     mkdir -p $CONFIGS_VOLUME/{{ .blockchainId }}
     cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
-    cp /home/{{ .blockchainId }}/upgrade.json $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json
+    wget -O $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json https://raw.githubusercontent.com/ava-labs/subnet-evm/master/networks/mainnet/{{ .ethChainId }}/upgrade.json
     {{- end }}
     
     # todo: bootstrap logic
