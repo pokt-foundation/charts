@@ -9,7 +9,8 @@ data:
     # exit script on any error
     set -e
 
-    apt-get install wget
+    apt-get update
+    apt-get -y install wget
 
     SCRIPTS_VOLUME={{ .Values.scripts_volume_mount }}
     CONFIGS_VOLUME={{ .Values.config_volume_mount }}
