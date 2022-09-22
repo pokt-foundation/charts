@@ -21,6 +21,7 @@ data:
     mkdir -p $CONFIGS_VOLUME/{{ .subnet }}
     mkdir -p $CONFIGS_VOLUME/{{ .blockchainId }}
     cp $SCRIPTS_VOLUME/{{ .name }}_config.json $CONFIGS_VOLUME/{{ .subnet }}/config.json
+    cp /home/{{ .blockchainId }}/upgrade.json $CONFIGS_VOLUME/{{ .blockchainId }}/upgrade.json
     {{- end }}
     
     # todo: bootstrap logic
