@@ -1,0 +1,12 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "pokt-portal.fullname" . }}
+  labels:
+    app: {{ template "pokt-portal.fullname" . }}
+    chart: {{ template "pokt-portal.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{ toYaml .Values.configurationFile | indent 2 }}
