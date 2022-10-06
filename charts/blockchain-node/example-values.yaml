@@ -100,6 +100,9 @@ statefulset:
             protocol: TCP
             ingressNginx:
               host: seed10.mainnet.pokt.network
+              annotations:
+                nginx.ingress.kubernetes.io/auth-secret: my-basic-auth
+                nginx.ingress.kubernetes.io/auth-type: basic
           - name: tendermintpeers
             type: ClusterIP
             port: 26656

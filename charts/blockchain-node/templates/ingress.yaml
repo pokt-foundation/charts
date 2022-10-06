@@ -10,6 +10,10 @@ metadata:
   name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
+  {{- if $prt.ingressNginx.annotations }}
+  annotations:
+    {{- toYaml $prt.ingressNginx.annotations | nindent 4 }}
+  {{- end }}
 spec:
   ingressClassName: nginx
   rules:
