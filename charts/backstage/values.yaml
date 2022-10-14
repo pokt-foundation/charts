@@ -28,7 +28,7 @@ backend:
     pullPolicy: IfNotPresent
   containerPort: 7007
   postgresql:
-    passwordSecret: postgresql-password   
+    passwordSecret: postgresql-password
   serviceType: ClusterIP
   postgresCertMountEnabled: false
   resources:
