@@ -2,7 +2,6 @@ remote: origin
 target-branch: master
 chart-dirs:
   - charts
-chart-repos:
-#  - pokt=https://pokt-foundation.gitlab.io/charts
-   - bitnami=https://charts.bitnami.com/bitnami
+# chart-repos:
+#  - external-secrets=https://charts.external-secrets.io
 helm-extra-args: --timeout 600s

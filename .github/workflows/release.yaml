@@ -22,7 +22,6 @@ jobs:
         run: |
           git config user.name "POKT_CI"
           git config user.email "helm-maintainers@users.noreply.github.com"
-
       - name: Install Helm
         uses: azure/setup-helm@v3.3
         with:
@@ -51,10 +50,11 @@ jobs:
       #    helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.0
+        uses: helm/chart-releaser-action@v1.4.1
         with:
           charts_dir: charts
           charts_repo_url: https://pokt-foundation.github.io/charts
           #config: cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: "true"
