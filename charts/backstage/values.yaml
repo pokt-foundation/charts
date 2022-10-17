@@ -38,7 +38,7 @@ backend:
       memory: 1024Mi
 
 lighthouse:
-  enabled: true
+  enabled: false
   replicaCount: 1
   image:
     repository: roadiehq/lighthouse-audit-service
