@@ -3,6 +3,27 @@ entries:
   backstage:
   - apiVersion: v2
     appVersion: v0.1.1-alpha.23
+    created: "2022-10-17T17:17:03.308094883Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.8.0
+    description: A Helm chart for Backstage
+    digest: c1e656b4324ef94b291b889ef860436993496a68375f2822363c5d521fb016c3
+    maintainers:
+    - name: GustavoBelfort
+    - name: pokt-foundation
+    name: backstage
+    sources:
+    - https://github.com/backstage/backstage
+    - https://github.com/spotify/lighthouse-audit-service
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/backstage-0.1.4/backstage-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: v0.1.1-alpha.23
     created: "2022-10-17T12:55:46.170899383Z"
     dependencies:
     - condition: postgresql.enabled
@@ -222,4 +243,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
     version: 0.1.0
-generated: "2022-10-17T12:55:46.170967483Z"
+generated: "2022-10-17T17:17:03.308233084Z"
