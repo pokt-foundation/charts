@@ -18,7 +18,7 @@ frontend:
       memory: 256Mi
 
 backend:
-  enabled: true
+  enabled: false
   nodeEnv: development
   demoData: true
   replicaCount: 1
