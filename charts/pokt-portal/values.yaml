@@ -5,12 +5,12 @@
 replicaCount: 3
 
 image:
-  repository: 059424750518.dkr.ecr.eu-central-1.amazonaws.com/gateway-prod
+  repository: pocketfoundation/portal-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "develop"
 
-imagePullSecrets: [{name: ecr-auth}]
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -81,61 +81,61 @@ tolerations: []
 
 affinity: {}
 
-configurationFile: 
-    .env: |-
-      # Pocket-js keys
-      GATEWAY_CLIENT_PRIVATE_KEY=v3rys3cr3tk3yud0nt3venkn0w
-      GATEWAY_CLIENT_PASSPHRASE=v3rys3cr3tp4ssphr4ze
-      
-      # Mongodb env
-      MONGO_ENDPOINT=mongodb://mongouser:mongopassword@db:27017/gateway?authSource=admin
-      DATABASE_ENCRYPTION_KEY=00000000000000000000000000000000
-      
-      # cache
-      REDIS_PORT=6379
-      
-      # remote cache
-      REMOTE_REDIS_ENDPOINT=cache:6379
-      
-      # local cache
-      LOCAL_REDIS_ENDPOINT=local-cache:6379
-      REDIS_LOCAL_TTL_FACTOR=1
-      
-      # Influx DB
-      INFLUX_URL=http://influxdb:8086
-      INFLUX_TOKEN=mytoken
-      INFLUX_ORG=myorg
-      
-      # Metrics DB
-      PSQL_CONNECTION=postgres://pguser:pgpassword@metricsdb:5432/gateway
-      PSQL_CERTIFICATE=https://s3.amazonaws.com/
-      
-      # logz
-      LOGZ_TOKEN=12345
-      
-      # pocket protocol dispatch and fallback nodes
-      DISPATCH_URL=https://node1.mainnet.pokt.network,https://node2.mainnet.pokt.network,https://node3.mainnet.pokt.network,https://node4.mainnet.pokt.network,https://node5.mainnet.pokt.network,https://node6.mainnet.pokt.network,https://node7.mainnet.pokt.network,https://node8.mainnet.pokt.network,https://node9.mainnet.pokt.network,https://node10.mainnet.pokt.network,https://node11.mainnet.pokt.network,https://node12.mainnet.pokt.network,https://node13.mainnet.pokt.network,https://node14.mainnet.pokt.network,https://node15.mainnet.pokt.network,https://node16.mainnet.pokt.network,https://node17.mainnet.pokt.network,https://node18.mainnet.pokt.network,https://node19.mainnet.pokt.network,https://node20.mainnet.pokt.network
-      POCKET_SESSION_BLOCK_FREQUENCY=4
-      POCKET_BLOCK_TIME=1038000
-      POCKET_RELAY_RETRIES=0
-      DEFAULT_SYNC_ALLOWANCE=5
-      DEFAULT_LOG_LIMIT_BLOCKS=10000
-      
-      # Choose your AAT plan
-      # values: freemium, premium
-      AAT_PLAN=freemium
-      
-      # Development environment
-      WATCH=true
-      NODE_ENV=development
-      REGION=localhost
-      ARCHIVAL_CHAINS="0022,0028,0010,000A,000B,000C"
-      
-      # For connection to the metrics db using self-signed cert
-      NODE_TLS_REJECT_UNAUTHORIZED=0
-      
-      LOG_TO_CLOUDWATCH=false
-      
-      # Datadog logging
-      LOG_TO_DATADOG=false
-      DATADOG_API_KEY=myApiKey
+configurationFile:
+  .env: |-
+    # Pocket-js keys
+    GATEWAY_CLIENT_PRIVATE_KEY=v3rys3cr3tk3yud0nt3venkn0w
+    GATEWAY_CLIENT_PASSPHRASE=v3rys3cr3tp4ssphr4ze
+
+    # Mongodb env
+    MONGO_ENDPOINT=mongodb://mongouser:mongopassword@db:27017/gateway?authSource=admin
+    DATABASE_ENCRYPTION_KEY=00000000000000000000000000000000
+
+    # cache
+    REDIS_PORT=6379
+
+    # remote cache
+    REMOTE_REDIS_ENDPOINT=cache:6379
+
+    # local cache
+    LOCAL_REDIS_ENDPOINT=local-cache:6379
+    REDIS_LOCAL_TTL_FACTOR=1
+
+    # Influx DB
+    INFLUX_URL=http://influxdb:8086
+    INFLUX_TOKEN=mytoken
+    INFLUX_ORG=myorg
+
+    # Metrics DB
+    PSQL_CONNECTION=postgres://pguser:pgpassword@metricsdb:5432/gateway
+    PSQL_CERTIFICATE=https://s3.amazonaws.com/
+
+    # logz
+    LOGZ_TOKEN=12345
+
+    # pocket protocol dispatch and fallback nodes
+    DISPATCH_URL=https://node1.mainnet.pokt.network,https://node2.mainnet.pokt.network,https://node3.mainnet.pokt.network,https://node4.mainnet.pokt.network,https://node5.mainnet.pokt.network,https://node6.mainnet.pokt.network,https://node7.mainnet.pokt.network,https://node8.mainnet.pokt.network,https://node9.mainnet.pokt.network,https://node10.mainnet.pokt.network,https://node11.mainnet.pokt.network,https://node12.mainnet.pokt.network,https://node13.mainnet.pokt.network,https://node14.mainnet.pokt.network,https://node15.mainnet.pokt.network,https://node16.mainnet.pokt.network,https://node17.mainnet.pokt.network,https://node18.mainnet.pokt.network,https://node19.mainnet.pokt.network,https://node20.mainnet.pokt.network
+    POCKET_SESSION_BLOCK_FREQUENCY=4
+    POCKET_BLOCK_TIME=1038000
+    POCKET_RELAY_RETRIES=0
+    DEFAULT_SYNC_ALLOWANCE=5
+    DEFAULT_LOG_LIMIT_BLOCKS=10000
+
+    # Choose your AAT plan
+    # values: freemium, premium
+    AAT_PLAN=freemium
+
+    # Development environment
+    WATCH=true
+    NODE_ENV=development
+    REGION=localhost
+    ARCHIVAL_CHAINS="0022,0028,0010,000A,000B,000C"
+
+    # For connection to the metrics db using self-signed cert
+    NODE_TLS_REJECT_UNAUTHORIZED=0
+
+    LOG_TO_CLOUDWATCH=false
+
+    # Datadog logging
+    LOG_TO_DATADOG=false
+    DATADOG_API_KEY=myApiKey
