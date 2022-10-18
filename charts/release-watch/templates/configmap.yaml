@@ -7,5 +7,5 @@ metadata:
     {{- include "release_watch.labels" . | nindent 4 }}
 data:
   repos.yml: |-
-    {{ tpl .Values.repos . | nindent 4 }}
+    {{ toYaml .Values.repos | nindent 4 }}
 {{- end }}
