@@ -243,4 +243,17 @@ entries:
     urls:
     - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
     version: 0.1.0
-generated: "2022-10-17T17:17:03.308233084Z"
+  release-watch:
+  - apiVersion: v2
+    appVersion: main
+    created: "2022-10-18T21:10:02.086249311Z"
+    description: A Helm chart for Kubernetes
+    digest: 96ee5b8ebab8844cbef635a15817bba608f19ae45e8927d78d24bd3e54c1433d
+    maintainers:
+    - name: pokt-foundation
+    name: release-watch
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
+    version: 0.1.2
+generated: "2022-10-18T21:10:02.086284317Z"
