@@ -23,25 +23,41 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "release-watch"
 
-env:
-  - name: GH_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: release-watch
-        key: GH_USERNAME
-        optional: false
-  - name: GH_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: release-watch
-        key: GH_TOKEN
-        optional: false
-  - name: DISCORD_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: release-watch
-        key: DISCORD_TOKEN
-        optional: false
+env: []
+  # - name: GH_USERNAME
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: release-watch
+  #       key: GH_USERNAME
+  #       optional: false
+  # - name: GH_TOKEN
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: release-watch
+  #       key: GH_TOKEN
+  #       optional: false
+  # - name: DISCORD_TOKEN
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: release-watch
+  #       key: DISCORD_TOKEN
+  #       optional: false
+
+additionalManifests: []
+  # - apiVersion: external-secrets.io/v1beta1
+  #   kind: ExternalSecret
+  #   metadata:
+  #     name: release-watch
+  #   spec:
+  #     refreshInterval: "15s"
+  #     secretStoreRef:
+  #       name: vault-backend
+  #       kind: SecretStore
+  #     target:
+  #       name: release-watch
+  #     dataFrom:
+  #     - extract:
+  #         key: prod
 
 repos:
   algorand:
