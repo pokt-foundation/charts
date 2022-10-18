@@ -1,0 +1,18 @@
+global:
+  chainHealthcheckSidecar:
+    repository: eepokt/chain-healthcheck-sidecar
+    tag: master
+  serviceAccount:
+    create: true
+    name: change-me
+    # annotations: []
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+  # Required to access pocket data snapshots
+  volumeSnapshotClassName: ebs-csi-volume-snapshot-class
+statefulset: []
+
+additionalManifests: []

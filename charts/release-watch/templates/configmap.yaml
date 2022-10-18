@@ -1,7 +1,11 @@
+{{- if .Values.repos }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Chart.Name }}
+  labels:
+    {{- include "release_watch.labels" . | nindent 4 }}
 data:
-  repos.yml: |
-    {{- toYaml .Values.repos | nindent 4 }}
+  repos.yml: |-
+    {{ tpl .Values.repos . | nindent 4 }}
+{{- end }}
