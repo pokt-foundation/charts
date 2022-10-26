@@ -6,6 +6,6 @@ metadata:
   labels:
     {{- include "release_watch.labels" . | nindent 4 }}
 data:
-  repos.yml: |-
-    {{ toYaml .Values.repos | nindent 4 }}
+  repos.yml: |
+    {{ .Values.repos | nindent 4 }}
 {{- end }}
