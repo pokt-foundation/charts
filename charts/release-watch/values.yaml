@@ -59,7 +59,7 @@ additionalManifests: []
   #     - extract:
   #         key: prod
 
-repos:
+repos: |
   algorand:
     channels:
       - "931305730080915526"
