@@ -229,4 +229,10 @@ spec:
         resources:
           requests:
             storage: {{ $sts.persistence.size | quote }}
+        {{- if $sts.persistence.gcpVolumeSnapshot }}
+        dataSource:
+          name: {{ $sts.persistence.gcpVolumeSnapshot | quote }}
+          kind: VolumeSnapshot
+          apiGroup: snapshot.storage.k8s.io
+        {{- end }}
 {{ end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
