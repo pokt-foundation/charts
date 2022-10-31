@@ -1,0 +1,121 @@
+# Default values for pokt-relay-meter
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+replicaCount: 1
+
+collector:
+  image:
+    repository: pocketfoundation/relay-meter-collector
+    pullPolicy: IfNotPresent
+    resources: 
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 500m
+        memory: 1024Mi
+
+    configurationFile:
+      .env: |-
+      # Influx DB
+      INFLUX_URL=
+      INFLUX_TOKEN=
+      INFLUX_ORG=myorg
+      INFLUXDB_BUCKET_DAILY=
+      INFLUXDB_BUCKET_CURRENT=
+
+      # Postgres DB
+      POSTGRES_HOST=
+      POSTGRES_PORT=5432
+      POSTGRES_USER
+      POSTGRES_PASSWORD
+      POSTGRES_DB
+
+      # Report
+      COLLECTION_INTERVAL_SECONDS=
+      ENV_REPORT_INTERVAL_SECONDS=
+
+apiserver:
+  image:
+    repository: pocketfoundation/relay-meter-apiserver
+    pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 500m
+        memory: 1024Mi
+    configurationFile:
+      .env: |-
+        # Backend API
+        API_SERVER_PORT=80
+        BACKEND_API_URL=
+        BACKEND_API_TOKEN=
+
+        # Postgres DB
+        POSTGRES_HOST=
+        POSTGRES_PORT=5432
+        POSTGRES_USER=
+        POSTGRES_PASSWORD=
+        POSTGRES_DB=
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
