@@ -1,0 +1,72 @@
+{{- range $kstfs, $sts := .Values.statefulset }}
+{{- range $kcntnr, $cntnr := $sts.containers }}
+{{- range $kprt, $prt := $cntnr.ports }}
+
+{{- if .GCPHTTPSLoadBalancer }}
+# https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#create_service
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
+spec:
+  {{- if .GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
+  securityPolicy:
+    name: {{ .GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
+  {{- end }}
+  healthCheck:
+    type: HTTP
+    requestPath: {{ quote .GCPHTTPSLoadBalancer.healthCheck.requestPath }}
+    {{- if .GCPHTTPSLoadBalancer.healthCheck.port }}
+    port: {{ .GCPHTTPSLoadBalancer.healthCheck.port }}
+    {{- end }}
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
+spec:
+  domains:
+  {{- with .GCPHTTPSLoadBalancer.domains }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
+  labels:
+    {{- include "blockchain-node.labels" $ | nindent 4 }}
+  annotations:
+  {{- if .GCPHTTPSLoadBalancer.dnsTTL }}
+    external-dns.alpha.kubernetes.io/ttl: {{ quote .GCPHTTPSLoadBalancer.dnsTTL }}
+  {{- end }}
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/managed-certificates: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
+    kubernetes.io/ingress.allow-http: "false"
+    # networking.gke.io/v1beta1.FrontendConfig: XXX
+    # kubernetes.io/ingress.global-static-ip-name: my-static-address
+spec:
+  defaultBackend:
+    service:
+      name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
+      port:
+        number: {{ .port }}
+  rules:
+  - host:  {{ index .GCPHTTPSLoadBalancer.domains 0 }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
+            port:
+              number: {{ .port }}
+        path: /*
+        pathType: ImplementationSpecific
+{{- end -}}
+
+{{- end -}}
+{{- end -}}
+{{- end -}}
+

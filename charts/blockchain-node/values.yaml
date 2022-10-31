@@ -1,4 +1,8 @@
 global:
+  syncLatestVolumeSnapshot:
+    enable: true
+    latestVolumeSnapshotNamespace: pokt-latest
+    latestVolumeSnapshotName: backups
   chainHealthcheckSidecar:
     repository: eepokt/chain-healthcheck-sidecar
     tag: master
