@@ -1,6 +1,8 @@
 {{- range $kstfs, $sts := .Values.statefulset }}
 {{- range $kcntnr, $cntnr := $sts.containers }}
 {{- range $kprt, $prt := $cntnr.ports }}
+
+
 ---
 apiVersion: v1
 kind: Service
@@ -8,6 +10,11 @@ metadata:
   name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
+
+{{- if .GCPHTTPSLoadBalancer }}
+  annotations:
+    cloud.google.com/backend-config: '{"default": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}'
+{{- end }}
 spec:
   selector:
     statefulsetname: {{ $sts.name }}
