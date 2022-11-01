@@ -1,0 +1,242 @@
+{{- range $ksts, $sts := $.Values.statefulset }}
+{{- $volumeName := printf "%s-data" $sts.name }}
+
+{{- $stsCMNames := list }}
+{{- range $cntnr := $sts.containers }}
+  {{- range $cm := $cntnr.mountConfigMaps }}
+    {{- $stsCMNames = append $stsCMNames $cm.name  }}
+  {{- end }}
+{{- end }}
+
+{{- $stsSecNames := list }}
+{{- range $cntnr := $sts.containers }}
+  {{- range $sec := $cntnr.mountSecrets }}
+    {{- $stsSecNames = append $stsSecNames $sec.name  }}
+  {{- end }}
+{{- end }}
+
+# Add prometheus annotations
+{{- $podAnnotations := (default (dict ) $sts.podAnnotations) }}
+{{- range $kcntnr, $cntnr := $sts.containers }}
+  {{- if $cntnr.healthProbes }}{{if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
+    {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" ($cntnr.healthProbes.portToMonitor|quote)) }}
+  {{- end }}{{- end }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $sts.name }}
+  labels:
+    {{- include "blockchain-node.labels" $ | nindent 4 }}
+    {{- with $sts.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: {{ template "blockchain-node.fullname" $ }}-{{ $sts.name }}
+  podManagementPolicy: {{ default "Parallel" $.Values.global.podManagementPolicy }}
+  updateStrategy:
+    type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
+    {{- if (eq "Recreate" (default "RollingUpdate" $.Values.global.updateStrategy)) }}
+    rollingUpdate: null
+    {{- end }}
+  selector:
+    matchLabels:
+      statefulsetname: {{ $sts.name }}
+  replicas: {{ default 1 $sts.replicas }}
+  template:
+    metadata:
+      name: {{ template "blockchain-node.fullname" $ }}
+      labels:
+        {{- include "blockchain-node.labels" $ | nindent 8 }}
+        {{- with $sts.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        statefulsetname: {{ $sts.name }}
+      {{- with $podAnnotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      terminationGracePeriodSeconds: {{ default 180 $.Values.global.terminationGracePeriodSeconds }}
+      {{- with $sts.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $sts.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $sts.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with $.Values.global.securityContext }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.global.serviceAccount.name }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+
+      initContainers:
+      {{- range $kcntnr, $cntnr := $sts.containers }}
+      {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}
+      {{ $cmPref := "/cm" }}
+      {{ $secPref := "/sec" }}
+      - name: cp-configs
+        image: alpine:latest
+        workingDir: {{ $sts.persistence.volumeMountPath }}
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -exu
+          {{- range $cm := (concat (default (list ) $cntnr.mountConfigMaps) (default (list ) $cntnr.mountSecrets)) }}
+            mkdir -p {{$cm.targetPath}}
+            cp -f /{{$cm.name}}/* {{$cm.targetPath}}
+          {{- end }}
+        volumeMounts:
+          - name: {{ $volumeName }}
+            mountPath: {{ $sts.persistence.volumeMountPath }}
+
+          # Volume mounts from mountConfigMaps
+          {{- range $cm := $cntnr.mountConfigMaps }}
+          - name: {{$cm.name}}
+            mountPath: /{{ $cm.name }}
+          {{- end }}
+
+          # Volume mounts from mountSecrets
+          {{- range $sec := $cntnr.mountSecrets }}
+          - name: {{$sec.name}}
+            mountPath: /{{ $sec.name }}
+            readOnly: true
+          {{- end }}
+      {{- end }}
+      {{- end }} #{{/* range $kcntnr, $cntnr := $sts.containers */}}
+
+      {{- with $sts.initContainers }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+
+      containers:
+      {{- range $kcntnr, $cntnr := $sts.containers }}
+        {{- if $cntnr.healthProbes }}
+        {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
+        - name: chain-healthcheck-sidecar
+          image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
+          imagePullPolicy: Always
+          env:
+            {{- range $k, $v := $cntnr.healthProbes.env }}
+            {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
+            {{- fail "LOCAL_RPC_ENDPOINT - is generated as http://localhost:_healthProbes.portToMonitor_. Remove it from the config." }}
+            {{- end }}
+            - name: {{$k}}
+              value: {{$v | quote}}
+            {{- end }}
+            - name: LOCAL_RPC_ENDPOINT
+              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}"
+          ports:
+            - name: healthcheck
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9090
+            initialDelaySeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+        {{- end }}
+        {{- end }}
+
+        - name: {{ $cntnr.name }}
+          image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
+
+          {{- with $cntnr.env }}
+          env: {{- toYaml . | nindent 12}}
+          {{- end }}
+
+          {{- with $cntnr.workingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- with $cntnr.command }}
+          command:
+            - /bin/sh
+            - -c
+            - {{ . }}
+          {{- end }}
+
+          {{- with $cntnr.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          ports:
+          {{- range $kprt, $prt := $cntnr.ports }}
+            - name:  {{ $prt.name}}
+              protocol: {{ $prt.protocol }}
+              containerPort: {{ $prt.port }}
+          {{- end }}
+
+          {{- if $cntnr.healthProbes }}
+          # TODO(@okdas): add ability to override startupProbe,livenessProbe,readinessProbe in the values.yaml independently from the healthcheck sidecar
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 9090
+            failureThreshold: 60
+            periodSeconds: 60
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 9090
+            failureThreshold: 2
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 9090
+            failureThreshold: 1
+            periodSeconds: 15
+          {{- end }}
+
+          volumeMounts:
+            - name: {{ $volumeName }}
+              mountPath: {{ $sts.persistence.volumeMountPath }}
+
+      {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
+
+      volumes:
+        {{- range $cmn := $stsCMNames }}
+        - name: {{$cmn}}
+          configMap:
+            name: {{$cmn}}
+        {{- end }}
+
+        {{- range $secn := $stsSecNames }}
+        - name: {{$secn}}
+          secret:
+            secretName: {{$secn}}
+            optional: false
+        {{- end }}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ $volumeName }}
+      spec:
+        {{- if $sts.persistence.storageClassName }}
+        storageClassName: {{ $sts.persistence.storageClassName }}
+        {{- end }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ $sts.persistence.size | quote }}
+        {{- if $sts.persistence.gcpVolumeSnapshot }}
+        dataSource:
+          name: {{ $sts.persistence.gcpVolumeSnapshot | quote }}
+          kind: VolumeSnapshot
+          apiGroup: snapshot.storage.k8s.io
+        {{- end }}
+{{ end }} # {{/* range $ksts, $sts := $.Values.statefulset */}}
