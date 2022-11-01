@@ -33,25 +33,28 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["npm", "run", "start"]
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          env:
+          {{- include "helpers.list-env-variables" . | indent 12 }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal.fullname" . }}-es
+              # key: env
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.configurationFile }}
           volumeMounts:
-            - name: config
-              mountPath: /config
-          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -63,13 +66,4 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.configurationFile }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "pokt-portal.fullname" . }}
-            items:
-            - key: .env
-              path: .env
       {{- end }}
