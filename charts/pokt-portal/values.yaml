@@ -93,7 +93,7 @@ env:
     # Pocket-js keys
     GATEWAY_CLIENT_PRIVATE_KEY: "v3rys3cr3tk3yud0nt3venkn0w"
     GATEWAY_CLIENT_PASSPHRASE: "v3rys3cr3tp4ssphr4ze"
-
+    BLOCKED_ADDRESSES_URL: "https://blocked-addresses.s3.us-west-2.amazonaws.com/blocked_address.json"
     # Mongodb env
     MONGO_ENDPOINT: "mongodb://mongouser:mongopassword@db:27017/gateway?authSource=admin"
     DATABASE_ENCRYPTION_KEY: "00000000000000000000000000000000"
@@ -109,9 +109,9 @@ env:
     REDIS_LOCAL_TTL_FACTOR: "1"
 
     # Influx DB
-    INFLUX_URL: "http://influxdb:8086"
-    INFLUX_TOKEN: "mytoken"
-    INFLUX_ORG: "myorg"
+    INFLUX_URLS: "http://influxdb:8086"
+    INFLUX_TOKENS: "mytoken"
+    INFLUX_ORGS: "myorg"
 
     # Metrics DB
     PSQL_CONNECTION: "postgres://pguser:pgpassword@metricsdb:5432/gateway"
@@ -142,6 +142,8 @@ env:
     NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
     LOG_TO_CLOUDWATCH: "false"
+    AWS_ACCESS_KEY_ID: "AXAI"
+    AWS_SECRET_ACCESS_KEY: "xYansdlapq912n"
 
     # Datadog logging
     LOG_TO_DATADOG: "false"
