@@ -36,7 +36,7 @@ dependencies:
 - name: influxdb2
   version: "2.1.1"
   repository: "https://helm.influxdata.com/"
-  condition: influxdb.enabled
+  condition: influxdb2.enabled
 - name: mongodb
   version: "13.3.0"
   repository: "https://charts.bitnami.com/bitnami"

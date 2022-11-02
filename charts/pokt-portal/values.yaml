@@ -154,6 +154,7 @@ env:
 redis:
   enabled: true
   fullnameOverride: "redis"
+  architecture: "standalone"
   auth:
     enabled: false
   master:
@@ -169,7 +170,7 @@ redis:
 ## @section influxdb subchart parameters
 ## @param influxdb.enabled Deploy influx subchart
 ##
-influxdb:
+influxdb2:
   enabled: true
   fullnameOverride: "influxdb"
   persistence:
