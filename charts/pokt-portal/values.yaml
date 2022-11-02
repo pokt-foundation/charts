@@ -95,7 +95,7 @@ env:
     GATEWAY_CLIENT_PASSPHRASE: "v3rys3cr3tp4ssphr4ze"
     BLOCKED_ADDRESSES_URL: "https://blocked-addresses.s3.us-west-2.amazonaws.com/blocked_address.json"
     # Mongodb env
-    MONGO_ENDPOINT: "mongodb://pokt:P0K7m0ngod8@mongodb:27017/gateway?authSource=admin"
+    MONGO_ENDPOINT: "mongodb://pokt:P0K7m0ngod8@mongodb:27017/gateway"
     DATABASE_ENCRYPTION_KEY: "00000000000000000000000000000000"
 
     # cache
@@ -121,7 +121,7 @@ env:
     LOGZ_TOKEN: "12345"
 
     # pocket protocol dispatch and fallback nodes
-    DISPATCH_URL: "https://node1.mainnet.pokt.network,https://node2.mainnet.pokt.network,https://node3.mainnet.pokt.network,https://node4.mainnet.pokt.network,https://node5.mainnet.pokt.network,https://node6.mainnet.pokt.network,https://node7.mainnet.pokt.network,https://node8.mainnet.pokt.network,https://node9.mainnet.pokt.network,https://node10.mainnet.pokt.network,https://node11.mainnet.pokt.network,https://node12.mainnet.pokt.network,https://node13.mainnet.pokt.network,https://node14.mainnet.pokt.network,https://node15.mainnet.pokt.network,https://node16.mainnet.pokt.network,https://node17.mainnet.pokt.network,https://node18.mainnet.pokt.network,https://node19.mainnet.pokt.network,https://node20.mainnet.pokt.network"
+    DISPATCH_URL: "https://node1.mainnet.pokt.network"
     POCKET_SESSION_BLOCK_FREQUENCY: "4"
     POCKET_BLOCK_TIME: "1038000"
     POCKET_RELAY_RETRIES: "0"
