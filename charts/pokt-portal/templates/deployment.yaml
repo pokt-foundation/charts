@@ -48,10 +48,11 @@ spec:
               port: http
           env:
           {{- include "helpers.list-env-variables" . | indent 12 }}
+          {{- if .Values.externalSecrets.enabled }}
           envFrom:
           - secretRef:
               name: {{ include "pokt-portal.fullname" . }}-es
-              # key: env
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

@@ -5,12 +5,12 @@
 replicaCount: 1
 
 redis:
-  enabled: true
+  enabled: false
   auth:
     enabled: false
 
 influx:
-  enabled: true
+  enabled: false
   adminUser:
     organization: "demand-infra"
     bucket: "default"
@@ -33,8 +33,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "develop"
 
-imagePullSecrets:
-  - name: "regcred"
+imagePullSecrets: []
+  # - name: "regcred"
 nameOverride: ""
 fullnameOverride: ""
 

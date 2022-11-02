@@ -66,7 +66,7 @@ Create the name of the service account to use
 - name: {{ $key }}
   valueFrom:
     secretKeyRef:
-      name: app-env-var-secret
+      name: {{ .Release.Name }}
       key: {{ $key }}
 {{- end}}
 {{- range $key, $val := .Values.env.normal }}
