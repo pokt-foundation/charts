@@ -3,6 +3,7 @@ name: pokt-portal
 description: A Helm chart for deploying the POKT Portal API services
 maintainers:
   - name: WesleyCharlesBlake
+    url: https://github.com/WesleyCharlesBlake/
   - name: pokt-foundation
     url: https://github.com/pokt-foundation/charts
 

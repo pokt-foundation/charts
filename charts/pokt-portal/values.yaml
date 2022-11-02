@@ -149,7 +149,6 @@ env:
 
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
-
 redis:
   enabled: false
   auth:
@@ -157,7 +156,7 @@ redis:
 
 ## @section influxdb subchart parameters
 ## @param influxdb.enabled Deploy influx subchart
-## 
+##
 influxdb:
   enabled: false
   adminUser:
@@ -166,6 +165,9 @@ influxdb:
     user: "admin"
     retention_policy: "0s"
 
+## @section mongodb subchart parameters
+## @param mongodb.enabled Deploy mongodb subchart
+##
 mongodb:
   enabled: false
   host: mongodb
