@@ -4,29 +4,6 @@
 
 replicaCount: 1
 
-# redis:
-#   enabled: false
-#   auth:
-#     enabled: false
-
-# influx:
-#   enabled: false
-#   adminUser:
-#     organization: "demand-infra"
-#     bucket: "default"
-#     user: "admin"
-#     retention_policy: "0s"
-
-# mongodb:
-#   enabled: false
-#   host: mongodb
-#   port: 27017
-#   username: ""
-#   password: ""
-#   database: "pokt-portal"
-#   auth:
-#     rootPassword: SuperS3cr37P@5$w0rd
-
 image:
   repository: pocketfoundation/portal-api
   pullPolicy: IfNotPresent
@@ -169,3 +146,32 @@ env:
     # Datadog logging
     LOG_TO_DATADOG: "false"
     DATADOG_API_KEY: myApiKey
+
+## @section redis subcharts parameters
+## @param redis.enabled Deploy redis subchart
+
+redis:
+  enabled: false
+  auth:
+    enabled: false
+
+## @section influxdb subchart parameters
+## @param influxdb.enabled Deploy influx subchart
+## 
+influxdb:
+  enabled: false
+  adminUser:
+    organization: "demand-infra"
+    bucket: "default"
+    user: "admin"
+    retention_policy: "0s"
+
+mongodb:
+  enabled: false
+  host: mongodb
+  port: 27017
+  username: ""
+  password: ""
+  database: "pokt-portal"
+  auth:
+    rootPassword: SuperS3cr37P@5$w0rd

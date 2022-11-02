@@ -4,6 +4,7 @@ description: A Helm chart for deploying the POKT Portal API services
 maintainers:
   - name: WesleyCharlesBlake
   - name: pokt-foundation
+    url: https://github.com/pokt-foundation/charts
 
 # A chart can be either an 'application' or a 'library' chart.
 #
