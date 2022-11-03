@@ -81,23 +81,18 @@ tolerations: []
 
 affinity: {}
 
+externalSecrets:
+  enabled: false
+  key: "rate-limiter/staging/env"
+  secretStore: "vault"
+  vault:
+    mountPath: "k8s-portal-us-east-2-staging"
+    role: "portal-api-staging"
+    serviceAccount: "potal-api"
+    namespace: "admin/engineering"
+    path: "developers/"
+    server: "https://hcp-vault-cluster-a-public-vault-72230702.bb94b393.z1.hashicorp.cloud:8200"
+    version: "v1"
+
 configurationFile:
   .env: |-
-    HTTP_DB_API_KEY=
-    HTTP_DB_URL=
-    RELAY_METER_URL=
-    HTTP_RETRIES=
-    HTTP_TIMEOUT=
-    PORT=
-    CACHE_REFRESH=
-    API_KEYS=
-    GRACE_PERIOD=
-    LOG_TO_CLOUDWATCH=
- 
-    # Datadog logging
-    LOG_TO_DATADOG=false
-    DATADOG_API_KEY=myApiKey
-    DD_SITE=datadoghq.eu
-    DD_LOGS_ENABLED=false
-    DD_APM_ENABLED=true
-    DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true    
