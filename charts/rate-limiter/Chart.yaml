@@ -2,7 +2,7 @@ apiVersion: v2
 name: pokt-rate-limiter
 description: A Helm chart for deploying the POKT Rate Limiter service
 maintainers:
-  - name: OlakunleAbiola
+  - name: olakunle-pokt
   - name: pokt-foundation
 
 # A chart can be either an 'application' or a 'library' chart.
