@@ -85,11 +85,26 @@ affinity: {}
 
 externalSecrets:
   enabled: false
+  # key: "path"
+  # vault:
+  #   mountPath: "somepath"
+  #   role: "demo"
+  #   serviceAccount: "demo"
+  #   key: "path"
+  #   namespace: "demo"
+  #   path: "demo"
+  #   server: "demo"
+  #   version: "demo"
+
 
 # Environment variable listing
 env:
   # non sensitive variables
   normal:
+    # remote cache
+    REDIS_PORT: "6379"
+  # sensitive variables stored in a secret
+  secret:
     # Pocket-js keys
     GATEWAY_CLIENT_PRIVATE_KEY: "v3rys3cr3tk3yud0nt3venkn0w"
     GATEWAY_CLIENT_PASSPHRASE: "v3rys3cr3tp4ssphr4ze"
@@ -97,9 +112,6 @@ env:
     # Mongodb env
     MONGO_ENDPOINT: "mongodb://pokt:P0K7m0ngod8@mongodb:27017/gateway"
     DATABASE_ENCRYPTION_KEY: "00000000000000000000000000000000"
-
-    # cache
-    REDIS_PORT: "6379"
 
     # remote cache
     REMOTE_REDIS_ENDPOINT: "redis-master:6379"
