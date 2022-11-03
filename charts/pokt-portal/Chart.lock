@@ -1,0 +1,12 @@
+dependencies:
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.3.7
+- name: influxdb2
+  repository: https://helm.influxdata.com/
+  version: 2.1.1
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 13.3.0
+digest: sha256:645a760a28f1fda2b3e7903022b77f115053ba78101b8ec785ff14d02a2d2aa5
+generated: "2022-11-02T19:46:44.046796+02:00"
