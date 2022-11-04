@@ -215,7 +215,6 @@ mongodb:
   persistence:
     enabled: false
 
-
 ## @section postgres subchart parameters
 ## @param mongodb.enabled Deploy mongodb subchart
 ##
