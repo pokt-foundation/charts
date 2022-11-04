@@ -85,16 +85,18 @@ affinity: {}
 
 externalSecrets:
   enabled: false
-  # key: "path"
+  # external secret key
+  # key: "some/path/secret"
+  # # secret-store config
+  # secretStore: "vault"
   # vault:
-  #   mountPath: "somepath"
-  #   role: "demo"
-  #   serviceAccount: "demo"
-  #   key: "path"
-  #   namespace: "demo"
-  #   path: "demo"
-  #   server: "demo"
-  #   version: "demo"
+  #   server: "https://vault:8200"
+  #   mountPath: "k8s-mount-path"
+  #   namespace: "our/namespace/"
+  #   serviceAccount: "portal-api"
+  #   role: "my-role"
+  #   path: "path/"
+  #   version: "v1"
 
 
 # Environment variable listing
@@ -126,7 +128,7 @@ env:
     INFLUX_ORGS: "demand-infra"
 
     # Metrics DB
-    PSQL_CONNECTION: "postgres://pguser:pgpassword@metricsdb:5432/gateway"
+    PSQL_CONNECTION: "postgres://pokt:P0K7p05tgr3s8@postgres:5432/metrics"
     PSQL_CERTIFICATE: "https://s3.amazonaws.com/"
 
     # logz
@@ -212,3 +214,19 @@ mongodb:
       - gateway
   persistence:
     enabled: false
+
+
+## @section postgres subchart parameters
+## @param mongodb.enabled Deploy mongodb subchart
+##
+postgresql:
+  enabled: true
+  fullnameOverride: "postgres"
+  architecture: "standalone"
+  auth:
+    username: "pokt"
+    password: "P0K7p05tgr3s8"
+    database: "metrics"
+  primary:
+    persistence:
+      enabled: false
