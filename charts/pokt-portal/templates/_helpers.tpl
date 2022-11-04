@@ -62,11 +62,10 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create env vars from a values.env
+Create secret env vars from a values.env
 */}}
 
-
-{{- define "helpers.list-env-variables"}}
+{{- define "helpers.secret-env-variables"}}
 {{- $secretName := printf "%s-vars" .Release.Name -}}
 {{- range $key, $val := .Values.env.secret }}
 - name: {{ $key }}
@@ -75,8 +74,14 @@ Create env vars from a values.env
       name: {{ $secretName }}
       key: {{ $key }}
 {{- end}}
+{{- end}}
+
+{{/*
+Create normal env vars from list
+*/}}
+{{- define "helpers.list-env-variables"}}
 {{- range $key, $val := .Values.env.normal }}
 - name: {{ $key }}
   value: {{ $val | quote }}
-{{- end}}
+{{- end }}
 {{- end }}
