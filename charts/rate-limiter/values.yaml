@@ -5,7 +5,7 @@
 replicaCount: 3
 
 image:
-  repository: pocketfoundation/rate-limiter
+  repository: 059424750518.dkr.ecr.us-west-2.amazonaws.com/rate-limiter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
