@@ -15,26 +15,29 @@ collector:
       requests:
         cpu: 500m
         memory: 1024Mi
+    env:
+      normal:
+        # Influx DB
+        INFLUX_URL=https://influx.portal.pokt.network:8086
+        INFLUX_ORG=pocket
+        INFLUXDB_BUCKET_DAILY=mainnetRelayApp2m
+        INFLUXDB_BUCKET_CURRENT=mainnetRelayApp2m
 
-    configurationFile:
-      .env: |-
-      # Influx DB
-      INFLUX_URL=
-      INFLUX_TOKEN=
-      INFLUX_ORG=myorg
-      INFLUXDB_BUCKET_DAILY=
-      INFLUXDB_BUCKET_CURRENT=
+        # Postgres DB
+        POSTGRES_HOST=relays-meter.cbullmfckexd.us-west-2.rds.amazonaws.com
+        POSTGRES_PORT=5432
+        POSTGRES_USER=postgres
 
-      # Postgres DB
-      POSTGRES_HOST=
-      POSTGRES_PORT=5432
-      POSTGRES_USER
-      POSTGRES_PASSWORD
-      POSTGRES_DB
+        # Report
+        COLLECTION_INTERVAL_SECONDS=30
+        ENV_REPORT_INTERVAL_SECONDS=10
+      secret:
+        # Influx DB
+        INFLUX_TOKEN=dummy
 
-      # Report
-      COLLECTION_INTERVAL_SECONDS=
-      ENV_REPORT_INTERVAL_SECONDS=
+        # Postgres DB
+        POSTGRES_PASSWORD=dummy
+
 
 apiserver:
   image:
@@ -47,23 +50,41 @@ apiserver:
       requests:
         cpu: 500m
         memory: 1024Mi
-    configurationFile:
-      .env: |-
+    env:
+      normal:
         # Backend API
         API_SERVER_PORT=80
-        BACKEND_API_URL=
-        BACKEND_API_TOKEN=
+        BACKEND_API_URL=https://postgres-api.backend.pokt.network
 
         # Postgres DB
-        POSTGRES_HOST=
+        POSTGRES_HOST=relays-meter.cbullmfckexd.us-west-2.rds.amazonaws.com
         POSTGRES_PORT=5432
-        POSTGRES_USER=
-        POSTGRES_PASSWORD=
-        POSTGRES_DB=
+        POSTGRES_USER=postgres
+      
+      secret:
+        # Backend API
+        BACKEND_API_TOKEN=dummy
+
+        # Postgres DB
+        POSTGRES_PASSWORD=dummy
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+externalSecrets:
+  enabled: true
+  # external secret key
+  key: "relay-meter/staging/env"
+  # secret-store config
+  vault:
+    server: "https://vault:8200"
+    mountPath: "k8s-mount-path"
+    namespace: "our/namespace/"
+    serviceAccount: "portal-api"
+    role: "my-role"
+    path: "path/"
+    version: "v1"
 
 serviceAccount:
   # Specifies whether a service account should be created

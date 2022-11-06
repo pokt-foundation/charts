@@ -33,18 +33,34 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.collector.image.repository }}:{{ .Values.collector.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.collector.image.pullPolicy }}
+          env:
+          {{- include "helpers.collector.list-env-variables" . | indent 12 }}
+          {{- if not .Values.collector.externalSecrets.enabled }}
+          {{- include "helpers.collector.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.collector.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal.fullname" . }}-es
+          {{- end }}
           resources:
             {{- toYaml .Values.collector.resources | nindent 12 }}
           {{- if .Values.collector.configurationFile }}
-          volumeMounts:
-            - name: config-collector
-              mountPath: /config
-          {{- end }}
         - name: {{ .Chart.Name }}-apiserver
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- include "helpers.apiserver.list-env-variables" . | indent 12 }}
+          {{- if not .Values.apiserver.externalSecrets.enabled }}
+          {{- include "helpers.apiserver.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.apiserver.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal.fullname" . }}-es
+          {{- end }}
           ports:
             - name: http
               containerPort: 80
@@ -52,9 +68,6 @@ spec:
           resources:
             {{- toYaml .Values.apiserver.resources | nindent 12 }}
           {{- if .Values.apiserver.configurationFile }}
-          volumeMounts:
-            - name: config-apiserver
-              mountPath: /config
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -67,19 +80,4 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.configurationFile }}
-      volumes:
-        - name: config-collector
-          configMap:
-            name: {{ include "pokt-relay-meter.fullname" . }}-collector
-            items:
-            - key: .env
-              path: .env
-        - name: config-apiserver
-          configMap:
-            name: {{ include "pokt-relay-meter.fullname" . }}-apiserver
-            items:
-            - key: .env
-              path: .env         
       {{- end }}

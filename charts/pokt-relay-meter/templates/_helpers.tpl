@@ -60,3 +60,53 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create secret env vars from a values.collector.env
+*/}}
+
+{{- define "helpers.collector.secret-env-variables"}}
+{{- $secretName := printf "%s-collector-vars" .Release.Name -}}
+{{- range $key, $val := .Values.collector.env.secret }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: {{ $key }}
+{{- end}}
+{{- end}}
+
+{{/*
+Create normal env vars from list
+*/}}
+{{- define "helpers.collector.list-env-variables"}}
+{{- range $key, $val := .Values.collector.env.normal }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create secret env vars from a values.apiserver.env
+*/}}
+
+{{- define "helpers.apiserver.secret-env-variables"}}
+{{- $secretName := printf "%s-apiserver-vars" .Release.Name -}}
+{{- range $key, $val := .Values.apiserver.env.secret }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName }}
+      key: {{ $key }}
+{{- end}}
+{{- end}}
+
+{{/*
+Create normal env vars from list
+*/}}
+{{- define "helpers.apiserver.list-env-variables"}}
+{{- range $key, $val := .Values.apiserver.env.normal }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end }}
