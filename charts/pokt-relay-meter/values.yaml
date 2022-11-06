@@ -6,8 +6,9 @@ replicaCount: 1
 
 collector:
   image:
-    repository: pocketfoundation/relay-meter-collector
+    repository: 059424750518.dkr.ecr.us-west-2.amazonaws.com/relay-meter-collector
     pullPolicy: IfNotPresent
+    tag: "latest"
     resources: 
       limits:
         cpu: 500m
@@ -41,8 +42,9 @@ collector:
 
 apiserver:
   image:
-    repository: pocketfoundation/relay-meter-apiserver
+    repository: 059424750518.dkr.ecr.us-west-2.amazonaws.com/relay-meter-apiserver
     pullPolicy: IfNotPresent
+    tag: "latest"
     resources:
       limits:
         cpu: 500m
