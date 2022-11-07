@@ -45,7 +45,6 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.collector.resources | nindent 12 }}
-          {{- if .Values.collector.configurationFile }}
         - name: {{ .Chart.Name }}-apiserver
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -67,8 +66,6 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.apiserver.resources | nindent 12 }}
-          {{- if .Values.apiserver.configurationFile }}
-          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
