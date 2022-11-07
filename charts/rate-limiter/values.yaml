@@ -102,10 +102,15 @@ externalSecrets:
 # Environment variable listing
 env:
   # non sensitive variables
-  normal: []
-    # remote cache
+  normal:
+    HTTP_RETRIES: "3"
+    HTTP_TIMEOUT: "180"
+    PORT: "80"
+    CACHE_REFRESH: "60"
+    GRACE_PERIOD: "180"
   # sensitive variables stored in a secret
-  secret: []
-    # Pocket-js keys
-    # HTTP_DB_API_KEY: "dummyvalue"
-    # API_KEYS: "dummyvalue"
+  secret:
+    HTTP_DB_API_KEY: "dummyvalu3"
+    HTTP_DB_URL: "https://postgres-api.com"
+    RELAY_METER_URL: "https://relaymeter.com"
+    API_KEYS: "dummyvalu3"
