@@ -109,7 +109,7 @@ env:
     CACHE_REFRESH: "60"
     GRACE_PERIOD: "180"
     HTTP_DB_API_KEY: "dummyvalu3"
-    HTTP_DB_URL: "https://postgres-api.com"
+    HTTP_DB_URL: "https://postgres-api-staging.backend.pokt.network"
     RELAY_METER_URL: "https://relaymeter.com"
     API_KEYS: "dummyvalu3"
   # sensitive variables stored in a secret
