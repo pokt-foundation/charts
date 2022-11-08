@@ -153,6 +153,9 @@ spec:
         - name: {{ $cntnr.name }}
           image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
+          {{- with $cntnr.imagePullSecrets }}
+          imagePullSecrets: {{ toYaml . | nindent 12 }}
+          {{- end }}
 
           {{- with $cntnr.env }}
           env: {{- toYaml . | nindent 12}}
