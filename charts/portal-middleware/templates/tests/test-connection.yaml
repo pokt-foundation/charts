@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "portal-middleware.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "portal-middleware.fullname" . }}:{{ .Values.service.port }}/healthz']
   restartPolicy: Never
