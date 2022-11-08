@@ -453,6 +453,22 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-0.0.1/pokt-portal-0.0.1.tgz
     version: 0.0.1
+  portal-middleware:
+  - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2022-11-08T13:21:56.769071165Z"
+    description: A Helm chart deploying middleware services
+    digest: fc9077d659daa5752de94a0c5e6752ad80e991687d079688a16dcef784d64f9c
+    maintainers:
+    - name: WesleyCharlesBlake
+      url: https://github.com/WesleyCharlesBlake/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: portal-middleware
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/portal-middleware-0.0.1/portal-middleware-0.0.1.tgz
+    version: 0.0.1
   release-watch:
   - apiVersion: v2
     appVersion: main
@@ -478,4 +494,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-11-08T03:58:27.910979535Z"
+generated: "2022-11-08T13:21:56.769242967Z"
