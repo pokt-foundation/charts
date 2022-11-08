@@ -205,6 +205,11 @@ spec:
             - name: {{ $volumeName }}
               mountPath: {{ $sts.persistence.volumeMountPath }}
 
+            {{- if $stfs.persistence.extraPVC }}
+            - name: extra-data
+              mountPath: /extra-data
+            {{- end }}
+
       {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       volumes:
@@ -219,6 +224,12 @@ spec:
           secret:
             secretName: {{$secn}}
             optional: false
+        {{- end }}
+
+        {{- if $stfs.persistence.extraPVC }}
+        - name: extra-data
+          persistentVolumeClaim:
+            claimName: {{ $stfs.persistence.extraPVC }}
         {{- end }}
 
   volumeClaimTemplates:
