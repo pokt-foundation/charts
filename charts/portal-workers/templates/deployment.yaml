@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pokt-portal-workers.fullname" . }}
+  labels:
+    {{- include "pokt-portal-workers.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pokt-portal-workers.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pokt-portal-workers.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pokt-portal-workers.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-analytics
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.analytics.image.repository }}:{{ .Values.analytics.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.analytics.image.pullPolicy }}
+          command: ["/app/analytics"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          env:
+          {{- include "helpers.portal-workers-analytics.list-env-variables" . | indent 12 }}
+          {{- if not .Values.externalSecrets.enabled }}
+          {{- include "helpers.portal-workers-analytics.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal-workers.fullname" . }}-es
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-notifier
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.notifier.image.repository }}:{{ .Values.notifier.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.notifier.image.pullPolicy }}
+          command: ["/app/notifier"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          env:
+          {{- include "helpers.portal-workers-notifier.list-env-variables" . | indent 12 }}
+          {{- if not .Values.externalSecrets.enabled }}
+          {{- include "helpers.portal-workers-notifier.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal-workers.fullname" . }}-es
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-stripe
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.stripe.image.repository }}:{{ .Values.stripe.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.stripe.image.pullPolicy }}
+          command: ["/app/stripe"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          env:
+          {{- include "helpers.portal-workers-stripe.list-env-variables" . | indent 12 }}
+          {{- if not .Values.externalSecrets.enabled }}
+          {{- include "helpers.portal-workers-stripe.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-portal-workers.fullname" . }}-es
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
