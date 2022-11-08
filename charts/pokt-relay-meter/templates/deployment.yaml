@@ -35,13 +35,13 @@ spec:
           imagePullPolicy: {{ .Values.collector.image.pullPolicy }}
           env:
           {{- include "helpers.collector.list-env-variables" . | indent 12 }}
-          {{- if not .Values.collector.externalSecrets.enabled }}
+          {{- if not .Values.externalSecrets.enabled }}
           {{- include "helpers.collector.secret-env-variables" . | indent 12 }}
           {{- end }}
-          {{- if .Values.collector.externalSecrets.enabled }}
+          {{- if .Values.externalSecrets.enabled }}
           envFrom:
           - secretRef:
-              name: {{ include "pokt-portal.fullname" . }}-es
+              name: {{ include "pokt-relay-meter.fullname" . }}-es
           {{- end }}
           resources:
             {{- toYaml .Values.collector.resources | nindent 12 }}
@@ -49,16 +49,16 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
           env:
           {{- include "helpers.apiserver.list-env-variables" . | indent 12 }}
-          {{- if not .Values.apiserver.externalSecrets.enabled }}
+          {{- if not .Values.externalSecrets.enabled }}
           {{- include "helpers.apiserver.secret-env-variables" . | indent 12 }}
           {{- end }}
-          {{- if .Values.apiserver.externalSecrets.enabled }}
+          {{- if .Values.externalSecrets.enabled }}
           envFrom:
           - secretRef:
-              name: {{ include "pokt-portal.fullname" . }}-es
+              name: {{ include "pokt-relay-meter.fullname" . }}-es
           {{- end }}
           ports:
             - name: http
