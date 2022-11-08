@@ -115,6 +115,9 @@ spec:
         {{- toYaml . | nindent 6 }}
       {{- end }}
 
+      {{- with $sts.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       {{- range $kcntnr, $cntnr := $sts.containers }}
         {{- if $cntnr.healthProbes }}
@@ -153,9 +156,6 @@ spec:
         - name: {{ $cntnr.name }}
           image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
-          {{- with $cntnr.imagePullSecrets }}
-          imagePullSecrets: {{ toYaml . | nindent 12 }}
-          {{- end }}
 
           {{- with $cntnr.env }}
           env: {{- toYaml . | nindent 12}}
