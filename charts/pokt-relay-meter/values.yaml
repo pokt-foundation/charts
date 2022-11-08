@@ -8,7 +8,7 @@ collector:
   image:
     repository: pocketfoundation/relay-meter-collector
     pullPolicy: IfNotPresent
-  resources: 
+  resources:
     limits:
       cpu: 500m
       memory: 1024Mi
@@ -22,7 +22,7 @@ collector:
       INFLUX_ORG: pocket
       INFLUXDB_BUCKET_DAILY: mainnetRelayApp2m
       INFLUXDB_BUCKET_CURRENT: mainnetRelayApp2m
-        
+
       # Postgres DB
       POSTGRES_HOST: relays-meter.cbullmfckexd.us-west-2.rds.amazonaws.com
       POSTGRES_PORT: 5432
@@ -43,8 +43,7 @@ apiserver:
   image:
     repository: pocketfoundation/relay-meter-apiserver
     pullPolicy: IfNotPresent
-    resources:
-  resources: 
+  resources:
     limits:
       cpu: 500m
       memory: 1024Mi
@@ -61,7 +60,7 @@ apiserver:
       POSTGRES_HOST: relays-meter.cbullmfckexd.us-west-2.rds.amazonaws.com
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
-      
+
     secret:
       # Backend API
       BACKEND_API_TOKEN: dummy
