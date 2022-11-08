@@ -3,6 +3,7 @@ target-branch: master
 chart-dirs:
   - charts
 chart-repos:
-#  - pokt=https://pokt-foundation.gitlab.io/charts
+#  - pokt=https://pokt-foundation.github.io/charts/
    - bitnami=https://charts.bitnami.com/bitnami
+   - influxdata=https://helm.influxdata.com/
 helm-extra-args: --timeout 600s
