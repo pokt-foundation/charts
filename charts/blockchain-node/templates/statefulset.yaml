@@ -115,6 +115,9 @@ spec:
         {{- toYaml . | nindent 6 }}
       {{- end }}
 
+      {{- with $sts.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       {{- range $kcntnr, $cntnr := $sts.containers }}
         {{- if $cntnr.healthProbes }}
@@ -205,6 +208,11 @@ spec:
             - name: {{ $volumeName }}
               mountPath: {{ $sts.persistence.volumeMountPath }}
 
+            {{- if $sts.persistence.extraPVC }}
+            - name: extra-data
+              mountPath: /extra-data
+            {{- end }}
+
       {{- end }} # {{/* range $kcntnr, $cntnr := $sts.containers */}}
 
       volumes:
@@ -219,6 +227,12 @@ spec:
           secret:
             secretName: {{$secn}}
             optional: false
+        {{- end }}
+
+        {{- if $sts.persistence.extraPVC }}
+        - name: extra-data
+          persistentVolumeClaim:
+            claimName: {{ $sts.persistence.extraPVC }}
         {{- end }}
 
   volumeClaimTemplates:
