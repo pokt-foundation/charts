@@ -10,9 +10,9 @@ metadata:
   name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
-  {{- if $prt.ingressNginx.annotations }}
+  {{- with $prt.ingressNginx.annotations }}
   annotations:
-    {{- toYaml $prt.ingressNginx.annotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   ingressClassName: nginx
@@ -27,7 +27,10 @@ spec:
             name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
             port:
               number: {{ $prt.port }}
-  tls: []
+  tls:
+  - hosts:
+    - {{ $prt.ingressNginx.host }}
+
 {{- end -}}{{- end -}}
 
 {{- end -}}
