@@ -163,6 +163,12 @@ env:
     LOG_TO_DATADOG: "false"
     DATADOG_API_KEY: myApiKey
 
+## @section portal-middleware subchart parameters
+## @param portal-middleware .enabled Deploy portal-middleware  subchart
+##
+portal-middleware:
+  enabled: true
+
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
 redis:
