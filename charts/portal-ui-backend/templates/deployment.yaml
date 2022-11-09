@@ -49,8 +49,9 @@ spec:
               port: http
           {{- end }}
           env:
+          {{- if .Values.env.normal }}
           {{- include "helpers.list-env-variables" . | indent 12 }}
-          {{- if not .Values.externalSecrets.enabled }}
+          {{- if .Values.env.secret }}
           {{- include "helpers.secret-env-variables" . | indent 12 }}
           {{- end }}
           {{- if .Values.externalSecrets.enabled }}
