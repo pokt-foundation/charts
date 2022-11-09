@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pokt-portal-ui-backend.fullname" . }}
+  labels:
+    {{- include "pokt-portal-ui-backend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "pokt-portal-ui-backend.selectorLabels" . | nindent 4 }}
