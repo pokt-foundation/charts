@@ -8,13 +8,9 @@ collector:
   image:
     repository: pocketfoundation/relay-meter-collector
     pullPolicy: IfNotPresent
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 500m
-      memory: 1024Mi
+
+  resources: {}
+
   env:
     normal:
       # Influx DB
@@ -44,13 +40,8 @@ apiserver:
   image:
     repository: pocketfoundation/relay-meter-apiserver
     pullPolicy: IfNotPresent
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1024Mi
-    requests:
-      cpu: 500m
-      memory: 1024Mi
+  resources: {}
+
   env:
     normal:
       # Backend API (http-db)
