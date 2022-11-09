@@ -3,7 +3,9 @@ name: pokt-relay-meter
 description: A Helm chart for deploying the POKT Relay Meter service
 maintainers:
   - name: rutwickjain87
+    url: https://github.com/rutwickjain87
   - name: pokt-foundation
+    url: https://github.com/pokt-foundation/charts
 
 # A chart can be either an 'application' or a 'library' chart.
 #
