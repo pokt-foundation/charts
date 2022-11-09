@@ -65,9 +65,9 @@ Create the name of the service account to use
 Create env vars fromo a list of key value pairs
 */}}
 
-{{- define "helpers.list-env-variables"}}
+{{- define "helpers.list-variables"}}
 {{- range $key, $val := .Values.envVars }}
 - name: {{ $key }}
   value: {{ $val | quote }}
-{{- end}}
+{{- end }}
 {{- end }}
