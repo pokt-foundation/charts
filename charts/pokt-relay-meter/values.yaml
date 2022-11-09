@@ -18,8 +18,8 @@ collector:
   env:
     normal:
       # Influx DB
-      INFLUX_URL: https://influx.portal.pokt.network:8086
-      INFLUX_ORG: pocket
+      INFLUXDB_URL: https://influx.portal.pokt.network:8086
+      INFLUXDB_ORG: pocket
       INFLUXDB_BUCKET_DAILY: mainnetRelayApp2m
       INFLUXDB_BUCKET_CURRENT: mainnetRelayApp2m
 
@@ -27,13 +27,14 @@ collector:
       POSTGRES_HOST: relays-meter.cbullmfckexd.us-west-2.rds.amazonaws.com
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
+      POSTGRES_DB: relay-meter
 
       # Report
       COLLECTION_INTERVAL_SECONDS: 30
       ENV_REPORT_INTERVAL_SECONDS: 10
     secret:
       # Influx DB
-      INFLUX_TOKEN: dummy
+      INFLUXDB_TOKEN: dummy
 
       # Postgres DB
       POSTGRES_PASSWORD: dummy
@@ -73,7 +74,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 externalSecrets:
-  enabled: true
+  enabled: false
   # external secret key
   key: "relay-meter/staging/env"
   # secret-store config
