@@ -27,3 +27,13 @@ version: 0.0.1
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.0.1"
+
+dependencies:
+- name: influxdb2
+  version: "2.1.1"
+  repository: "https://helm.influxdata.com/"
+  condition: influxdb2.enabled
+- name: postgresql
+  version: "12.1.0"
+  repository: "https://charts.bitnami.com/bitnami"
+  condition: postgresql.enabled
