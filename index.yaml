@@ -469,6 +469,21 @@ entries:
     version: 0.0.1
   portal-middleware:
   - apiVersion: v2
+    appVersion: 0.0.10
+    created: "2022-11-09T12:21:26.54693286Z"
+    description: A Helm chart deploying middleware services
+    digest: 472435065927e369c724bec0ae1bc285a3d08920ddae2927a2eef449445e1e1a
+    maintainers:
+    - name: WesleyCharlesBlake
+      url: https://github.com/WesleyCharlesBlake/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: portal-middleware
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/portal-middleware-0.0.2/portal-middleware-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     appVersion: 0.0.4
     created: "2022-11-08T13:21:56.769071165Z"
     description: A Helm chart deploying middleware services
@@ -508,4 +523,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-11-08T15:45:13.074015867Z"
+generated: "2022-11-09T12:21:26.547008461Z"
