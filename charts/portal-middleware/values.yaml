@@ -100,3 +100,18 @@ affinity: {}
 envVars:
   BACKEND_URL: "http://api.svc.default.cluster.local:3000"
   PORT: "8080"
+
+config_json: |
+    {
+        "plugins": [
+            "mev"
+        ],
+        "mev": {
+            "chains": {
+                "avax": {
+                    "provider": "avax-provider",
+                    "sleep_duration": 1234
+                }
+            }
+        }
+    }
