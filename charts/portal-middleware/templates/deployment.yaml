@@ -27,6 +27,10 @@ spec:
       serviceAccountName: {{ include "portal-middleware.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "portal-middleware.fullname" . -}}-config
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -59,7 +63,12 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 6 }}
             successThreshold: {{ .Values.readinessProbe.successThreshold | default 1 }}
           {{- end }}
+          volumeMounts:
+          - mountPath: /config
+            name: config
           env:
+            - name: CONFIG_FILE
+              value: /config/config.json
           {{- include "helpers.list-variables" . | indent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
