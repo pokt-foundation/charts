@@ -103,15 +103,37 @@ envVars:
 
 config_json: |
     {
-        "plugins": [
-            "mev"
-        ],
-        "mev": {
-            "chains": {
-                "avax": {
-                    "provider": "avax-provider",
-                    "sleep_duration": 1234
-                }
-            }
-        }
+    	"chain_mappings": {
+    		"eth-mainnet": "eth",
+    		"eth-goerli": "eth"
+    	},
+    	"plugins_config": {
+    		"plugins": [
+    			"mev"
+    		],
+    		"mev": {
+    			"chains": {
+    				"avax": {
+    					"provider": "avax-provider",
+    					"sleep_duration": 1234
+    				}
+    			}
+    		}
+    	}
     }
+
+externalSecrets:
+  enabled: false
+  # external secret key
+  # decodingStrategy: Auto
+  # key: "some/path/secret"
+  # # secret-store config
+  # secretStore: "vault"
+  # vault:
+  #   server: "https://vault:8200"
+  #   mountPath: "k8s-mount-path"
+  #   namespace: "our/namespace/"
+  #   serviceAccount: "portal-api"
+  #   role: "my-role"
+  #   path: "path/"
+  #   version: "v1"
