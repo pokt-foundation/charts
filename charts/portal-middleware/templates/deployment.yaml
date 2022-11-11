@@ -28,15 +28,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        {{- if not .Values.externalSecrets.enabled }}
-        - name: config
-          configMap:
-            name: {{ include "portal-middleware.fullname" . }}-config
-        {{- end }}
         {{- if .Values.externalSecrets.enabled }}
         - name: external-secrets
           secret:
             secretName:  {{ include "portal-middleware.fullname" . }}-es
+        {{- else }}
+        - name: config
+          configMap:
+            name: {{ include "portal-middleware.fullname" . }}-config
         {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -71,14 +70,13 @@ spec:
             successThreshold: {{ .Values.readinessProbe.successThreshold | default 1 }}
           {{- end }}
           volumeMounts:
-          {{- if not .Values.externalSecrets }}
-          - mountPath: /config
-            name: config
-          {{- end }}
           {{- if .Values.externalSecrets.enabled }}
           - mountPath: "/config/"
             name: external-secrets
             readOnly: true
+          {{- else }}
+          - mountPath: /config
+            name: config
           {{- end }}
           env:
             - name: CONFIG_FILE
