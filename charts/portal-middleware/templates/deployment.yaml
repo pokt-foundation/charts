@@ -75,7 +75,7 @@ spec:
           - mountPath: /config
             name: config
           {{- end }}
-          {{- if .Values.externalSecrets }}
+          {{- if .Values.externalSecrets.enabled }}
           - mountPath: "/config/"
             name: external-secrets
             readOnly: true
