@@ -103,17 +103,23 @@ envVars:
 
 config_json: |
     {
-        "plugins": [
-            "mev"
-        ],
-        "mev": {
-            "chains": {
-                "avax": {
-                    "provider": "avax-provider",
-                    "sleep_duration": 1234
-                }
-            }
-        }
+    	"chain_mappings": {
+    		"eth-mainnet": "eth",
+    		"eth-goerli": "eth"
+    	},
+    	"plugins_config": {
+    		"plugins": [
+    			"mev"
+    		],
+    		"mev": {
+    			"chains": {
+    				"avax": {
+    					"provider": "avax-provider",
+    					"sleep_duration": 1234
+    				}
+    			}
+    		}
+    	}
     }
 
 externalSecrets:
