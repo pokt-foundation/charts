@@ -19,7 +19,7 @@
 {{- $podAnnotations := (default (dict ) $sts.podAnnotations) }}
 {{- range $kcntnr, $cntnr := $sts.containers }}
   {{- if $cntnr.healthProbes }}{{if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
-    {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" ($cntnr.healthProbes.portToMonitor|quote)) }}
+    {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" "9090") }}
   {{- end }}{{- end }}
 {{- end }}
 ---
