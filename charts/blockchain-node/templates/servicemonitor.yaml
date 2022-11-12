@@ -15,7 +15,7 @@ spec:
   ports:
     - port: 9090
       targetPort: 9090
-      name: readyness
+      name: readiness
 
 ---
 kind: ServiceMonitor
@@ -25,7 +25,7 @@ metadata:
 spec:
   endpoints:
   - interval: 60s
-    port: readyness
+    port: readiness
     path: /metrics
   namespaceSelector:
     matchNames:
