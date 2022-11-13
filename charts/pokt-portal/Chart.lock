@@ -14,5 +14,8 @@ dependencies:
 - name: portal-middleware
   repository: https://pokt-foundation.github.io/charts
   version: 0.0.2
+- name: portal-ui-backend
+  repository: https://pokt-foundation.github.io/charts
+  version: 0.0.1
 digest: sha256:c1a9b571b2b7d428d02fa616bd98254d1bf92785d853dc17849dc81c1fa66a88
 generated: "2022-11-09T14:26:50.203320836+02:00"

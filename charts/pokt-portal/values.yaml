@@ -169,6 +169,9 @@ env:
 portal-middleware:
   enabled: true
 
+portal-ui-backend:
+  enabled: true
+
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
 redis:
