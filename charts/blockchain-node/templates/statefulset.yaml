@@ -116,7 +116,7 @@ spec:
         {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
         - name: chain-healthcheck-sidecar
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
-          imagePullPolicy: Always
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
           env:
             {{- range $k, $v := $cntnr.healthProbes.env }}
             {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
