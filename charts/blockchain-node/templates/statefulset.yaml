@@ -14,14 +14,6 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
-
-# Add prometheus annotations
-{{- $podAnnotations := (default (dict ) $sts.podAnnotations) }}
-{{- range $kcntnr, $cntnr := $sts.containers }}
-  {{- if $cntnr.healthProbes }}{{if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
-    {{- $podAnnotations = merge $podAnnotations (dict "prometheus.io/scrape" "true" "prometheus.io/port" ($cntnr.healthProbes.portToMonitor|quote)) }}
-  {{- end }}{{- end }}
-{{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -53,7 +45,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         statefulsetname: {{ $sts.name }}
-      {{- with $podAnnotations }}
+      {{- with $sts.podAnnotations }}
       annotations: {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
@@ -124,7 +116,7 @@ spec:
         {{- if and $cntnr.healthProbes.env $cntnr.healthProbes.portToMonitor }}
         - name: chain-healthcheck-sidecar
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
-          imagePullPolicy: Always
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
           env:
             {{- range $k, $v := $cntnr.healthProbes.env }}
             {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
