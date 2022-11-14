@@ -10,6 +10,6 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
+      command: ['nc']
       args: ['{{ include "pokt-relay-meter.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
