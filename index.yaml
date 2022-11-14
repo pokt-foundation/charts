@@ -46,9 +46,9 @@ entries:
   blockchain-node:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-11-12T21:16:41.454897182Z"
+    created: "2022-11-14T12:54:18.999250083Z"
     description: A Helm chart to deploy a blockchain node
-    digest: 9ecc4e243325bf53dc4f7d8be2e1023e23d7b2845b66820c553855d69371dbb9
+    digest: f60acdd8275ad9bde51a795e3d8ef86b6fce2bbfbf6161ccb087d74ec9b3e3bf
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -62,6 +62,19 @@ entries:
     created: "2022-11-13T21:11:07.281549692Z"
     description: A Helm chart to deploy a blockchain node
     digest: 0b7bbf622fe61227a32e1bd22f68990ef955df4d9423527158e45287b43cece7
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    name: blockchain-node
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.0.14-rc.13/blockchain-node-0.0.14-rc.13.tgz
+    version: 0.0.14-rc.13
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-11-12T21:16:41.454897182Z"
+    description: A Helm chart to deploy a blockchain node
+    digest: 9ecc4e243325bf53dc4f7d8be2e1023e23d7b2845b66820c553855d69371dbb9
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -111,9 +124,9 @@ entries:
     version: 0.0.14-rc.10
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-11-11T20:25:27.820190882Z"
+    created: "2022-11-08T03:58:27.91070183Z"
     description: A Helm chart to deploy a blockchain node
-    digest: 40b0b653a26846949cc4dfc1d3734ab316b0fc66666bb20dcbb163afb4c7925f
+    digest: 768b44e5741ca33429c7ca9935a282d16cfe2ba54045adadbe7858d8c1e82eea
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -124,9 +137,9 @@ entries:
     version: 0.0.14-rc.9
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-11-08T03:58:27.91070183Z"
+    created: "2022-11-11T20:25:27.820190882Z"
     description: A Helm chart to deploy a blockchain node
-    digest: 768b44e5741ca33429c7ca9935a282d16cfe2ba54045adadbe7858d8c1e82eea
+    digest: 40b0b653a26846949cc4dfc1d3734ab316b0fc66666bb20dcbb163afb4c7925f
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -581,6 +594,31 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-ui-backend-0.0.1/pokt-portal-ui-backend-0.0.1.tgz
     version: 0.0.1
+  pokt-relay-meter:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2022-11-14T12:54:19.142556324Z"
+    dependencies:
+    - condition: influxdb2.enabled
+      name: influxdb2
+      repository: https://helm.influxdata.com/
+      version: 2.1.1
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT Relay Meter service
+    digest: b3ad96c2e72b988d4879467a3199b5d74ea00e3984ed341a7d8e63203e28de72
+    maintainers:
+    - name: rutwickjain87
+      url: https://github.com/rutwickjain87
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-relay-meter
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-relay-meter-0.0.1/pokt-relay-meter-0.0.1.tgz
+    version: 0.0.1
   portal-middleware:
   - apiVersion: v2
     appVersion: 0.0.16
@@ -667,4 +705,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-11-13T21:11:07.282064802Z"
+generated: "2022-11-14T12:54:19.142920628Z"
