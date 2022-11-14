@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pokt-relay-meter.fullname" . }}
+  labels:
+    {{- include "pokt-relay-meter.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pokt-relay-meter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pokt-relay-meter.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pokt-relay-meter.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-collector
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.collector.image.repository }}:{{ .Values.collector.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.collector.image.pullPolicy }}
+          env:
+          {{- include "helpers.collector.list-env-variables" . | indent 12 }}
+          {{- if not .Values.externalSecrets.enabled }}
+          {{- include "helpers.collector.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-relay-meter.fullname" . }}-es
+          {{- end }}
+          resources:
+            {{- toYaml .Values.collector.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-apiserver
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
+          env:
+          {{- include "helpers.apiserver.list-env-variables" . | indent 12 }}
+          {{- if not .Values.externalSecrets.enabled }}
+          {{- include "helpers.apiserver.secret-env-variables" . | indent 12 }}
+          {{- end }}
+          {{- if .Values.externalSecrets.enabled }}
+          envFrom:
+          - secretRef:
+              name: {{ include "pokt-relay-meter.fullname" . }}-es
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.apiserver.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
