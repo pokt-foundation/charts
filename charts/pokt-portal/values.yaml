@@ -85,8 +85,9 @@ affinity: {}
 
 externalSecrets:
   enabled: false
-  # external secret key
+  # # external secret key
   # key: "some/path/secret"
+  # decodginStrategy: Auto
   # # secret-store config
   # secretStore: "vault"
   # vault:
@@ -107,6 +108,7 @@ env:
     REDIS_PORT: "6379"
   # sensitive variables stored in a secret
   secret:
+    GATEWAY_HOST: localhost
     # Pocket-js keys
     GATEWAY_CLIENT_PRIVATE_KEY: "v3rys3cr3tk3yud0nt3venkn0w"
     GATEWAY_CLIENT_PASSPHRASE: "v3rys3cr3tp4ssphr4ze"
