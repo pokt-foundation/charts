@@ -85,8 +85,9 @@ affinity: {}
 
 externalSecrets:
   enabled: false
-  # external secret key
+  # # external secret key
   # key: "some/path/secret"
+  # decodginStrategy: Auto
   # # secret-store config
   # secretStore: "vault"
   # vault:
