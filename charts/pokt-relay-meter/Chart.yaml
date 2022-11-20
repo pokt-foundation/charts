@@ -1,9 +1,9 @@
 apiVersion: v2
-name: pokt-portal
-description: A Helm chart for deploying the POKT Portal API services
+name: pokt-relay-meter
+description: A Helm chart for deploying the POKT Relay Meter service
 maintainers:
-  - name: WesleyCharlesBlake
-    url: https://github.com/WesleyCharlesBlake/
+  - name: rutwickjain87
+    url: https://github.com/rutwickjain87
   - name: pokt-foundation
     url: https://github.com/pokt-foundation/charts
 
@@ -20,44 +20,20 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.0.5
+version: 0.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "0.0.9"
+appVersion: "0.0.1"
 
 dependencies:
-- name: redis
-  version: "17.3.7"
-  repository: "https://charts.bitnami.com/bitnami"
-  condition: redis.enabled
 - name: influxdb2
   version: "2.1.1"
   repository: "https://helm.influxdata.com/"
   condition: influxdb2.enabled
-- name: mongodb
-  version: "13.3.0"
-  repository: "https://charts.bitnami.com/bitnami"
-  condition: mongodb.enabled
 - name: postgresql
   version: "12.1.0"
   repository: "https://charts.bitnami.com/bitnami"
   condition: postgresql.enabled
-- name: portal-middleware
-  version: "0.0.2"
-  repository: "https://pokt-foundation.github.io/charts"
-  condition: portal-middleware.enabled
-# - name: pokt-relay-meter
-#   version: "0.0.1"
-#   repository: "https://pokt-foundation.github.io/charts"
-#   condition: relayMeter.enabled
-# - name: pokt-rate-limiter
-#   version: "0.0.1"
-#   repository: "https://pokt-foundation.github.io/charts"
-#   condition: rateLimiter.enabled
-# - name: pokt-portal-workers
-#   version: "0.0.1"
-#   repository: "https://pokt-foundation.github.io/charts"
-#   condition: workers.enabled
