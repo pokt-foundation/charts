@@ -8,8 +8,8 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: nc
+    - name: wget
       image: busybox
-      command: ['nc']
+      command: ['wget']
       args: ['{{ include "pokt-http-db.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
