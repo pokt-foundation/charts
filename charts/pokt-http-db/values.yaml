@@ -175,7 +175,7 @@ postgresql:
             UNIQUE (blockchain_id, domain),
             PRIMARY KEY (id),
             CONSTRAINT fk_blockchain
-                FOREIGN KEY(blockchain_id) 
+                FOREIGN KEY(blockchain_id)
                 REFERENCES blockchains(blockchain_id)
           );
 
@@ -247,10 +247,10 @@ postgresql:
             custom_limit INT NULL,
             PRIMARY KEY (id),
             CONSTRAINT fk_application
-                FOREIGN KEY(application_id) 
+                FOREIGN KEY(application_id)
                 REFERENCES applications(application_id),
             CONSTRAINT fk_pay_plan
-                FOREIGN KEY(pay_plan) 
+                FOREIGN KEY(pay_plan)
                 REFERENCES pay_plans(plan_type)
           );
 
@@ -265,7 +265,7 @@ postgresql:
             version VARCHAR,
             PRIMARY KEY (id),
             CONSTRAINT fk_application
-                FOREIGN KEY(application_id) 
+                FOREIGN KEY(application_id)
                 REFERENCES applications(application_id)
           );
 
@@ -281,7 +281,7 @@ postgresql:
             whitelist_user_agents VARCHAR[],
             PRIMARY KEY (id),
             CONSTRAINT fk_application
-                FOREIGN KEY(application_id) 
+                FOREIGN KEY(application_id)
                 REFERENCES applications(application_id)
           );
 
@@ -295,7 +295,7 @@ postgresql:
             on_full BOOLEAN,
             PRIMARY KEY (id),
             CONSTRAINT fk_application
-                FOREIGN KEY(application_id) 
+                FOREIGN KEY(application_id)
                 REFERENCES applications(application_id)
           );
 
@@ -307,10 +307,10 @@ postgresql:
             UNIQUE(lb_id, app_id),
             PRIMARY KEY (id),
             CONSTRAINT fk_lb
-                FOREIGN KEY(lb_id) 
+                FOREIGN KEY(lb_id)
                 REFERENCES loadbalancers(lb_id),
             CONSTRAINT fk_app
-                FOREIGN KEY(app_id) 
+                FOREIGN KEY(app_id)
                 REFERENCES applications(application_id)
           );
 
@@ -326,12 +326,12 @@ postgresql:
 
           CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS $$
 
-              DECLARE 
+              DECLARE
                   data json;
                   notification json;
-              
+
               BEGIN
-              
+
                   -- Convert the old or new row to JSON, based on the kind of action.
                   -- Action = DELETE?             -> OLD row
                   -- Action = INSERT or UPDATE?   -> NEW row
@@ -340,21 +340,21 @@ postgresql:
                   ELSE
                       data = row_to_json(NEW);
                   END IF;
-                  
+
                   -- Contruct the notification as a JSON string.
                   notification = json_build_object(
                                     'table',TG_TABLE_NAME,
                                     'action', TG_OP,
                                     'data', data);
-                  
-                                  
+
+    
                   -- Execute pg_notify(channel, notification)
                   PERFORM pg_notify('events',notification::text);
                   
                   -- Result is ignored since this is an AFTER trigger
                   RETURN NULL; 
               END;
-              
+
           $$ LANGUAGE plpgsql;
 
           CREATE TRIGGER loadbalancer_notify_event
