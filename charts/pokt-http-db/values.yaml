@@ -347,12 +347,12 @@ postgresql:
                                     'action', TG_OP,
                                     'data', data);
 
-    
+
                   -- Execute pg_notify(channel, notification)
                   PERFORM pg_notify('events',notification::text);
-                  
+
                   -- Result is ignored since this is an AFTER trigger
-                  RETURN NULL; 
+                  RETURN NULL;
               END;
 
           $$ LANGUAGE plpgsql;
