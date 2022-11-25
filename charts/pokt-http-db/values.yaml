@@ -103,10 +103,10 @@ externalSecrets:
 env:
   # non sensitive variables
   normal:
-    PORT: "80"
-    CONNECTION_STRING: "postgres://pokt:P0K7p05tgr3s8@postgres-httpdb.portal-api.svc.cluser.local:5432/phd?sslmode=disable"
+    PORT: 80
+    CONNECTION_STRING: "postgres://pokt:P0K7p05tgr3s8@postgres-httpdb:5432/phd?sslmode=disable"
     API_KEYS: "dummyvalue"
-    CACHE_REFRESH: "180"
+    CACHE_REFRESH: 180
   # sensitive variables stored in a secret
   secret: []
     # PHD_API_KEY: "dummyvalu3"
