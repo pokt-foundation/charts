@@ -137,11 +137,11 @@ spec:
             initialDelaySeconds: 15
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 5m
+              memory: 72Mi
             limits:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 10m
+              memory: 128Mi
         {{- end }}
         {{- end }}
 
@@ -174,26 +174,43 @@ spec:
               containerPort: {{ $prt.port }}
           {{- end }}
 
-          {{- if $cntnr.healthProbes }}
-          # TODO(@okdas): add ability to override startupProbe,livenessProbe,readinessProbe in the values.yaml independently from the healthcheck sidecar
+          {{- if and $cntnr.healthProbes (not $cntnr.startupProbe) }}
           startupProbe:
             httpGet:
               path: /health/startup
               port: 9090
             failureThreshold: 60
             periodSeconds: 60
+          {{- else }}
+            {{- with (default (list ) $cntnr.startupProbe) }}
+          startupProbe: {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+
+          {{- if and $cntnr.healthProbes (not $cntnr.livenessProbe) }}
           livenessProbe:
             httpGet:
               path: /health/liveness
               port: 9090
             failureThreshold: 2
             periodSeconds: 15
+          {{- else }}
+            {{- with (default (list ) $cntnr.livenessProbe) }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+
+          {{- if and $cntnr.healthProbes (not $cntnr.readinessProbe) }}
           readinessProbe:
             httpGet:
               path: /health/readiness
               port: 9090
             failureThreshold: 1
             periodSeconds: 15
+          {{- else }}
+            {{- with (default (list ) $cntnr.readinessProbe) }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
 
           volumeMounts:
