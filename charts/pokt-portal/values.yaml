@@ -4,6 +4,55 @@
 
 replicaCount: 1
 
+middleware:
+  enabled: true
+  image:
+    repository: pocketfoundation/portal-middleware
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  config_json: |
+      {
+      	"chain_mappings": {
+      		"eth-mainnet": "eth",
+      		"eth-goerli": "eth"
+      	},
+      	"plugins_config": {
+      		"plugins": [
+      			"mev"
+      		],
+      		"mev": {
+      			"chains": {
+      				"avax": {
+      					"provider": "avax-provider",
+      					"sleep_duration": 1234
+      				}
+      			}
+      		}
+      	}
+      }
+
+  livenessProbe:
+    enabled: true
+    # initialDelaySeconds: 30
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+
+  readinessProbe:
+    enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+
 image:
   repository: pocketfoundation/portal-api
   pullPolicy: IfNotPresent
@@ -164,12 +213,6 @@ env:
     # Datadog logging
     LOG_TO_DATADOG: "false"
     DATADOG_API_KEY: myApiKey
-
-## @section portal-middleware subchart parameters
-## @param portal-middleware .enabled Deploy portal-middleware  subchart
-##
-portal-middleware:
-  enabled: true
 
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart

@@ -28,10 +28,53 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+      {{- if .Values.middleware.enabled }}
+        - name: middleware
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.middleware.service.port }}
+              protocol: TCP
+          {{- if .Values.middleware.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.middleware.livenessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.livenessProbe.successThreshold | default 1}}
+          {{- end }}
+          {{- if .Values.middleware.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.middleware.readinessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.readinessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.readinessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.readinessProbe.successThreshold | default 1 }}
+          {{- end }}
+          volumeMounts:
+          - mountPath: /config
+            name: config
+          env:
+            - name: CONFIG_FILE
+              value: /config/config.json
+            - name: BACKEND_URL
+              value: "http://localhost:{{ .Values.service.port }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- end }}
+        - name: api
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["npm", "run", "start"]
           ports:
@@ -73,3 +116,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        {{- if .Values.middleware.enabled }}
+        - name: config
+          configMap:
+            name: {{ include "pokt-portal.fullname" . }}-config
+        {{- end }}
