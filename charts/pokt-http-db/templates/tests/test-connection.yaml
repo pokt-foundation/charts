@@ -11,5 +11,5 @@ spec:
     - name: nc
       image: busybox
       command: ['nc']
-      args: ['{{ include "pokt-http-db.fullname" . }}:{{ .Values.service.port }}']
+      args: ['-zv' '{{ include "pokt-http-db.fullname" . }}' '{{ .Values.service.port }}']
   restartPolicy: Never
