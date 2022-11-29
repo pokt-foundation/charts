@@ -139,7 +139,7 @@ externalSecrets:
   enabled: false
   # external secret key
   key: "some/path/secret"
-  decodginStrategy: Auto
+  decodginStrategy: "None"
   # secret-store config
   secretStore: "vault"
   vault:
