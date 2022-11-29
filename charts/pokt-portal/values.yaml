@@ -10,11 +10,7 @@ middleware:
     repository: pocketfoundation/portal-middleware
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
-
-  service:
-    type: ClusterIP
-    port: 8080
+    tag: "0.0.21"
 
   config_json: |
       {
@@ -38,7 +34,7 @@ middleware:
       }
 
   livenessProbe:
-    enabled: true
+    enabled: false
     # initialDelaySeconds: 30
     # periodSeconds: 10
     # timeoutSeconds: 5
@@ -46,12 +42,17 @@ middleware:
     # successThreshold: 1
 
   readinessProbe:
-    enabled: true
+    enabled: false
     # initialDelaySeconds: 5
     # periodSeconds: 10
     # timeoutSeconds: 5
     # failureThreshold: 6
     # successThreshold: 1
+
+  externalSecrets:
+    # # external secret key
+    key: "some/path/secret"
+    decodginStrategy: "Auto"
 
 image:
   repository: pocketfoundation/portal-api
@@ -88,17 +89,19 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 3000
+  # must be 3000 for api OR 8080 for middleware
+  port: 8080
 
 probes:
   enabled: false
 
 ingress:
+  # must be one of api or middleware
   enabled: false
   className: ""
   annotations: {}
   hosts:
-    - host: mydomain.com
+    - host: "*.localhost"
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -134,19 +137,19 @@ affinity: {}
 
 externalSecrets:
   enabled: false
-  # # external secret key
-  # key: "some/path/secret"
-  # decodginStrategy: Auto
-  # # secret-store config
-  # secretStore: "vault"
-  # vault:
-  #   server: "https://vault:8200"
-  #   mountPath: "k8s-mount-path"
-  #   namespace: "our/namespace/"
-  #   serviceAccount: "portal-api"
-  #   role: "my-role"
-  #   path: "path/"
-  #   version: "v1"
+  # external secret key
+  key: "some/path/secret"
+  decodginStrategy: Auto
+  # secret-store config
+  secretStore: "vault"
+  vault:
+    server: "https://vault:8200"
+    mountPath: "k8s-mount-path"
+    namespace: "our/namespace/"
+    serviceAccount: "portal-api"
+    role: "my-role"
+    path: "path/"
+    version: "v1"
 
 
 # Environment variable listing
@@ -170,7 +173,7 @@ env:
     REMOTE_REDIS_ENDPOINT: "redis-master:6379"
 
     # local cache
-    LOCAL_REDIS_ENDPOINT: "redis-master:6379"
+    LOCAL_REDIS_ENDPOINT: "localhost:6379"
     REDIS_LOCAL_TTL_FACTOR: "1"
 
     # Influx DB
