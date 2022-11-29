@@ -486,6 +486,38 @@ entries:
   pokt-portal:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2022-11-29T11:43:23.865542408Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.3.7
+    - condition: influxdb2.enabled
+      name: influxdb2
+      repository: https://helm.influxdata.com/
+      version: 2.1.1
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.3.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT Portal API services
+    digest: be9a0d71f726289882dde1d0c0e0b165f496aa3a30b54dea65195b014cb66ef6
+    maintainers:
+    - name: WesleyCharlesBlake
+      url: https://github.com/WesleyCharlesBlake/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-portal
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-0.1.2/pokt-portal-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2022-11-29T11:31:38.729679172Z"
     dependencies:
     - condition: redis.enabled
@@ -837,4 +869,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-11-29T11:31:38.729825373Z"
+generated: "2022-11-29T11:43:23.865793607Z"
