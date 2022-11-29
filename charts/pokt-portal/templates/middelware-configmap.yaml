@@ -1,0 +1,9 @@
+{{- if .Values.middleware.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pokt-portal.fullname" . -}}-config
+data:
+  config.json: |
+{{ .Values.middleware.config_json | indent 4 }}
+{{- end }}

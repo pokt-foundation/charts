@@ -11,8 +11,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.1.0
-- name: portal-middleware
-  repository: https://pokt-foundation.github.io/charts
-  version: 0.0.2
-digest: sha256:c1a9b571b2b7d428d02fa616bd98254d1bf92785d853dc17849dc81c1fa66a88
-generated: "2022-11-09T14:26:50.203320836+02:00"
+digest: sha256:c9d6e1b6e963535d86ede95b253570dc8f9e3abd2cad0413bd4ec596f031f385
+generated: "2022-11-25T22:53:26.902806+02:00"

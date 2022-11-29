@@ -28,15 +28,69 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        ### portal-middleware sidecar container ###
+      {{- if .Values.middleware.enabled }}
+        - name: middleware
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.middleware.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.middleware.livenessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.livenessProbe.successThreshold | default 1}}
+          {{- end }}
+          {{- if .Values.middleware.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.middleware.readinessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.readinessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.readinessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.readinessProbe.successThreshold | default 1 }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.externalSecrets.enabled }}
+          - mountPath: "/config/"
+            name: external-secrets
+            readOnly: true
+          {{- else }}
+          - mountPath: /config
+            name: config
+          {{- end }}
+          env:
+            - name: CONFIG_FILE
+              value: /config/config.json
+            - name: BACKEND_URL
+              value: "http://localhost:3000"
+            - name: PORT
+              value: "8080"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- end }}
+
+        ### portal-api sidecar container ###
+        - name: api
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["npm", "run", "start"]
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: 3000
               protocol: TCP
           {{- if .Values.probes.enabled }}
           livenessProbe:
@@ -60,7 +114,22 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
+
+        ### redis sidecar container ###
+        - name: redis
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: redis
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: REDIS_TLS_ENABLED
+              value: "no"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -73,3 +142,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        {{- if .Values.middleware.enabled }}
+        {{- if .Values.externalSecrets.enabled }}
+        - name: external-secrets
+          secret:
+            secretName:  {{ include "pokt-portal.fullname" . }}-middleware-es
+        {{- else }}
+        - name: config
+          configMap:
+            name: {{ include "pokt-portal.fullname" . -}}-config
+        {{- end }}
+        {{- end }}
