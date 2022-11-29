@@ -138,7 +138,7 @@ affinity: {}
 ## @param mongodb.enabled Deploy mongodb subchart
 ##
 postgresql:
-  enabled: true
+  enabled: false
   fullnameOverride: "postgres"
   architecture: "standalone"
   auth:
@@ -187,7 +187,7 @@ postgresql:
 ## @param influxdb.enabled Deploy influx subchart
 ##
 influxdb2:
-  enabled: true
+  enabled: false
   fullnameOverride: "influxdb"
   persistence:
     enabled: false
