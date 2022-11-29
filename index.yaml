@@ -464,6 +464,25 @@ entries:
     urls:
     - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
     version: 0.1.0
+  pokt-http-db:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2022-11-29T10:15:04.129138395Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT HTTP DB service
+    digest: 81e1220e46c2304e9a449c096a800a24d6ce4a3ebd62d9e9e452d851ae55c4bc
+    maintainers:
+    - name: olakunle-pokt
+    - name: pokt-foundation
+    name: pokt-http-db
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-http-db-0.0.1/pokt-http-db-0.0.1.tgz
+    version: 0.0.1
   pokt-portal:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -786,4 +805,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-11-29T10:13:19.465185115Z"
+generated: "2022-11-29T10:15:04.129342797Z"
