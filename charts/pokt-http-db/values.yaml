@@ -104,7 +104,7 @@ env:
   # non sensitive variables
   normal:
     PORT: 80
-    CONNECTION_STRING: "postgres://pokt:P0K7p05tgr3s8@postgres-httpdb:5432/phd?sslmode=disable"
+    CONNECTION_STRING: "postgres://pokt:dummy@postgres-httpdb:5432/phd?sslmode=disable"
     API_KEYS: "dummyvalue"
     CACHE_REFRESH: 180
   # sensitive variables stored in a secret
@@ -126,7 +126,7 @@ postgresql:
   architecture: "standalone"
   auth:
     username: "pokt"
-    password: "P0K7p05tgr3s8"
+    password: "dummy"
     database: "phd"
   primary:
     persistence:

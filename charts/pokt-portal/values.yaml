@@ -162,12 +162,12 @@ env:
   secret:
     GATEWAY_HOST: localhost
     # Pocket-js keys
-    GATEWAY_CLIENT_PRIVATE_KEY: "v3rys3cr3tk3yud0nt3venkn0w"
-    GATEWAY_CLIENT_PASSPHRASE: "v3rys3cr3tp4ssphr4ze"
+    GATEWAY_CLIENT_PRIVATE_KEY: "dummy"
+    GATEWAY_CLIENT_PASSPHRASE: "dummy"
     BLOCKED_ADDRESSES_URL: "https://blocked-addresses.s3.us-west-2.amazonaws.com/blocked_address.json"
     # Mongodb env
     MONGO_ENDPOINT: "mongodb://pokt:P0K7m0ngod8@mongodb:27017/gateway"
-    DATABASE_ENCRYPTION_KEY: "00000000000000000000000000000000"
+    DATABASE_ENCRYPTION_KEY: "dummy"
 
     # remote cache
     REMOTE_REDIS_ENDPOINT: "redis-master:6379"
@@ -178,11 +178,11 @@ env:
 
     # Influx DB
     INFLUX_URLS: "http://influxdb"
-    INFLUX_TOKENS: "xbvafasvxgxg1262619"
+    INFLUX_TOKENS: "dummy"
     INFLUX_ORGS: "demand-infra"
 
     # Metrics DB
-    PSQL_CONNECTION: "postgres://pokt:P0K7p05tgr3s8@postgres:5432/metrics"
+    PSQL_CONNECTION: "postgres://pokt:dummy@postgres:5432/metrics"
     PSQL_CERTIFICATE: "https://s3.amazonaws.com/"
 
     # logz
@@ -210,12 +210,12 @@ env:
     NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
     LOG_TO_CLOUDWATCH: "false"
-    AWS_ACCESS_KEY_ID: "AXAI"
-    AWS_SECRET_ACCESS_KEY: "xYansdlapq912n"
+    AWS_ACCESS_KEY_ID: "dummy"
+    AWS_SECRET_ACCESS_KEY: "dummy"
 
     # Datadog logging
     LOG_TO_DATADOG: "false"
-    DATADOG_API_KEY: myApiKey
+    DATADOG_API_KEY: dummy
 
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
@@ -248,8 +248,8 @@ influxdb2:
     bucket: "default"
     user: "admin"
     retention_policy: "0s"
-    password: "SuperS3cr37P@5$w0rd"
-    token: "xbvafasvxgxg1262619"
+    password: "dummy"
+    token: "dummy"
 
 ## @section mongodb subchart parameters
 ## @param mongodb.enabled Deploy mongodb subchart
@@ -259,11 +259,11 @@ mongodb:
   fullnameOverride: "mongodb"
   port: 27017
   auth:
-    rootPassword: SuperS3cr37P@5$w0rd
+    rootPassword: dummy
     usernames:
       - pokt
     passwords:
-      - P0K7m0ngod8
+      - dummy
     databases:
       - gateway
   persistence:
@@ -278,7 +278,7 @@ postgresql:
   architecture: "standalone"
   auth:
     username: "pokt"
-    password: "P0K7p05tgr3s8"
+    password: "dummy"
     database: "metrics"
   primary:
     persistence:

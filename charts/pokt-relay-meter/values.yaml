@@ -30,10 +30,10 @@ collector:
       ENV_REPORT_INTERVAL_SECONDS: 10
     secret:
       # Influx DB
-      INFLUXDB_TOKEN: xbvafasvxgxg1262619
+      INFLUXDB_TOKEN: dummy
 
       # Postgres DB
-      POSTGRES_PASSWORD: P0K7p05tgr3s8
+      POSTGRES_PASSWORD: dummy
 
 
 apiserver:
@@ -59,7 +59,7 @@ apiserver:
       BACKEND_API_TOKEN: dummy
 
       # Postgres DB
-      POSTGRES_PASSWORD: P0K7p05tgr3s8
+      POSTGRES_PASSWORD: dummy
 
 imagePullSecrets: []
 nameOverride: ""
@@ -143,7 +143,7 @@ postgresql:
   architecture: "standalone"
   auth:
     username: "pokt"
-    password: "P0K7p05tgr3s8"
+    password: "dummy"
     database: "relay-meter"
   primary:
     persistence:
@@ -196,5 +196,5 @@ influxdb2:
     bucket: "default"
     user: "admin"
     retention_policy: "0s"
-    password: "SuperS3cr37P@5$w0rd"
-    token: "xbvafasvxgxg1262619"
+    password: "dummy"
+    token: "dummy"
