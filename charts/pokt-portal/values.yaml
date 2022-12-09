@@ -14,6 +14,7 @@ middleware:
 
   config_json: |
       {
+        "backend_url": "http://localhost:3000",
       	"chain_mappings": {
       		"eth-mainnet": "eth",
       		"eth-goerli": "eth"
