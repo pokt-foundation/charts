@@ -841,6 +841,19 @@ entries:
     version: 0.0.1
   pokt-portal-ui-backend:
   - apiVersion: v2
+    appVersion: 0.0.9
+    created: "2022-12-11T22:24:48.24354949Z"
+    description: A Helm chart for deploying the POKT Portal UI Backend service
+    digest: 21f1bb47e7f2d5bf043ea9e20ee97d1905c72016bfdcffe292581a7c265cb617
+    maintainers:
+    - name: olakunle-pokt
+    - name: pokt-foundation
+    name: pokt-portal-ui-backend
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-ui-backend-0.0.9/pokt-portal-ui-backend-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2022-12-08T10:00:03.561103732Z"
     description: A Helm chart for deploying the POKT Portal UI Backend service
@@ -1040,4 +1053,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-12-09T12:50:22.537238539Z"
+generated: "2022-12-11T22:24:48.243755896Z"
