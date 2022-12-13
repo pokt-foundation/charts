@@ -10,10 +10,11 @@ middleware:
     repository: pocketfoundation/portal-middleware
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.0.21"
+    tag: "0.0.32"
 
   config_json: |
       {
+        "backend_url": "http://localhost:3000",
       	"chain_mappings": {
       		"eth-mainnet": "eth",
       		"eth-goerli": "eth"
