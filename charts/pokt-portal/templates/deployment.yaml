@@ -72,9 +72,9 @@ spec:
           {{- end }}
           env:
             - name: CONFIG_FILE
-              value: /config/config.json
+              value: "/config/config.json"
             - name: PORT
-              value: {{ .Values.service.port | default "8080" }}
+              value: "{{ .Values.service.port | default "8080" }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- end }}
