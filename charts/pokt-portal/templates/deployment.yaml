@@ -117,10 +117,10 @@ spec:
         - name: redis
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: redis
+          image: "{{ .Values.localRedis.image.repository | default "redis" }}:{{ .Values.localRedis.image.tag | default "6.2-alpine" }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: "{{ .Values.localRedis.image.repository | default "redis" }}:{{ .Values.localRedis.image.tag | default "6.2-alpine" }}"
+            - name: redis
               containerPort: 6379
               protocol: TCP
           env:
