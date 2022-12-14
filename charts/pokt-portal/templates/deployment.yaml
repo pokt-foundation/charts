@@ -120,14 +120,11 @@ spec:
           image: redis
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: redis
+            - name: "{{ .Values.localRedis.image.repository | default "redis" }}:{{ .Values.localRedis.image.tag | default "6.2-alpine" }}"
               containerPort: 6379
               protocol: TCP
           env:
-            - name: ALLOW_EMPTY_PASSWORD
-              value: "yes"
-            - name: REDIS_TLS_ENABLED
-              value: "no"
+          {{- include "helpers.redis-env-variables" . | indent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

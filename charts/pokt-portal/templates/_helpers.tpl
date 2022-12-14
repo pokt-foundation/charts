@@ -85,3 +85,12 @@ Create normal env vars from list
   value: {{ $val | quote }}
 {{- end }}
 {{- end }}
+
+
+*/}}
+{{- define "helpers.redis-env-variables"}}
+{{- range $key, $val := .Values.localRedis.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end }}

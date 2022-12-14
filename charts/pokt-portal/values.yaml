@@ -75,6 +75,13 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "portal-api"
 
+localRedis:
+  image:
+    repository: redis
+    tag: "6.2-alpine"
+  envs:
+    ALLOW_EMPTY_PASSWORD: "yes"
+
 podAnnotations: {}
 
 podSecurityContext: {}
