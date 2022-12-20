@@ -10,7 +10,7 @@ middleware:
     repository: pocketfoundation/portal-middleware
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "0.0.49"
 
   config_json: |
       {
@@ -65,11 +65,14 @@ middleware:
     key: "some/path/secret"
     decodginStrategy: "Auto"
 
+  envs:
+    BACKEND_URL: "http://localhost:3000"
+
 image:
   repository: pocketfoundation/portal-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "0.0.36"
 
 imagePullSecrets: []
   # - name: "regcred"
