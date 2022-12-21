@@ -16,3 +16,18 @@ Install the `pokt/avalanche` chart with the release name `avalanche` into the `a
 ```bash
 helm install avalanche pokt/avalanche --create-namespace --namespace avalanche
 ```
+
+### Commit hooks
+
+This repo uses pre-commit hooks for lint, syntax and documentation purposes. To setup this hook, simply go ahead and install `pre-commit` package.
+
+For MacOS users:
+
+```bash
+brew install norwoodj/tap/helm-docs
+brew install pre-commit
+```
+
+For Linux users, you can find the package in the [release page](https://github.com/norwoodj/helm-docs/releases).
+
+Once installed you can simply run `pre-commit install` command.
