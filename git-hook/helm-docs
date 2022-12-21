@@ -7,4 +7,4 @@ if ! command -v helm-docs > /dev/null 2>&1; then
     exit 1
 fi
 
-
+git status --porcelain | while read chart do; helm-docs $chart; done
