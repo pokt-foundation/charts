@@ -14,7 +14,19 @@ helm repo update pokt
 Install the `pokt/avalanche` chart with the release name `avalanche` into the `avalanche` namespace.
 
 ```bash
+helm repo add pokt https://pokt-foundation.gitlab.io/charts
+helm repo update pokt
 helm install avalanche pokt/avalanche --create-namespace --namespace avalanche
+```
+
+### Ethereum
+
+Add the Helm repository locally and update.
+
+```bash
+helm repo add simbachain https://simbachain.gitlab.io/charts
+helm repo update simbachain
+helm install ethereum simbachain/ethereum --create-namespace --namespace ethereum
 ```
 
 ### Commit hooks
