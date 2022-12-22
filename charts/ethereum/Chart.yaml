@@ -4,7 +4,7 @@ description: A decentralized blockchain platform that establishes a peer-to-peer
   that securely executes and verifies application code in smart contracts
 name: ethereum
 type: application
-version: 0.0.8
+version: 0.0.9
 maintainers:
   - name: WesleyCharlesBlake
   - name: pokt-foundation
