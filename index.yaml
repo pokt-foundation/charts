@@ -3,6 +3,27 @@ entries:
   backstage:
   - apiVersion: v2
     appVersion: v0.1.1-alpha.23
+    created: "2022-12-22T21:02:41.941701105Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.8.0
+    description: A Helm chart for Backstage
+    digest: 1412302c206126a96beb6b8f4d4ba7ff8bbdf6e29e71dfeadb3490038a83aae4
+    maintainers:
+    - name: GustavoBelfort
+    - name: pokt-foundation
+    name: backstage
+    sources:
+    - https://github.com/backstage/backstage
+    - https://github.com/spotify/lighthouse-audit-service
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/backstage-0.1.5/backstage-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: v0.1.1-alpha.23
     created: "2022-10-17T17:17:03.308094883Z"
     dependencies:
     - condition: postgresql.enabled
@@ -44,6 +65,19 @@ entries:
     - https://github.com/pokt-foundation/charts/releases/download/backstage-0.1.3/backstage-0.1.3.tgz
     version: 0.1.3
   blockchain-node:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-12-22T21:02:42.08152648Z"
+    description: A Helm chart to deploy a blockchain node
+    digest: bd67fcb29fcbb0b88dd6368b9361db068d66ebc4c430c6be623966a9464490bb
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    name: blockchain-node
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.0.14-rc.16/blockchain-node-0.0.14-rc.16.tgz
+    version: 0.0.14-rc.16
   - apiVersion: v2
     appVersion: 1.16.0
     created: "2022-12-05T01:06:27.044712767Z"
@@ -450,6 +484,20 @@ entries:
   ethereum:
   - apiVersion: v2
     appVersion: v1.10.14
+    created: "2022-12-22T21:02:42.288414071Z"
+    description: A decentralized blockchain platform that establishes a peer-to-peer
+      network that securely executes and verifies application code in smart contracts
+    digest: 7f6005618bcf19837ac595b5921922ff56ac40858c839748e7a0968a200f0a98
+    maintainers:
+    - name: WesleyCharlesBlake
+    - name: pokt-foundation
+    name: ethereum
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/ethereum-0.0.9/ethereum-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
+    appVersion: v1.10.14
     created: "2022-04-27T16:49:56.12664247Z"
     description: A decentralized blockchain platform that establishes a peer-to-peer
       network that securely executes and verifies application code in smart contracts
@@ -465,6 +513,20 @@ entries:
   harmony:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2022-12-22T21:02:42.413697235Z"
+    description: A Helm chart for Kubernetes
+    digest: 95687bff7d07c8502e2956ac6f6a1c9d5a829eb5881c9fac9426378b4875fbc5
+    maintainers:
+    - name: okdas
+    - name: WesleyCharlesBlake
+    - name: pokt-foundation
+    name: harmony
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/harmony-0.1.1/harmony-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2022-05-03T09:20:23.145222556Z"
     description: A Helm chart for Kubernetes
     digest: 58b7224783c07544a75cf5f4e948faaf65c7aed6bcd797dc1a93f02732328f59
@@ -478,6 +540,24 @@ entries:
     - https://github.com/pokt-foundation/k8s/releases/download/harmony-0.1.0/harmony-0.1.0.tgz
     version: 0.1.0
   pokt-http-db:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2022-12-22T21:02:42.567096814Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT HTTP DB service
+    digest: e59109d60d43c03441ae67b729d9254c1c5cbb48360d63e422fc775233837d58
+    maintainers:
+    - name: olakunle-pokt
+    - name: pokt-foundation
+    name: pokt-http-db
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-http-db-0.0.3/pokt-http-db-0.0.3.tgz
+    version: 0.0.3
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2022-12-08T10:00:02.986029684Z"
@@ -515,6 +595,38 @@ entries:
     - https://github.com/pokt-foundation/charts/releases/download/pokt-http-db-0.0.1/pokt-http-db-0.0.1.tgz
     version: 0.0.1
   pokt-portal:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2022-12-22T21:02:42.723688518Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.3.7
+    - condition: influxdb2.enabled
+      name: influxdb2
+      repository: https://helm.influxdata.com/
+      version: 2.1.1
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.3.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT Portal API services
+    digest: 12edfba6fa4d5343e86a7fc341a029d804d445a0aade9d84de1ee21ae3bbafb5
+    maintainers:
+    - name: WesleyCharlesBlake
+      url: https://github.com/WesleyCharlesBlake/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-portal
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-0.1.10/pokt-portal-0.1.10.tgz
+    version: 0.1.10
   - apiVersion: v2
     appVersion: 0.1.0
     created: "2022-12-21T11:42:01.182795317Z"
@@ -1002,6 +1114,19 @@ entries:
   pokt-portal-ui-backend:
   - apiVersion: v2
     appVersion: 0.0.9
+    created: "2022-12-22T21:02:42.855904935Z"
+    description: A Helm chart for deploying the POKT Portal UI Backend service
+    digest: debc9ed468dbb31ce69ebab23a78ddf3c0cb51e8f0b80d3ee296fc58bc618e65
+    maintainers:
+    - name: olakunle-pokt
+    - name: pokt-foundation
+    name: pokt-portal-ui-backend
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-ui-backend-0.0.10/pokt-portal-ui-backend-0.0.10.tgz
+    version: 0.0.10
+  - apiVersion: v2
+    appVersion: 0.0.9
     created: "2022-12-11T22:24:48.24354949Z"
     description: A Helm chart for deploying the POKT Portal UI Backend service
     digest: 21f1bb47e7f2d5bf043ea9e20ee97d1905c72016bfdcffe292581a7c265cb617
@@ -1040,6 +1165,30 @@ entries:
     - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-ui-backend-0.0.1/pokt-portal-ui-backend-0.0.1.tgz
     version: 0.0.1
   pokt-relay-meter:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2022-12-22T21:02:43.008799811Z"
+    dependencies:
+    - condition: influxdb2.enabled
+      name: influxdb2
+      repository: https://helm.influxdata.com/
+      version: 2.1.1
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT Relay Meter service
+    digest: 25d8e90b5d04fa434a59d68ef6057c93809fe5dc574b5f5397665db3d2fe3a55
+    maintainers:
+    - name: rutwickjain87
+      url: https://github.com/rutwickjain87
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-relay-meter
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-relay-meter-0.0.4/pokt-relay-meter-0.0.4.tgz
+    version: 0.0.4
   - apiVersion: v2
     appVersion: 0.0.1
     created: "2022-12-08T10:00:03.805712845Z"
@@ -1191,6 +1340,18 @@ entries:
   release-watch:
   - apiVersion: v2
     appVersion: main
+    created: "2022-12-22T21:02:43.157185952Z"
+    description: A Helm chart for Kubernetes
+    digest: 982626fca6296f30e8dad80145534dfadd9804cac56b6241bdb9276c955af481
+    maintainers:
+    - name: pokt-foundation
+    name: release-watch
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.4/release-watch-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: main
     created: "2022-10-26T13:34:49.551173918Z"
     description: A Helm chart for Kubernetes
     digest: 48857e86838c36487d84b5a623b3914437492e303bf42fdd181e7b310d63b8c8
@@ -1213,4 +1374,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-12-21T11:42:01.183015718Z"
+generated: "2022-12-22T21:02:43.157791856Z"
