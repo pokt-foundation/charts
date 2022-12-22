@@ -1,282 +1,179 @@
-# Backstage demo helm charts
-
-This folder contains Helm charts that can easily create a Kubernetes deployment of a demo Backstage app.
-
-### Pre-requisites
-
-These charts depend on the `nginx-ingress` controller being present in the cluster. If it's not already installed you
-can run:
-
-```shell
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm install nginx-ingress ingress-nginx/ingress-nginx
-```
-
-### Installing the charts
-
-After choosing a DNS name where backstage will be hosted create a yaml file for your custom configuration.
-
-```yaml
-appConfig:
-  app:
-    baseUrl: https://backstage.mydomain.com
-    title: Backstage
-  backend:
-    baseUrl: https://backstage.mydomain.com
-    cors:
-      origin: https://backstage.mydomain.com
-  lighthouse:
-    baseUrl: https://backstage.mydomain.com/lighthouse-api
-  techdocs:
-    storageUrl: https://backstage.mydomain.com/api/techdocs/static/docs
-    requestUrl: https://backstage.mydomain.com/api/techdocs
-```
-
-Then use it to run:
-
-```shell
-git clone https://github.com/backstage/backstage.git
-cd contrib/chart/backstage
-helm dependency update
-helm install -f backstage-mydomain.yaml backstage .
-```
-
-This command will deploy the following pieces:
-
-- Backstage frontend
-- Backstage backend with scaffolder and auth plugins
-- (optional) a PostgreSQL instance
-- lighthouse plugin
-- ingress
-
-After a few minutes Backstage should be up and running in your cluster under the DNS specified earlier.
-
-Make sure to create the appropriate DNS entry in your infrastructure. To find the public IP address run:
-
-```shell
-$ kubectl get ingress
-NAME                HOSTS   ADDRESS         PORTS   AGE
-backstage-ingress   *       123.1.2.3       80      17m
-```
-
-> **NOTE**: this is not a production ready deployment.
-
-## Customization
-
-### Issue certificates
-
-These charts can install or reuse a `clusterIssuer` to generate certificates for the backstage `ingress`. To do that:
-
-1. [Install][install-cert-manager] or make sure [cert-manager][cert-manager] is installed in the cluster.
-2. Enable the issuer in the charts. This will first check if there is a `letsencrypt` issuer already deployed in your
-   cluster and deploy one if it doesn't exist.
-
-To enable it you need to provide a valid email address in the chart's values:
-
-```yaml
-issuer:
-  email: me@example.com
-  clusterIssuer: 'letsencrypt-prod'
-```
-
-By default, the charts use `letsencrypt-staging` so in the above example we instruct helm to use the production issuer
-instead.
-
-[cert-manager]: https://cert-manager.io/docs/
-[install-cert-manager]: https://cert-manager.io/docs/installation/kubernetes/#installing-with-helm
-
-### Custom PostgreSQL instance
-
-Configuring a connection to an existing PostgreSQL instance is possible through the chart's values.
-
-First create a yaml file with the configuration you want to override, for example `backstage-prod.yaml`:
-
-```yaml
-postgresql:
-  enabled: false
-
-appConfig:
-  app:
-    baseUrl: https://backstage-demo.mydomain.com
-    title: Backstage
-  backend:
-    baseUrl: https://backstage-demo.mydomain.com
-    cors:
-      origin: https://backstage-demo.mydomain.com
-    database:
-      client: pg
-      connection:
-        database: backstage_plugin_catalog
-        host: <host>
-        user: <pg user>
-        password: <password>
-  lighthouse:
-    baseUrl: https://backstage-demo.mydomain.com/lighthouse-api
-
-lighthouse:
-  database:
-    client: pg
-    connection:
-      host: <host>
-      user: <pg user>
-      password: <password>
-      database: lighthouse_audit_service
-```
-
-For the CA, create a `configMap` named `<release name>-<chart name>-postgres-ca` with a file called `ca.crt`:
-
-```shell
-kubectl create configmap my-company-backstage-postgres-ca --from-file=ca.crt"
-```
-
-or disable CA mount
-
-```yaml
-backend:
-  postgresCertMountEnabled: false
-
-lighthouse:
-  postgresCertMountEnabled: false
-```
-
-> Where the release name contains the chart name "backstage" then only the release name will be used.
-
-Now install the helm chart:
-
-```shell
-cd contrib/chart/backstage
-helm install -f backstage-prod.yaml my-backstage .
-```
-
-### Use your own docker images
-
-The docker images used for the deployment can be configured through the charts values:
-
-```yaml
-frontend:
-  image:
-    repository: <image-name>
-    tag: <image-tag>
-
-backend:
-  image:
-    repository: <image-name>
-    tag: <image-tag>
-
-lighthouse:
-  image:
-    repository: <image-name>
-    tag: <image-tag>
-```
-
-### Use a private docker repo
-
-Create a docker-registry secret
-
-```shell
-kubectl create secret docker-registry <docker_registry_secret_name> # args
-```
-
-> For private images on docker hub --docker-server can be set to docker.io
-
-Reference the secret in your chart values
-
-```yaml
-dockerRegistrySecretName: <docker_registry_secret_name>
-```
-
-### Different namespace
-
-To install the charts a specific namespace use `--namespace <ns>`:
-
-```shell
-helm install -f my_values.yaml --namespace demos backstage .
-```
-
-### Disable loading of demo data
-
-To deploy backstage with the pre-loaded demo data disable `backend.demoData`:
-
-```shell
-helm install -f my_values.yaml --set backend.demoData=false backstage .
-```
-
-### Other options
-
-For more customization options take a look at the [values.yaml](/contrib/chart/backstage/values.yaml) file.
-
-## Troubleshooting
-
-Some resources created by these charts are meant to survive after upgrades and even after uninstalls. When
-troubleshooting these charts it can be useful to delete these resources between re-installs.
-
-Secrets:
-
-```
-<release-name>-postgresql-certs -- contains the certificates used by the deployed PostgreSQL
-```
-
-Persistent volumes:
-
-```
-data-<release-name>-postgresql-0 -- this is the data volume used by PostgreSQL to store data and configuration
-```
-
-> **NOTE**: this volume also stores the configuration for PostgreSQL which includes things like the password for the
-> `postgres` user. This means that uninstalling and re-installing the charts with `postgres.enabled` set to `true` and
-> auto generated passwords will fail. The solution is to delete this volume with
-> `kubectl delete pvc data-<release-name>-postgresql-0`
-
-ConfigMaps:
-
-```
-<release-name>-postgres-ca -- contains the generated CA certificate for PostgreSQL when `postgres` is enabled
-```
-
-#### Unable to verify signature
-
-```
-Backend failed to start up Error: unable to verify the first certificate
-    at TLSSocket.onConnectSecure (_tls_wrap.js:1501:34)
-    at TLSSocket.emit (events.js:315:20)
-    at TLSSocket._finishInit (_tls_wrap.js:936:8)
-    at TLSWrap.ssl.onhandshakedone (_tls_wrap.js:710:12) {
-  code: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE'
-```
-
-This error happens in the backend when it tries to connect to the configured PostgreSQL database and the specified CA is not correct. The solution is to make sure that the contents of the `configMap` that holds the certificate match the CA for the PostgreSQL instance. A workaround is to set `appConfig.backend.database.connection.ssl.rejectUnauthorized` to `false` in the chart's values.
-
-#### Multi-Platform Kubernetes Services
-
-If you are running a multi-platform Kubernetes service with Windows and Linux nodes then you will need to apply a `nodeSelector` to the Helm chart to ensure that pods are scheduled onto the correct platform nodes.
-
-Add the following to your Helm values file:
-
-```yaml
-global:
-  nodeSelector:
-    kubernetes.io/os: linux
-
-# If using Postgres Chart also add
-postgresql:
-  master:
-    nodeSelector:
-      kubernetes.io/os: linux
-  slave:
-    nodeSelector:
-      kubernetes.io/os: linux
-```
-
-<!-- TODO Add example command when we know the final name of the charts -->
-
-## Uninstalling Backstage
-
-To uninstall Backstage simply run:
-
-```shell
-RELEASE_NAME=<release-name> # use `helm list` to find out the name
-helm uninstall ${RELEASE_NAME}
-kubectl delete pvc data-${RELEASE_NAME}-postgresql-0
-kubectl delete secret ${RELEASE_NAME}-postgresql-certs
-kubectl delete configMap ${RELEASE_NAME}-postgres-ca
-```
+# backstage
+
+![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.1.1-alpha.23](https://img.shields.io/badge/AppVersion-v0.1.1--alpha.23-informational?style=flat-square)
+
+A Helm chart for Backstage
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| GustavoBelfort |  |  |
+| pokt-foundation |  |  |
+
+## Source Code
+
+* <https://github.com/backstage/backstage>
+* <https://github.com/spotify/lighthouse-audit-service>
+
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://charts.bitnami.com/bitnami | postgresql | 11.8.0 |
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| appConfig.app.baseUrl | string | `"https://backstage.tooling.pokt.network"` |  |
+| appConfig.app.googleAnalyticsTrackingId | string | `nil` |  |
+| appConfig.app.title | string | `"Backstage"` |  |
+| appConfig.auth.providers.auth0.development.clientId | string | `"${AUTH_AUTH0_CLIENT_ID}"` |  |
+| appConfig.auth.providers.auth0.development.clientSecret | string | `"${AUTH_AUTH0_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.auth0.development.domain | string | `"${AUTH_AUTH0_DOMAIN}"` |  |
+| appConfig.auth.providers.github.development.appOrigin | string | `"http://localhost:3000/"` |  |
+| appConfig.auth.providers.github.development.clientId | string | `"${AUTH_GITHUB_CLIENT_ID}"` |  |
+| appConfig.auth.providers.github.development.clientSecret | string | `"${AUTH_GITHUB_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.github.development.enterpriseInstanceUrl | string | `"${AUTH_GITHUB_ENTERPRISE_INSTANCE_URL}"` |  |
+| appConfig.auth.providers.github.development.secure | bool | `false` |  |
+| appConfig.auth.providers.gitlab.development.appOrigin | string | `"http://localhost:3000/"` |  |
+| appConfig.auth.providers.gitlab.development.audience | string | `"${GITLAB_BASE_URL}"` |  |
+| appConfig.auth.providers.gitlab.development.clientId | string | `"${AUTH_GITLAB_CLIENT_ID}"` |  |
+| appConfig.auth.providers.gitlab.development.clientSecret | string | `"${AUTH_GITLAB_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.gitlab.development.secure | bool | `false` |  |
+| appConfig.auth.providers.google.development.appOrigin | string | `"http://localhost:3000/"` |  |
+| appConfig.auth.providers.google.development.clientId | string | `"${AUTH_GOOGLE_CLIENT_ID}"` |  |
+| appConfig.auth.providers.google.development.clientSecret | string | `"${AUTH_GOOGLE_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.google.development.secure | bool | `false` |  |
+| appConfig.auth.providers.microsoft.development.clientId | string | `"${AUTH_MICROSOFT_CLIENT_ID}"` |  |
+| appConfig.auth.providers.microsoft.development.clientSecret | string | `"${AUTH_MICROSOFT_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.microsoft.development.tenantId | string | `"${AUTH_MICROSOFT_TENANT_ID}"` |  |
+| appConfig.auth.providers.oauth2.development.appOrigin | string | `"http://localhost:3000/"` |  |
+| appConfig.auth.providers.oauth2.development.authorizationURL | string | `"${AUTH_OAUTH2_AUTH_URL}"` |  |
+| appConfig.auth.providers.oauth2.development.clientId | string | `"${AUTH_OAUTH2_CLIENT_ID}"` |  |
+| appConfig.auth.providers.oauth2.development.clientSecret | string | `"${AUTH_OAUTH2_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.oauth2.development.secure | bool | `false` |  |
+| appConfig.auth.providers.oauth2.development.tokenURL | string | `"${AUTH_OAUTH2_TOKEN_URL}"` |  |
+| appConfig.auth.providers.okta.development.appOrigin | string | `"http://localhost:3000/"` |  |
+| appConfig.auth.providers.okta.development.audience | string | `"${AUTH_OKTA_AUDIENCE}"` |  |
+| appConfig.auth.providers.okta.development.clientId | string | `"${AUTH_OKTA_CLIENT_ID}"` |  |
+| appConfig.auth.providers.okta.development.clientSecret | string | `"${AUTH_OKTA_CLIENT_SECRET}"` |  |
+| appConfig.auth.providers.okta.development.secure | bool | `false` |  |
+| appConfig.backend.baseUrl | string | `"https://backstage.tooling.pokt.network"` |  |
+| appConfig.backend.cors.origin | string | `"https://backstage.tooling.pokt.network"` |  |
+| appConfig.backend.database.client | string | `"pg"` |  |
+| appConfig.backend.database.connection.database | string | `"backstage_plugin_catalog"` |  |
+| appConfig.backend.database.connection.host | string | `nil` |  |
+| appConfig.backend.database.connection.password | string | `nil` |  |
+| appConfig.backend.database.connection.port | string | `nil` |  |
+| appConfig.backend.database.connection.ssl.ca | string | `nil` |  |
+| appConfig.backend.database.connection.ssl.rejectUnauthorized | bool | `false` |  |
+| appConfig.backend.database.connection.user | string | `nil` |  |
+| appConfig.backend.listen.port | int | `7007` |  |
+| appConfig.lighthouse.baseUrl | string | `"https://backstage.tooling.pokt.network/lighthouse-api"` |  |
+| appConfig.rollbar.organization | string | `"example-org-name"` |  |
+| appConfig.sentry.organization | string | `"example-org-name"` |  |
+| appConfig.techdocs.requestUrl | string | `"https://backstage.tooling.pokt.network/api/techdocs"` |  |
+| appConfig.techdocs.storageUrl | string | `"https://backstage.tooling.pokt.network/api/techdocs/static/docs"` |  |
+| auth.auth0.clientId | string | `"b"` |  |
+| auth.auth0.clientSecret | string | `"b"` |  |
+| auth.auth0.domain | string | `"b"` |  |
+| auth.azure.api.token | string | `"h"` |  |
+| auth.circleciAuthToken | string | `"r"` |  |
+| auth.github.clientId | string | `"c"` |  |
+| auth.github.clientSecret | string | `"c"` |  |
+| auth.githubToken | string | `"g"` |  |
+| auth.gitlab.baseUrl | string | `"b"` |  |
+| auth.gitlab.clientId | string | `"b"` |  |
+| auth.gitlab.clientSecret | string | `"b"` |  |
+| auth.gitlabToken | string | `"g"` |  |
+| auth.google.clientId | string | `"a"` |  |
+| auth.google.clientSecret | string | `"a"` |  |
+| auth.microsoft.clientId | string | `"f"` |  |
+| auth.microsoft.clientSecret | string | `"f"` |  |
+| auth.microsoft.tenantId | string | `"f"` |  |
+| auth.newRelicRestApiKey | string | `"r"` |  |
+| auth.oauth2.authUrl | string | `"b"` |  |
+| auth.oauth2.clientId | string | `"b"` |  |
+| auth.oauth2.clientSecret | string | `"b"` |  |
+| auth.oauth2.tokenUrl | string | `"b"` |  |
+| auth.okta.audience | string | `"b"` |  |
+| auth.okta.clientId | string | `"b"` |  |
+| auth.okta.clientSecret | string | `"b"` |  |
+| auth.pagerdutyToken | string | `"h"` |  |
+| auth.rollbarAccountToken | string | `"f"` |  |
+| auth.sentryToken | string | `"e"` |  |
+| auth.travisciAuthToken | string | `"fake-travis-ci-auth-token"` |  |
+| backend.containerPort | int | `7007` |  |
+| backend.demoData | bool | `true` |  |
+| backend.enabled | bool | `false` |  |
+| backend.image.pullPolicy | string | `"IfNotPresent"` |  |
+| backend.image.repository | string | `"martinaif/backstage-k8s-demo-backend"` |  |
+| backend.image.tag | string | `"20210423T1550"` |  |
+| backend.nodeEnv | string | `"development"` |  |
+| backend.postgresCertMountEnabled | bool | `false` |  |
+| backend.postgresql.passwordSecret | string | `"postgresql-password"` |  |
+| backend.replicaCount | int | `1` |  |
+| backend.resources.limits.memory | string | `"1024Mi"` |  |
+| backend.resources.requests.memory | string | `"512Mi"` |  |
+| backend.serviceType | string | `"ClusterIP"` |  |
+| externalSecrets.authMountPath | string | `"k8s-tooling-us-east-1"` |  |
+| externalSecrets.controller | string | `""` |  |
+| externalSecrets.deletionPolicy | string | `"Delete"` |  |
+| externalSecrets.enabled | bool | `false` |  |
+| externalSecrets.namespace | string | `"admin/engineering/"` |  |
+| externalSecrets.refreshInterval | string | `"0"` |  |
+| externalSecrets.role | string | `"backstage"` |  |
+| externalSecrets.secretKey | string | `"backstage/app-config.yaml"` |  |
+| externalSecrets.secretStoretPath | string | `"devops/"` |  |
+| externalSecrets.targetName | string | `"backstage"` |  |
+| externalSecrets.vaultServer | string | `"https://hcp-vault-cluster-a-public-vault-72230702.bb94b393.z1.hashicorp.cloud:8200"` |  |
+| externalSecrets.version | string | `"v1"` |  |
+| frontend.containerPort | int | `80` |  |
+| frontend.enabled | bool | `false` |  |
+| frontend.image.pullPolicy | string | `"IfNotPresent"` |  |
+| frontend.image.repository | string | `"martinaif/backstage-k8s-demo-frontend"` |  |
+| frontend.image.tag | string | `"test1"` |  |
+| frontend.replicaCount | int | `1` |  |
+| frontend.resources.limits.memory | string | `"256Mi"` |  |
+| frontend.resources.requests.memory | string | `"128Mi"` |  |
+| frontend.serviceType | string | `"ClusterIP"` |  |
+| fullnameOverride | string | `""` |  |
+| global.nodeSelector | object | `{}` |  |
+| global.postgresql.caFilename | string | `"ca.crt"` |  |
+| global.postgresql.postgresqlUsername | string | `"postgres"` |  |
+| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| issuer.clusterIssuer | string | `"letsencrypt-staging"` |  |
+| issuer.email | string | `nil` |  |
+| lighthouse.containerPort | int | `3003` |  |
+| lighthouse.database.connection.database | string | `"lighthouse_audit_service"` |  |
+| lighthouse.database.connection.host | string | `nil` |  |
+| lighthouse.database.connection.password | string | `nil` |  |
+| lighthouse.database.connection.port | string | `nil` |  |
+| lighthouse.database.connection.user | string | `nil` |  |
+| lighthouse.database.pathToDatabaseCa | string | `nil` |  |
+| lighthouse.enabled | bool | `false` |  |
+| lighthouse.image.pullPolicy | string | `"IfNotPresent"` |  |
+| lighthouse.image.repository | string | `"roadiehq/lighthouse-audit-service"` |  |
+| lighthouse.image.tag | string | `"latest"` |  |
+| lighthouse.postgresCertMountEnabled | bool | `true` |  |
+| lighthouse.replicaCount | int | `1` |  |
+| lighthouse.resources.limits.memory | string | `"256Mi"` |  |
+| lighthouse.resources.requests.memory | string | `"128Mi"` |  |
+| lighthouse.serviceType | string | `"ClusterIP"` |  |
+| nameOverride | string | `""` |  |
+| postgresql.enabled | bool | `true` |  |
+| postgresql.initdbScriptsSecret | string | `"backstage-postgresql-initdb"` |  |
+| postgresql.nameOverride | string | `"postgresql"` |  |
+| postgresql.service.port | int | `5432` |  |
+| postgresql.tls.certFilename | string | `"tls.crt"` |  |
+| postgresql.tls.certKeyFilename | string | `"tls.key"` |  |
+| postgresql.tls.certificatesSecret | string | `"backstage-postgresql-certs"` |  |
+| postgresql.tls.enabled | bool | `false` |  |
+| postgresql.volumePermissions.enabled | bool | `true` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `"backstage"` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
