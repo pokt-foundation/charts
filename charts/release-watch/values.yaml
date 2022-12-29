@@ -36,12 +36,12 @@ env:
   #       name: release-watch
   #       key: GH_TOKEN
   #       optional: false
-   - name: DISCORD_TOKEN
-     valueFrom:
-       secretKeyRef:
-         name: release-watch
-         key: DISCORD_TOKEN
-         optional: false
+  - name: DISCORD_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: release-watch
+        key: DISCORD_TOKEN
+        optional: false
 
 additionalManifests: []
   # - apiVersion: external-secrets.io/v1beta1
