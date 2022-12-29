@@ -23,7 +23,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "release-watch"
 
-env: []
+env:
   # - name: GH_USERNAME
   #   valueFrom:
   #     secretKeyRef:
@@ -36,12 +36,12 @@ env: []
   #       name: release-watch
   #       key: GH_TOKEN
   #       optional: false
-  # - name: DISCORD_TOKEN
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: release-watch
-  #       key: DISCORD_TOKEN
-  #       optional: false
+   - name: DISCORD_TOKEN
+     valueFrom:
+       secretKeyRef:
+         name: release-watch
+         key: DISCORD_TOKEN
+         optional: false
 
 additionalManifests: []
   # - apiVersion: external-secrets.io/v1beta1
