@@ -7,4 +7,4 @@ if ! command -v helm-docs > /dev/null 2>&1; then
     exit 1
 fi
 
-git diff --dirstat=files,0 | awk '{print $2}' | while read chart; do pushd $chart && helm-docs . && popd; done
+git diff --dirstat=files,0 HEAD | awk '{print $2}' | while read chart; do pushd $chart && helm-docs && popd; done
