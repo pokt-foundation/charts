@@ -1340,6 +1340,18 @@ entries:
   release-watch:
   - apiVersion: v2
     appVersion: main
+    created: "2023-01-02T17:24:25.986187458Z"
+    description: A Helm chart for Kubernetes
+    digest: 5b2d4acff14cdfd5360ed3cdd207e17cdbbca8049d269f28d1c865a0883d1171
+    maintainers:
+    - name: pokt-foundation
+    name: release-watch
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.5/release-watch-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: main
     created: "2022-12-22T21:02:43.157185952Z"
     description: A Helm chart for Kubernetes
     digest: 982626fca6296f30e8dad80145534dfadd9804cac56b6241bdb9276c955af481
@@ -1374,4 +1386,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2022-12-22T21:02:43.157791856Z"
+generated: "2023-01-02T17:24:25.986412359Z"
