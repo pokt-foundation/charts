@@ -1,0 +1,200 @@
+# Default values for pokt-relay-meter
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+replicaCount: 1
+
+collector:
+  image:
+    repository: pocketfoundation/relay-meter-collector
+    pullPolicy: IfNotPresent
+
+  resources: {}
+
+  env:
+    normal:
+      # Influx DB
+      INFLUXDB_URL: http://influxdb
+      INFLUXDB_ORG: demand-infra
+      INFLUXDB_BUCKET_DAILY: default
+      INFLUXDB_BUCKET_CURRENT: default
+
+      # Postgres DB
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: pokt
+      POSTGRES_DB: relay-meter
+
+      # Report
+      COLLECTION_INTERVAL_SECONDS: 30
+      ENV_REPORT_INTERVAL_SECONDS: 10
+    secret:
+      # Influx DB
+      INFLUXDB_TOKEN: xbvafasvxgxg1262619
+
+      # Postgres DB
+      POSTGRES_PASSWORD: P0K7p05tgr3s8
+
+
+apiserver:
+  image:
+    repository: pocketfoundation/relay-meter-apiserver
+    pullPolicy: IfNotPresent
+  resources: {}
+
+  env:
+    normal:
+      # Backend API (http-db)
+      API_SERVER_PORT: 80
+      BACKEND_API_URL: https://postgres-api.backend.pokt.network
+
+      # Postgres DB
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: pokt
+      POSTGRES_DB: relay-meter
+
+    secret:
+      # Backend API
+      BACKEND_API_TOKEN: dummy
+
+      # Postgres DB
+      POSTGRES_PASSWORD: P0K7p05tgr3s8
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+externalSecrets:
+  enabled: false
+  # external secret key
+  key: "relay-meter/staging/env"
+  # secret-store config
+  vault:
+    server: "https://vault:8200"
+    mountPath: "k8s-mount-path"
+    namespace: "our/namespace/"
+    serviceAccount: "portal-api"
+    role: "my-role"
+    path: "path/"
+    version: "v1"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## @section postgres subchart parameters
+## @param mongodb.enabled Deploy mongodb subchart
+##
+postgresql:
+  enabled: false
+  fullnameOverride: "postgres"
+  architecture: "standalone"
+  auth:
+    username: "pokt"
+    password: "P0K7p05tgr3s8"
+    database: "relay-meter"
+  primary:
+    persistence:
+      enabled: false
+    initdb:
+      scripts:
+        00_db_init_script.sql.sql: |
+          DROP TABLE IF EXISTS relay_counts;
+          DROP TABLE IF EXISTS daily_app_sums;
+          DROP TABLE IF EXISTS todays_app_sums;
+          DROP TABLE IF EXISTS todays_app_latencies;
+
+          CREATE TABLE relay_counts (
+            id INT GENERATED ALWAYS AS IDENTITY,
+            application VARCHAR NOT NULL,
+            count_success bigint NOT NULL,
+            count_failure bigint NOT NULL,
+            time TIMESTAMPTZ
+          );
+          CREATE TABLE daily_app_sums (
+            id INT GENERATED ALWAYS AS IDENTITY,
+            application VARCHAR NOT NULL,
+            count_success bigint NOT NULL,
+            count_failure bigint NOT NULL,
+            time TIMESTAMPTZ
+          );
+          CREATE TABLE todays_app_sums (
+            id INT GENERATED ALWAYS AS IDENTITY,
+            application VARCHAR NOT NULL,
+            count_success bigint NOT NULL,
+            count_failure bigint NOT NULL
+          );
+          CREATE TABLE todays_app_latencies (
+            id INT GENERATED ALWAYS AS IDENTITY,
+            application VARCHAR NOT NULL,
+            time VARCHAR NOT NULL,
+            latency DECIMAL NOT NULL
+          );
+
+## @section influxdb subchart parameters
+## @param influxdb.enabled Deploy influx subchart
+##
+influxdb2:
+  enabled: false
+  fullnameOverride: "influxdb"
+  persistence:
+    enabled: false
+  adminUser:
+    organization: "demand-infra"
+    bucket: "default"
+    user: "admin"
+    retention_policy: "0s"
+    password: "SuperS3cr37P@5$w0rd"
+    token: "xbvafasvxgxg1262619"

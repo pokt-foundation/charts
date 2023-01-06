@@ -23,7 +23,7 @@ jobs:
           git config user.name "POKT_CI"
           git config user.email "helm-maintainers@users.noreply.github.com"
       - name: Install Helm
-        uses: azure/setup-helm@v3.3
+        uses: azure/setup-helm@v3.4
         with:
           version: v3.8.1
 
@@ -45,15 +45,17 @@ jobs:
 #          GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
 #          GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
 
-      #- name: Add dependency chart repos
-      #  run: |
-      #    helm repo add bitnami https://charts.bitnami.com/bitnami
-
+      - name: Add repositories
+        run: |
+          for dir in $(ls -d charts/*/); do
+            helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
+          done
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.0
+        uses: helm/chart-releaser-action@v1.4.1
         with:
           charts_dir: charts
           charts_repo_url: https://pokt-foundation.github.io/charts
           #config: cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: "true"

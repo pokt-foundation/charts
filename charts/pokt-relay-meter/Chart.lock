@@ -1,0 +1,9 @@
+dependencies:
+- name: influxdb2
+  repository: https://helm.influxdata.com/
+  version: 2.1.1
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.0
+digest: sha256:91500ee4e52e218f7d49423f78f983641191357de7e8ad08f48af6e0c68afa17
+generated: "2022-11-09T15:37:45.099353+02:00"
