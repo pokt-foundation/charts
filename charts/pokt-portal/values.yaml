@@ -170,10 +170,10 @@ resources: {}
 
 autoscaling:
   enabled: false
-  minReplicas: 3
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 65
-  targetMemoryUtilizationPercentage: 65
+  # minReplicas: 3
+  # maxReplicas: 100
+  # targetCPUUtilizationPercentage: 65
+  # targetMemoryUtilizationPercentage: 65
 
 nodeSelector: {}
 
@@ -184,18 +184,18 @@ affinity: {}
 externalSecrets:
   enabled: false
   # external secret key
-  key: "some/path/secret"
-  decodginStrategy: "None"
-  # secret-store config
-  secretStore: "vault"
-  vault:
-    server: "https://vault:8200"
-    mountPath: "k8s-mount-path"
-    namespace: "our/namespace/"
-    serviceAccount: "portal-api"
-    role: "my-role"
-    path: "path/"
-    version: "v1"
+  # key: "some/path/secret"
+  # decodginStrategy: "None"
+  # # secret-store config
+  # secretStore: "vault"
+  # vault:
+  #   server: "https://vault:8200"
+  #   mountPath: "k8s-mount-path"
+  #   namespace: "our/namespace/"
+  #   serviceAccount: "portal-api"
+  #   role: "my-role"
+  #   path: "path/"
+  #   version: "v1"
 
 
 # Environment variable listing
@@ -203,7 +203,8 @@ env:
   # non sensitive variables
   normal:
     # remote cache
-    REDIS_PORT: "6379"
+    FOO: "bar"
+
   # sensitive variables stored in a secret
   secret:
     GATEWAY_HOST: localhost
@@ -217,7 +218,7 @@ env:
 
     # remote cache
     REMOTE_REDIS_ENDPOINT: "redis-master:6379"
-
+    REDIS_PORT: "6379"
     # local cache
     LOCAL_REDIS_ENDPOINT: "localhost:6379"
     REDIS_LOCAL_TTL_FACTOR: "1"

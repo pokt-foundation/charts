@@ -1,6 +1,6 @@
 # pokt-portal
 
-![Version: 0.1.11](https://img.shields.io/badge/Version-0.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.12](https://img.shields.io/badge/Version-0.1.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 A Helm chart for deploying the POKT Portal API services
 
@@ -26,11 +26,7 @@ A Helm chart for deploying the POKT Portal API services
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.minReplicas | int | `3` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `65` |  |
-| autoscaling.targetMemoryUtilizationPercentage | int | `65` |  |
-| env.normal.REDIS_PORT | string | `"6379"` |  |
+| env.normal.FOO | string | `"bar"` |  |
 | env.secret.AAT_PLAN | string | `"freemium"` |  |
 | env.secret.ARCHIVAL_CHAINS | string | `"0022,0028,0010,000A,000B,000C"` |  |
 | env.secret.AWS_ACCESS_KEY_ID | string | `"AXAI"` |  |
@@ -60,20 +56,11 @@ A Helm chart for deploying the POKT Portal API services
 | env.secret.PSQL_CERTIFICATE | string | `"https://s3.amazonaws.com/"` |  |
 | env.secret.PSQL_CONNECTION | string | `"postgres://pokt:P0K7p05tgr3s8@postgres:5432/metrics"` |  |
 | env.secret.REDIS_LOCAL_TTL_FACTOR | string | `"1"` |  |
+| env.secret.REDIS_PORT | string | `"6379"` |  |
 | env.secret.REGION | string | `"localhost"` |  |
 | env.secret.REMOTE_REDIS_ENDPOINT | string | `"redis-master:6379"` |  |
 | env.secret.WATCH | string | `"true"` |  |
-| externalSecrets.decodginStrategy | string | `"None"` |  |
 | externalSecrets.enabled | bool | `false` |  |
-| externalSecrets.key | string | `"some/path/secret"` |  |
-| externalSecrets.secretStore | string | `"vault"` |  |
-| externalSecrets.vault.mountPath | string | `"k8s-mount-path"` |  |
-| externalSecrets.vault.namespace | string | `"our/namespace/"` |  |
-| externalSecrets.vault.path | string | `"path/"` |  |
-| externalSecrets.vault.role | string | `"my-role"` |  |
-| externalSecrets.vault.server | string | `"https://vault:8200"` |  |
-| externalSecrets.vault.serviceAccount | string | `"portal-api"` |  |
-| externalSecrets.vault.version | string | `"v1"` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"pocketfoundation/portal-api"` |  |
