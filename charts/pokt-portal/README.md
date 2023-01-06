@@ -1,6 +1,6 @@
 # pokt-portal
 
-![Version: 0.1.9](https://img.shields.io/badge/Version-0.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.11](https://img.shields.io/badge/Version-0.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 A Helm chart for deploying the POKT Portal API services
 
@@ -25,11 +25,11 @@ A Helm chart for deploying the POKT Portal API services
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| autoscaling.enabled | bool | `true` |  |
+| autoscaling.enabled | bool | `false` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `3` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `65` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `65` |  |
 | env.normal.REDIS_PORT | string | `"6379"` |  |
 | env.secret.AAT_PLAN | string | `"freemium"` |  |
 | env.secret.ARCHIVAL_CHAINS | string | `"0022,0028,0010,000A,000B,000C"` |  |

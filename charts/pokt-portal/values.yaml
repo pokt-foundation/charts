@@ -169,11 +169,11 @@ resources: {}
   #   memory: 128Mi
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 3
   maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 65
+  targetMemoryUtilizationPercentage: 65
 
 nodeSelector: {}
 
