@@ -94,6 +94,7 @@ localRedis:
     tag: "6.2-alpine"
   envs:
     ALLOW_EMPTY_PASSWORD: "yes"
+  resources: {}
 
 podAnnotations: {}
 
