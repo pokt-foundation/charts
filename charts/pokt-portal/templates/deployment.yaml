@@ -152,6 +152,8 @@ spec:
               protocol: TCP
           env:
           {{- include "helpers.redis-env-variables" . | indent 12 }}
+          resources:
+            {{- toYaml .Values.localRedis.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
