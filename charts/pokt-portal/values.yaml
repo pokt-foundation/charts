@@ -94,14 +94,7 @@ localRedis:
     tag: "6.2-alpine"
   envs:
     ALLOW_EMPTY_PASSWORD: "yes"
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1024Mi
-    requests:
-      cpu: 1000m
-      memory: 512Mi
-
+  resources: {}
 
 podAnnotations: {}
 
