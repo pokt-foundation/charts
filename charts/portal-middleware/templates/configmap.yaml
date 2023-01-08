@@ -1,9 +1,0 @@
-{{- if not .Values.externalSecrets.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "portal-middleware.fullname" . -}}-config
-data:
-  config.json: |
-{{ .Values.config_json | indent 4 }}
-{{- end }}
