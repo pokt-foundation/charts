@@ -14,6 +14,7 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -157,12 +158,11 @@ spec:
           workingDir: {{ . }}
           {{- end }}
           {{- with $cntnr.command }}
-          command:
-            - /bin/sh
-            - -c
-            - {{ . }}
+          command: {{- toYaml . | nindent 12 }}
           {{- end }}
-
+          {{- with $cntnr.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $cntnr.resources }}
           resources: {{- toYaml . | nindent 12 }}
           {{- end }}
