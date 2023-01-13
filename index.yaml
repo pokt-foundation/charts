@@ -67,6 +67,19 @@ entries:
   blockchain-node:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-01-13T02:48:14.231955382Z"
+    description: A Helm chart to deploy a blockchain node
+    digest: b30896cb3aeb17b3b495ba34a440aeeecb49368de1de9dd759fe478b3ac6a3c0
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    name: blockchain-node
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.1.2/blockchain-node-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-01-08T21:14:59.552468259Z"
     description: A Helm chart to deploy a blockchain node
     digest: ef9961ca70677845bc3eda34cc080640585fa0d99e808c88945be8aa47505b99
@@ -1495,4 +1508,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2023-01-08T21:14:59.552926175Z"
+generated: "2023-01-13T02:48:14.232472083Z"
