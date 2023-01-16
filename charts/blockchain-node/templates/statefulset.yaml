@@ -119,15 +119,12 @@ spec:
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
           env:
+            - name: LOCAL_RPC_ENDPOINT
+              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}"
             {{- range $k, $v := $cntnr.healthProbes.env }}
-            {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
-            {{- fail "LOCAL_RPC_ENDPOINT - is generated as http://localhost:_healthProbes.portToMonitor_. Remove it from the config." }}
-            {{- end }}
             - name: {{$k}}
               value: {{$v | quote}}
             {{- end }}
-            - name: LOCAL_RPC_ENDPOINT
-              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}"
           ports:
             - name: healthcheck
               containerPort: 9090
