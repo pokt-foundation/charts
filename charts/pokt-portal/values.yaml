@@ -68,6 +68,9 @@ middleware:
   envs:
     BACKEND_URL: "http://localhost:3000"
 
+  ### middleware resource definition
+  resources: {}
+
 image:
   repository: pocketfoundation/portal-api
   pullPolicy: IfNotPresent
