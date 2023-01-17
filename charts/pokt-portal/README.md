@@ -1,6 +1,6 @@
 # pokt-portal
 
-![Version: 0.1.12](https://img.shields.io/badge/Version-0.1.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 A Helm chart for deploying the POKT Portal API services
 
@@ -86,6 +86,7 @@ A Helm chart for deploying the POKT Portal API services
 | localRedis.envs.ALLOW_EMPTY_PASSWORD | string | `"yes"` |  |
 | localRedis.image.repository | string | `"redis"` |  |
 | localRedis.image.tag | string | `"6.2-alpine"` |  |
+| localRedis.resources | object | `{}` |  |
 | middleware.config_json | string | `"{\n  \"backend_url\": \"http://localhost:3000\",\n\t\"chain_mappings\": {\n\t\t\"eth-mainnet\": \"eth\",\n\t\t\"eth-goerli\": \"eth\"\n\t},\n\t\"plugins_config\": {\n\t\t\"plugins\": [\n\t\t\t\"mev\"\n\t\t],\n\t\t\"mev\": {\n\t\t\t\"chains\": {\n\t\t\t\t\"avax\": {\n\t\t\t\t\t\"provider\": \"avax-provider\",\n\t\t\t\t\t\"sleep_duration\": 1234\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n"` |  |
 | middleware.enabled | bool | `true` |  |
 | middleware.envs.BACKEND_URL | string | `"http://localhost:3000"` |  |
@@ -96,6 +97,7 @@ A Helm chart for deploying the POKT Portal API services
 | middleware.image.tag | string | `"0.0.49"` |  |
 | middleware.livenessProbe.enabled | bool | `true` |  |
 | middleware.readinessProbe.enabled | bool | `true` |  |
+| middleware.resources | object | `{}` |  |
 | middleware.startupProbe.enabled | bool | `true` |  |
 | mongodb.auth.databases[0] | string | `"gateway"` |  |
 | mongodb.auth.passwords[0] | string | `"P0K7m0ngod8"` |  |
