@@ -14,6 +14,7 @@
     {{- $stsSecNames = append $stsSecNames $sec.name  }}
   {{- end }}
 {{- end }}
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -118,15 +119,20 @@ spec:
           image: {{ $.Values.global.chainHealthcheckSidecar.repository -}}:{{- $.Values.global.chainHealthcheckSidecar.tag }}
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
           env:
+            {{- $localRpcPath := "/" }}
             {{- range $k, $v := $cntnr.healthProbes.env }}
             {{- if eq $k "LOCAL_RPC_ENDPOINT" }}
-            {{- fail "LOCAL_RPC_ENDPOINT - is generated as http://localhost:_healthProbes.portToMonitor_. Remove it from the config." }}
+            {{- fail "LOCAL_RPC_ENDPOINT - is generated as http://localhost:_healthProbes.portToMonitor_/LOCAL_RPC_PATH. Please remove it from the config." }}
             {{- end }}
+            {{- if eq $k "LOCAL_RPC_PATH" }}
+            {{- $localRpcPath = $v }}
+            {{- else }}
             - name: {{$k}}
               value: {{$v | quote}}
             {{- end }}
+            {{- end }}
             - name: LOCAL_RPC_ENDPOINT
-              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}"
+              value: "http://127.0.0.1:{{$cntnr.healthProbes.portToMonitor}}{{$localRpcPath}}"
           ports:
             - name: healthcheck
               containerPort: 9090
@@ -149,6 +155,9 @@ spec:
           image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
           imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
 
+          {{- with $cntnr.envFrom }}
+          envFrom: {{- toYaml . | nindent 12}}
+          {{- end }}
           {{- with $cntnr.env }}
           env: {{- toYaml . | nindent 12}}
           {{- end }}
@@ -157,12 +166,11 @@ spec:
           workingDir: {{ . }}
           {{- end }}
           {{- with $cntnr.command }}
-          command:
-            - /bin/sh
-            - -c
-            - {{ . }}
+          command: {{- toYaml . | nindent 12 }}
           {{- end }}
-
+          {{- with $cntnr.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with $cntnr.resources }}
           resources: {{- toYaml . | nindent 12 }}
           {{- end }}

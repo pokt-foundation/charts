@@ -61,6 +61,17 @@ spec:
             failureThreshold: {{ .Values.middleware.readinessProbe.failureThreshold | default 6 }}
             successThreshold: {{ .Values.middleware.readinessProbe.successThreshold | default 1 }}
           {{- end }}
+          {{- if .Values.middleware.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.middleware.startupProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.startupProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.startupProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.startupProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.startupProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
+          {{- end }}
           volumeMounts:
           {{- if .Values.externalSecrets.enabled }}
           - mountPath: "/config/"
@@ -76,7 +87,11 @@ spec:
             - name: PORT
               value: "{{ .Values.service.port | default "8080" }}"
           resources:
+          {{- if not .Values.middleware.resources }}
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- else }}
+            {{- toYaml .Values.middleware.resources | nindent 12 }}
+          {{- end }}
       {{- end }}
 
         ### portal-api sidecar container ###
@@ -92,13 +107,29 @@ spec:
               protocol: TCP
           {{- if .Values.probes.enabled }}
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
+            initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.probes.livenessProbe.successThreshold | default 1}}
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
+            initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.probes.livenessProbe.successThreshold | default 1}}
+          startupProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold | default 12 }}
+            successThreshold: {{ .Values.probes.livenessProbe.successThreshold | default 1}}
           {{- end }}
           env:
           {{- include "helpers.list-env-variables" . | indent 12 }}
@@ -125,6 +156,12 @@ spec:
               protocol: TCP
           env:
           {{- include "helpers.redis-env-variables" . | indent 12 }}
+          resources:
+          {{- if not .Values.localRedis.resources }}
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- else }}
+            {{- toYaml .Values.localRedis.resources | nindent 12 }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
