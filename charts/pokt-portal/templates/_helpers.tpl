@@ -100,17 +100,17 @@ Autoscaling behavior definition
 */}}
 {{- define "pokt-portal.autoscaling-behavior" -}}
 {{- $stabilizationWindow := 300 }}
-{{- $policyMax := Max }}
-{{- $policyMin := Min }}
+{{- $policyMax := "Max" }}
+{{- $policyMin := "Min" }}
 behavior:
   scaleDown:
-    stabilizationWindowSeconds: {{ .Values.autoscaling.policy.behavior.scaleDown.stabilizationWindowSeconds | default $stabilizationWindow }}
-    selectPolicy: {{ .Values.autoscaling.policy.behavior.scaleDown.selectPolicy | default $policyMin }}
+    stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.behavior.scaleDown.selectPolicy | default $policyMin }}
     policies:
-      {{- toYaml .Values.autoscaling.policy.behavior.scaleDown.policies }}
+      {{- toYaml .Values.autoscaling.behavior.scaleDown.policies }}
   scaleUp:
-    stabilizationWindowSeconds: {{ .Values.autoscaling.policy.behavior.scaleUp.stabilizationWindowSeconds | default $stabilizationWindow }}
-    selectPolicy: {{ .Values.autoscaling.policy.behavior.scaleUp.selectPolicy | default $policyMax }}
+    stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.behavior.scaleUp.selectPolicy | default $policyMax }}
     policies:
-      {{- toYaml .Values.autoscaling.policy.behavior.scaleUp.policies }}
+      {{- toYaml .Values.autoscaling.behavior.scaleUp.policies }}
 {{- end }}
