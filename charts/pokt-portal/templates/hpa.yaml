@@ -12,6 +12,7 @@ spec:
     name: {{ include "pokt-portal.fullname" . }}
   {{- if .Values.autoscaling.policies.enabled }}
   {{- include "pokt-portal.autoscaling-behavior" . | nindent 2 }}
+  {{- end }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
