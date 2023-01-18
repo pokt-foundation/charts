@@ -87,7 +87,11 @@ spec:
             - name: PORT
               value: "{{ .Values.service.port | default "8080" }}"
           resources:
+          {{- if not .Values.middleware.resources }}
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- else }}
+            {{- toYaml .Values.middleware.resources | nindent 12 }}
+          {{- end }}
       {{- end }}
 
         ### portal-api sidecar container ###
@@ -153,7 +157,11 @@ spec:
           env:
           {{- include "helpers.redis-env-variables" . | indent 12 }}
           resources:
+          {{- if not .Values.localRedis.resources }}
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- else }}
             {{- toYaml .Values.localRedis.resources | nindent 12 }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
