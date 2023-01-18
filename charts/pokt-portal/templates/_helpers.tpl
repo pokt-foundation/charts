@@ -104,13 +104,13 @@ Autoscaling behavior definition
 {{- $policyMin := "Min" }}
 behavior:
   scaleDown:
-    stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | default $stabilizationWindow }}
-    selectPolicy: {{ .Values.autoscaling.behavior.scaleDown.selectPolicy | default $policyMin }}
+    stabilizationWindowSeconds: {{ .Values.autoscaling.policies.behavior.scaleDown.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.policies.behavior.scaleDown.selectPolicy | default $policyMin }}
     policies:
-      {{- toYaml .Values.autoscaling.behavior.scaleDown.policies }}
+      {{- toYaml .Values.autoscaling.policies.behavior.scaleDown.policies }}
   scaleUp:
-    stabilizationWindowSeconds: {{ .Values.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | default $stabilizationWindow }}
-    selectPolicy: {{ .Values.autoscaling.behavior.scaleUp.selectPolicy | default $policyMax }}
+    stabilizationWindowSeconds: {{ .Values.autoscaling.policies.behavior.scaleUp.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.policies.behavior.scaleUp.selectPolicy | default $policyMax }}
     policies:
-      {{- toYaml .Values.autoscaling.behavior.scaleUp.policies }}
+      {{- toYaml .Values.autoscaling.policies.behavior.scaleUp.policies }}
 {{- end }}
