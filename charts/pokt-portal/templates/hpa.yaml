@@ -10,17 +10,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "pokt-portal.fullname" . }}
-  behavior:
-    scaleDown:
-      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleDown.stabilizationWindowSeconds | default 300 }}
-      selectPolicy: {{ .Values.autoscaling.scaleDown.policy | default "Min" }}
-      policies:
-        {{- toYaml .Values.autoscaling.scaleDown.policies | nindent 8 }}
-    scaleUp:
-      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleUp.stabilizationWindowSeconds | default 0 }}
-      selectPolicy: {{ .Values.autoscaling.scaleDown.policy | default "Max" }}
-      policies:
-        {{- toYaml .Values.autoscaling.scaleUp.policies | nindent 8 }}
+  {{- if .Values.autoscaling.policies.enabled }}
+  {{- include "pokt-portal.autoscaling-behavior" . | nindent 2 }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

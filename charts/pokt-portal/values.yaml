@@ -173,13 +173,16 @@ resources: {}
   #   memory: 128Mi
 
 ## Autoscaling definition. This section includes HPA with scale up/down
-#  behavior block and stabilization window. This is included by default
-#  in this section but may be later on enabled/disabled via template.
-#  When using HPA behavior using multiple policies that can reflect the
-#  different scale scenarios a deployment could face will provide the
-#  best scaling results. This will require a lot of back and forth tweaking.
+#  behavior block and stabilization window.
 autoscaling:
   enabled: false
+  ## Policies flag enables autoscaling behavior based on a set of scale
+  ## up/down policies. It expects at least one policy for scale up and
+  ## scale down respecitvely. This will allow to fine tune scaling events
+  ## and reduce throttling or flapping when scale occurs. Bear in mind
+  ## getting this section to work right might require a lot of back
+  ## and forth tweaking, trial and error.
+  # policies: false
   # behavior:
   #   scaleDown:
   #     stabilizationWindowSeconds: 300
