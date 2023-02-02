@@ -94,3 +94,23 @@ Create normal env vars from list
   value: {{ $val | quote }}
 {{- end }}
 {{- end }}
+
+{{/*
+Autoscaling behavior definition
+*/}}
+{{- define "pokt-portal.autoscaling-behavior" -}}
+{{- $stabilizationWindow := 300 }}
+{{- $policyMax := "Max" }}
+{{- $policyMin := "Min" }}
+behavior:
+  scaleDown:
+    stabilizationWindowSeconds: {{ .Values.autoscaling.policies.behavior.scaleDown.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.policies.behavior.scaleDown.selectPolicy | default $policyMin }}
+    policies:
+      {{- toYaml .Values.autoscaling.policies.behavior.scaleDown.policies }}
+  scaleUp:
+    stabilizationWindowSeconds: {{ .Values.autoscaling.policies.behavior.scaleUp.stabilizationWindowSeconds | default $stabilizationWindow }}
+    selectPolicy: {{ .Values.autoscaling.policies.behavior.scaleUp.selectPolicy | default $policyMax }}
+    policies:
+      {{- toYaml .Values.autoscaling.policies.behavior.scaleUp.policies }}
+{{- end }}
