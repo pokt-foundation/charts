@@ -1,0 +1,225 @@
+# Default values for pokt-portal.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+middleware:
+  enabled: true
+  image:
+    repository: pocketfoundation/portal-middleware
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+  config_json: |
+      {
+        "backend_url": "http://localhost:3000",
+      	"chain_mappings": {
+      		"eth-mainnet": "eth",
+      		"eth-goerli": "eth"
+      	},
+      	"plugins_config": {
+      		"plugins": [
+      			"mev"
+      		],
+      		"mev": {
+      			"chains": {
+      				"avax": {
+      					"provider": "avax-provider",
+      					"sleep_duration": 1234
+      				}
+      			}
+      		}
+      	}
+      }
+
+  ### middleware  container probes ####
+
+  livenessProbe:
+    enabled: true
+    # initialDelaySeconds: 30
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+  readinessProbe:
+    enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+  startupProbe:
+    enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+
+  envs:
+    BACKEND_URL: "http://localhost:3000"
+
+  ### middleware resource definition
+  resources: {}
+
+imagePullSecrets: []
+  # - name: "regcred"
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "portal-middleware"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+externalSecrets:
+  enabled: false
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  # must be 3000 for api OR 8080 for middleware
+  port: 8080
+
+### api container probes ####
+probes:
+  enabled: true
+
+  livenessProbe:
+    enabled: true
+    # initialDelaySeconds: 30
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+  readinessProbe:
+    enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+  startupProbe:
+    enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
+
+### end api container probes ####
+
+ingress:
+  # must be one of api or middleware
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: "*.localhost"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: mydomain-com-tls
+      hosts:
+        - mydomain.com
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Autoscaling definition. This section includes HPA with scale up/down
+#  behavior block and stabilization window.
+autoscaling:
+  enabled: false
+  ## Policies block enables autoscaling behavior based on a set of scale
+  ## up/down policies. It expects at least one policy for scale up and
+  ## scale down respecitvely. This will allow to fine tune scaling events
+  ## and reduce throttling or flapping when scale occurs. Bear in mind
+  ## getting this section to work right might require a lot of back
+  ## and forth tweaking, trial and error.
+  # policies:
+  #   enabled: false
+  #   behavior:
+  #     scaleDown:
+  #       stabilizationWindowSeconds: 300
+  #       selectPolicy: Min
+  #       policies:
+  #         - type: Percent
+  #           value: 80
+  #           periodSeconds: 60
+  #     scaleUp:
+  #       stabilizationWindowSeconds: 0
+  #       selectPolicy: Max
+  #       policies:
+  #         - type: Percent
+  #           value: 80
+  #           periodSeconds: 30
+  #         - type: Pods
+  #           value: 5
+  #           periodSeconds: 30
+  # minReplicas: 3
+  # maxReplicas: 100
+  # targetCPUUtilizationPercentage: 65
+  # targetMemoryUtilizationPercentage: 65
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Environment variable listing
+env:
+  # non sensitive variables
+  normal:
+    # remote cache
+    FOO: "bar"
+
+  # sensitive variables stored in a secret
+  secret:
+    GATEWAY_HOST: localhost
+
+## @section redis subcharts parameters
+## @param redis.enabled Deploy redis subchart
+redis:
+  enabled: true
+  fullnameOverride: "redis"
+  architecture: "standalone"
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  replica:
+    persistence:
+      enabled: false
+  sentinel:
+    persistence:
+      enabled: false
