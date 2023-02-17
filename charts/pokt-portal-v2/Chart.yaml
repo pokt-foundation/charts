@@ -1,5 +1,5 @@
 apiVersion: v2
-name: portal-middleware
+name: pokt-portal-v2
 description: A Helm chart for deploying the POKT Portal API Rewrite service(s)
 maintainers:
   - name: olakunle-pokt

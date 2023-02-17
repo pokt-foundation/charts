@@ -1,4 +1,4 @@
-# pokt-portal
+# pokt-portal-v2
 
 ![Version: 0.0.0](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
@@ -28,7 +28,7 @@ A Helm chart for deploying the POKT Portal API services
 | externalSecrets.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"pocketfoundation/portal-api"` |  |
+| image.repository | string | `"pocketfoundation/portal-middleware"` |  |
 | image.tag | string | `"0.0.36"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
@@ -70,7 +70,7 @@ A Helm chart for deploying the POKT Portal API services
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `"portal-api"` |  |
+| serviceAccount.name | string | `"pokt-portal-v2"` |  |
 | tolerations | list | `[]` |  |
 
 ----------------------------------------------

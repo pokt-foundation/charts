@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "portal-middleware.name" -}}
+{{- define "pokt-portal-v2.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "portal-middleware.fullname" -}}
+{{- define "pokt-portal-v2.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "portal-middleware.chart" -}}
+{{- define "pokt-portal-v2.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "portal-middleware.labels" -}}
-helm.sh/chart: {{ include "portal-middleware.chart" . }}
-{{ include "portal-middleware.selectorLabels" . }}
+{{- define "pokt-portal-v2.labels" -}}
+helm.sh/chart: {{ include "pokt-portal-v2.chart" . }}
+{{ include "pokt-portal-v2.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "portal-middleware.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "portal-middleware.name" . }}
+{{- define "pokt-portal-v2.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "pokt-portal-v2.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "portal-middleware.serviceAccountName" -}}
+{{- define "pokt-portal-v2.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "portal-middleware.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "pokt-portal-v2.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -98,7 +98,7 @@ Create normal env vars from list
 {{/*
 Autoscaling behavior definition
 */}}
-{{- define "portal-middleware.autoscaling-behavior" -}}
+{{- define "pokt-portal-v2.autoscaling-behavior" -}}
 {{- $stabilizationWindow := 300 }}
 {{- $policyMax := "Max" }}
 {{- $policyMin := "Min" }}

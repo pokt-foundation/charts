@@ -2,16 +2,16 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "portal-middleware.fullname" . }}
+  name: {{ include "pokt-portal-v2.fullname" . }}
   labels:
-    {{- include "portal-middleware.labels" . | nindent 4 }}
+    {{- include "pokt-portal-v2.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "portal-middleware.fullname" . }}
+    name: {{ include "pokt-portal-v2.fullname" . }}
   {{- if .Values.autoscaling.policies.enabled }}
-  {{- include "portal-middleware.autoscaling-behavior" . | nindent 2 }}
+  {{- include "pokt-portal-v2.autoscaling-behavior" . | nindent 2 }}
   {{- end }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}

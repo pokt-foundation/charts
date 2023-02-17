@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "portal-middleware.fullname" . }}
+  name: {{ include "pokt-portal-v2.fullname" . }}
   labels:
-    {{- include "portal-middleware.labels" . | nindent 4 }}
+    {{- include "pokt-portal-v2.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "portal-middleware.selectorLabels" . | nindent 6 }}
+      {{- include "pokt-portal-v2.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "portal-middleware.selectorLabels" . | nindent 8 }}
+        {{- include "pokt-portal-v2.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "portal-middleware.serviceAccountName" . }}
+      serviceAccountName: {{ include "pokt-portal-v2.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -111,10 +111,10 @@ spec:
         {{- if .Values.externalSecrets.enabled }}
         - name: external-secrets
           secret:
-            secretName:  {{ include "portal-middleware.fullname" . }}-middleware-es
+            secretName:  {{ include "pokt-portal-v2.fullname" . }}-middleware-es
         {{- else }}
         - name: config
           configMap:
-            name: {{ include "portal-middleware.fullname" . -}}-config
+            name: {{ include "pokt-portal-v2.fullname" . -}}-config
         {{- end }}
         {{- end }}
