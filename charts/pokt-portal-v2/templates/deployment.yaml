@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pokt-portal-v2.fullname" . }}
+  labels:
+    {{- include "pokt-portal-v2.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "pokt-portal-v2.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pokt-portal-v2.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pokt-portal-v2.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        ### portal-middleware sidecar container ###
+      {{- if .Values.middleware.enabled }}
+        - name: middleware
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.middleware.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.middleware.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.middleware.livenessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.livenessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.livenessProbe.periodSeconds  | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.livenessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.livenessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.livenessProbe.successThreshold | default 1}}
+          {{- end }}
+          {{- if .Values.middleware.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.middleware.readinessProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.readinessProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.readinessProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.readinessProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.readinessProbe.successThreshold | default 1 }}
+          {{- end }}
+          {{- if .Values.middleware.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.middleware.startupProbe.path | default "/healthz" }}
+              port: http
+            initialDelaySeconds: {{ .Values.middleware.startupProbe.initialDelaySeconds | default 30 }}
+            periodSeconds: {{ .Values.middleware.startupProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.middleware.startupProbe.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.middleware.startupProbe.failureThreshold | default 6 }}
+            successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.externalSecrets.enabled }}
+          - mountPath: "/config/"
+            name: external-secrets
+            readOnly: true
+          {{- else }}
+          - mountPath: /config
+            name: config
+          {{- end }}
+          env:
+            - name: CONFIG_FILE
+              value: "/config/config.json"
+            - name: PORT
+              value: "{{ .Values.service.port | default "8080" }}"
+          resources:
+          {{- if not .Values.middleware.resources }}
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- else }}
+            {{- toYaml .Values.middleware.resources | nindent 12 }}
+          {{- end }}
+      {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.middleware.enabled }}
+        {{- if .Values.externalSecrets.enabled }}
+        - name: external-secrets
+          secret:
+            secretName:  {{ include "pokt-portal-v2.fullname" . }}-middleware-es
+        {{- else }}
+        - name: config
+          configMap:
+            name: {{ include "pokt-portal-v2.fullname" . -}}-config
+        {{- end }}
+        {{- end }}

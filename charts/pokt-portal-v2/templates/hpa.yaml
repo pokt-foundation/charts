@@ -1,0 +1,35 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "pokt-portal-v2.fullname" . }}
+  labels:
+    {{- include "pokt-portal-v2.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "pokt-portal-v2.fullname" . }}
+  {{- if .Values.autoscaling.policies.enabled }}
+  {{- include "pokt-portal-v2.autoscaling-behavior" . | nindent 2 }}
+  {{- end }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    - resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+      type: Resource
+    {{- end }}
+    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+      type: Resource
+    {{- end }}
+{{- end }}
