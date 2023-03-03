@@ -43,7 +43,6 @@ A Helm chart for deploying the POKT Portal API services
 | localRedis.image.repository | string | `"redis"` |  |
 | localRedis.image.tag | string | `"6.2-alpine"` |  |
 | localRedis.resources | object | `{}` |  |
-| middleware.config_json | string | `"{\n  \"backend_url\": \"http://localhost:3000\",\n\t\"chain_mappings\": {\n\t\t\"eth-mainnet\": \"eth\",\n\t\t\"eth-goerli\": \"eth\"\n\t},\n\t\"plugins_config\": {\n\t\t\"plugins\": [\n\t\t\t\"mev\"\n\t\t],\n\t\t\"mev\": {\n\t\t\t\"chains\": {\n\t\t\t\t\"avax\": {\n\t\t\t\t\t\"provider\": \"avax-provider\",\n\t\t\t\t\t\"sleep_duration\": 1234\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n"` |  |
 | middleware.enabled | bool | `true` |  |
 | middleware.envs.BACKEND_URL | string | `"http://localhost:3000"` |  |
 | middleware.externalSecrets.decodginStrategy | string | `"Auto"` |  |

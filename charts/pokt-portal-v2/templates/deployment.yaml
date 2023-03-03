@@ -37,7 +37,7 @@ spec:
           imagePullPolicy: {{ .Values.middleware.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 80
               protocol: TCP
           {{- if .Values.middleware.livenessProbe.enabled }}
           livenessProbe:
@@ -85,7 +85,7 @@ spec:
             - name: CONFIG_FILE
               value: "/config/config.json"
             - name: PORT
-              value: "{{ .Values.service.port | default "8080" }}"
+              value: "{{ .Values.service.port | default "80" }}"
           resources:
           {{- if not .Values.middleware.resources }}
             {{- toYaml .Values.resources | nindent 12 }}

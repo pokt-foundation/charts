@@ -96,8 +96,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  # must be 3000 for api OR 8080 for middleware
-  port: 8080
+  port: 80
 
 ### api container probes ####
 probes:
@@ -198,13 +197,23 @@ affinity: {}
 # Environment variable listing
 env:
   # non sensitive variables
-  normal:
-    # remote cache
-    FOO: "bar"
+   normal: []
 
   # sensitive variables stored in a secret
-  secret:
-    GATEWAY_HOST: localhost
+   secret: []
+
+externalSecrets:
+  enabled: true
+  # secret-store config
+  secretStore: "gcpsm"
+  gcpsm:
+    namespace: "external-secrets"
+    clusterLocation: "europe-west3"
+    clusterName: "portal-eu-west3-staging"
+    ProjectID: "portal-eu-west3-staging-bf66"
+    serviceAccount:
+      name: "external-secrets"
+      namespace: "external-secrets"
 
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
