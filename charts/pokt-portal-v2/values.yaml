@@ -34,6 +34,11 @@ middleware:
       	}
       }
 
+  middlewareConfigPath: "/app/config.json"
+
+  # iterate through all the key values and inject into env vars
+  portalSecretEnvs: "portal-secret-envs"
+
   ### middleware  container probes ####
 
   livenessProbe:

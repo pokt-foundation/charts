@@ -83,9 +83,13 @@ spec:
           {{- end }}
           env:
             - name: CONFIG_FILE
-              value: "/config/config.json"
+              value: "{{ .Values.middlewareConfigPath | default /app/config.json }}"
             - name: PORT
-              value: "{{ .Values.service.port | default "80" }}"
+              value: "{{ .Values.service.port | default '80' }}"
+          envFrom:
+            - secretRef:
+              name: "{{ _.Release.Name_ }}-secret-vars"
+
           resources:
           {{- if not .Values.middleware.resources }}
             {{- toYaml .Values.resources | nindent 12 }}
@@ -108,11 +112,6 @@ spec:
       {{- end }}
       volumes:
         {{- if .Values.middleware.enabled }}
-        {{- if .Values.externalSecrets.enabled }}
-        - name: external-secrets
-          secret:
-            secretName:  {{ include "pokt-portal-v2.fullname" . }}-middleware-es
-        {{- else }}
         - name: config
           configMap:
             name: {{ include "pokt-portal-v2.fullname" . -}}-config
