@@ -35,7 +35,7 @@ middleware:
       }
 
   configPath: "/config/config.json"
-  middlewareContainerPort: 80
+  containerPort: 80
 
   # iterate through all the key values and inject into env vars
   portalSecretEnvs: "portal-secret-envs"
@@ -51,13 +51,13 @@ middleware:
     # successThreshold: 1
   readinessProbe:
     enabled: true
-    # initialDelaySeconds: 5
+    initialDelaySeconds: 25
     # periodSeconds: 10
     # timeoutSeconds: 5
     # failureThreshold: 6
     # successThreshold: 1
   startupProbe:
-    enabled: true
+    enabled: false
     # initialDelaySeconds: 5
     # periodSeconds: 10
     # timeoutSeconds: 5
