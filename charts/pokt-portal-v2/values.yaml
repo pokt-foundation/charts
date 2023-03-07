@@ -34,7 +34,8 @@ middleware:
       	}
       }
 
-  middlewareConfigPath: "/app/config.json"
+  configPath: "/config/config.json"
+  middlewareContainerPort: 80
 
   # iterate through all the key values and inject into env vars
   portalSecretEnvs: "portal-secret-envs"

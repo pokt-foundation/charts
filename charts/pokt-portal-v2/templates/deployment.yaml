@@ -33,11 +33,11 @@ spec:
         - name: middleware
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}"
+          image: {{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.middleware.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.containerPort | default 80 }}
               protocol: TCP
           {{- if .Values.middleware.livenessProbe.enabled }}
           livenessProbe:
@@ -73,22 +73,13 @@ spec:
             successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
           {{- end }}
           volumeMounts:
-          {{- if .Values.externalSecrets.enabled }}
-          - mountPath: "/config/"
-            name: external-secrets
-            readOnly: true
-          {{- else }}
-          - mountPath: /config
+          - mountPath: {{ .Values.middleware.configPath | default "/config" }}
             name: config
-          {{- end }}
           env:
             - name: CONFIG_FILE
-              value: "{{ .Values.middlewareConfigPath | default /app/config.json }}"
+              value: {{ .Values.middleware.configPath | default "/config/config.json" }}
             - name: PORT
-              value: "{{ .Values.service.port | default '80' }}"
-          envFrom:
-            - secretRef:
-              name: "{{ _.Release.Name_ }}-secret-vars"
+              value: {{ .Values.middleware.containerPort | default 80 }}
 
           resources:
           {{- if not .Values.middleware.resources }}
@@ -115,5 +106,4 @@ spec:
         - name: config
           configMap:
             name: {{ include "pokt-portal-v2.fullname" . -}}-config
-        {{- end }}
         {{- end }}
