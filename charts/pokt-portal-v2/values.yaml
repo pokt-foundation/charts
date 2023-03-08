@@ -12,6 +12,7 @@ middleware:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
 
+  localConfigPath: "config.json"
   configMountPath: "/config"
   containerPort: 80
 

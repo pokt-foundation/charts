@@ -4,4 +4,4 @@ metadata:
   name: {{ include "pokt-portal-v2.fullname" . -}}-config
 data:
   config.json: |-
-{{ .Files.Get "config.json" | indent 4}}
+{{ .Files.Get .Values.middleware.localConfigPath | indent 4}}
