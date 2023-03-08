@@ -144,30 +144,30 @@ autoscaling:
   ## and reduce throttling or flapping when scale occurs. Bear in mind
   ## getting this section to work right might require a lot of back
   ## and forth tweaking, trial and error.
-  # policies:
-  #   enabled: false
-  #   behavior:
-  #     scaleDown:
-  #       stabilizationWindowSeconds: 300
-  #       selectPolicy: Min
-  #       policies:
-  #         - type: Percent
-  #           value: 80
-  #           periodSeconds: 60
-  #     scaleUp:
-  #       stabilizationWindowSeconds: 0
-  #       selectPolicy: Max
-  #       policies:
-  #         - type: Percent
-  #           value: 80
-  #           periodSeconds: 30
-  #         - type: Pods
-  #           value: 5
-  #           periodSeconds: 30
-  # minReplicas: 3
-  # maxReplicas: 100
-  # targetCPUUtilizationPercentage: 65
-  # targetMemoryUtilizationPercentage: 65
+  policies:
+    enabled: false
+    behavior:
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        selectPolicy: Min
+        policies:
+          - type: Percent
+            value: 80
+            periodSeconds: 60
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        selectPolicy: Max
+        policies:
+          - type: Percent
+            value: 80
+            periodSeconds: 30
+          - type: Pods
+            value: 2
+            periodSeconds: 30
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 65
+  targetMemoryUtilizationPercentage: 65
 
 nodeSelector: {}
 
