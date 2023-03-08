@@ -3,6 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ include "pokt-portal-v2.fullname" . -}}-config
 data:
-  {{- range $key, $val := .Values.env.normal }}
-  {{ $key }}: {{ $val }}
-  {{- end}}
+  config.json: |-
+{{ .Files.Get "config.json" | indent 4}}

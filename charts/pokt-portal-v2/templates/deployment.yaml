@@ -28,7 +28,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        ### portal-middleware sidecar container ###
+        ### portal-middleware container ###
       {{- if .Values.middleware.enabled }}
         - name: middleware
           securityContext:
@@ -73,13 +73,23 @@ spec:
             successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
           {{- end }}
           volumeMounts:
-          - mountPath: {{ .Values.middleware.configPath | default "/config" }}
+          - mountPath: {{ .Values.middleware.configMountPath | default "/config" }}
             name: config
           env:
             - name: CONFIG_FILE
-              value: {{ .Values.middleware.configPath | default "/config/config.json" }}
+              value: {{ printf "%s/%s" ( trimSuffix "/" .Values.middleware.configMountPath ) "config.json"}}
             - name: PORT
-              value: {{ .Values.middleware.containerPort | default 80 }}
+              value: "{{ .Values.middleware.containerPort | default 80 }}"
+            - name: GATEWAY_PRIVATE_KEY
+              value: {{ .Values.middleware.gatewayPrivateKey | quote }}
+            - name: DISPATCHER_URL
+              value: {{ .Values.middleware.dispatcherUrl | quote }}
+            - name: POCKET_NODE_URL
+              value: {{ .Values.middleware.pocketNodeUrl | quote }}
+            - name: REDIS_HOST
+              value: {{ .Values.middleware.redisHost | quote }}
+            - name: REDIS_PORT
+              value: {{ .Values.middleware.redisPort | quote }}
 
           resources:
           {{- if not .Values.middleware.resources }}
