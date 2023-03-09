@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 2
+replicaCount: 1
 
 middleware:
   enabled: true
@@ -12,27 +12,12 @@ middleware:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
 
-  config_json: |
-      {
-        "backend_url": "http://localhost:3000",
-      	"chain_mappings": {
-      		"eth-mainnet": "eth",
-      		"eth-goerli": "eth"
-      	},
-      	"plugins_config": {
-      		"plugins": [
-      			"mev"
-      		],
-      		"mev": {
-      			"chains": {
-      				"avax": {
-      					"provider": "avax-provider",
-      					"sleep_duration": 1234
-      				}
-      			}
-      		}
-      	}
-      }
+  localConfigPath: "config.json"
+  configMountPath: "/config"
+  containerPort: 80
+
+  # iterate through all the key values and inject into env vars
+  portalSecretEnvs: "portal-secret-envs"
 
   ### middleware  container probes ####
 
@@ -45,13 +30,13 @@ middleware:
     # successThreshold: 1
   readinessProbe:
     enabled: true
-    # initialDelaySeconds: 5
+    initialDelaySeconds: 25
     # periodSeconds: 10
     # timeoutSeconds: 5
     # failureThreshold: 6
     # successThreshold: 1
   startupProbe:
-    enabled: true
+    enabled: false
     # initialDelaySeconds: 5
     # periodSeconds: 10
     # timeoutSeconds: 5
@@ -83,9 +68,6 @@ podAnnotations: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
-externalSecrets:
-  enabled: false
-
 securityContext: {}
   # capabilities:
   #   drop:
@@ -96,8 +78,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  # must be 3000 for api OR 8080 for middleware
-  port: 8080
+  port: "80"
 
 ### api container probes ####
 probes:
@@ -198,18 +179,28 @@ affinity: {}
 # Environment variable listing
 env:
   # non sensitive variables
-  normal:
-    # remote cache
-    FOO: "bar"
+  normal: []
 
   # sensitive variables stored in a secret
-  secret:
-    GATEWAY_HOST: localhost
+  secret: []
+
+externalSecrets:
+  enabled: true
+  # secret-store config
+  secretStore: "gcpsm"
+  gcpsm:
+    namespace: "external-secrets"
+    clusterLocation: "europe-west3"
+    clusterName: "portal-eu-west3-staging"
+    ProjectID: "portal-eu-west3-staging-bf66"
+    serviceAccount:
+      name: "external-secrets"
+      namespace: "external-secrets"
 
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
 redis:
-  enabled: true
+  enabled: false
   fullnameOverride: "redis"
   architecture: "standalone"
   auth:

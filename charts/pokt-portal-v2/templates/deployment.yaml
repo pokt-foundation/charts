@@ -28,16 +28,16 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        ### portal-middleware sidecar container ###
+        ### portal-middleware container ###
       {{- if .Values.middleware.enabled }}
         - name: middleware
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}"
+          image: {{ .Values.middleware.image.repository }}:{{ .Values.middleware.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.middleware.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.containerPort | default 80 }}
               protocol: TCP
           {{- if .Values.middleware.livenessProbe.enabled }}
           livenessProbe:
@@ -73,19 +73,24 @@ spec:
             successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
           {{- end }}
           volumeMounts:
-          {{- if .Values.externalSecrets.enabled }}
-          - mountPath: "/config/"
-            name: external-secrets
-            readOnly: true
-          {{- else }}
-          - mountPath: /config
+          - mountPath: {{ .Values.middleware.configMountPath | default "/config" }}
             name: config
-          {{- end }}
           env:
             - name: CONFIG_FILE
-              value: "/config/config.json"
+              value: {{ printf "%s/%s" ( trimSuffix "/" .Values.middleware.configMountPath ) "config.json"}}
             - name: PORT
-              value: "{{ .Values.service.port | default "8080" }}"
+              value: "{{ .Values.middleware.containerPort | default 80 }}"
+            - name: GATEWAY_PRIVATE_KEY
+              value: {{ .Values.middleware.gatewayPrivateKey | quote }}
+            - name: DISPATCHER_URL
+              value: {{ .Values.middleware.dispatcherUrl | quote }}
+            - name: POCKET_NODE_URL
+              value: {{ .Values.middleware.pocketNodeUrl | quote }}
+            - name: REDIS_HOST
+              value: {{ .Values.middleware.redisHost | quote }}
+            - name: REDIS_PORT
+              value: {{ .Values.middleware.redisPort | quote }}
+
           resources:
           {{- if not .Values.middleware.resources }}
             {{- toYaml .Values.resources | nindent 12 }}
@@ -108,13 +113,7 @@ spec:
       {{- end }}
       volumes:
         {{- if .Values.middleware.enabled }}
-        {{- if .Values.externalSecrets.enabled }}
-        - name: external-secrets
-          secret:
-            secretName:  {{ include "pokt-portal-v2.fullname" . }}-middleware-es
-        {{- else }}
         - name: config
           configMap:
             name: {{ include "pokt-portal-v2.fullname" . -}}-config
-        {{- end }}
         {{- end }}
