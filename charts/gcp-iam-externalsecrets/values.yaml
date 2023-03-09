@@ -1,0 +1,11 @@
+iamPolicyMember:
+  iamMember: service-account-name
+  secretProjectID: project
+  secretID: my-secret
+  workloadIdentityEndpoint: cluster.svc.id.goog
+
+externalSecrets:
+  clusterLocation: europe-west3
+  clusterName: cluster-name
+  clusterProjectID: project
+  namespace: default
