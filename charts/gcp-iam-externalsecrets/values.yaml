@@ -15,7 +15,7 @@ iamPolicyMember:
 externalSecrets:
   # -- Wether to create both the SecretStore and the ExternalSecret K8s Resources
   create: true
-  
+
   # -- Location of the cluster in which to create the External Secrets K8s resources
   clusterLocation: europe-west3
 
