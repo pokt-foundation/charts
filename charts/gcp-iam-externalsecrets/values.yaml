@@ -1,11 +1,29 @@
 iamPolicyMember:
+  # -- Name of the GCP Service Account to create.
+  # The service account will be created under the same project as the cluster in order to allow Workload Identity to work
   iamMember: service-account-name
+
+  # -- GCP Project that contains the secret that the created service account will have access to
   secretProjectID: project
+
+  # -- Secret ID that the created service account will have access to
   secretID: my-secret
+
+  # -- GCP Workload Identity namespace that External Secrets will use to authenticate against
   workloadIdentityEndpoint: cluster.svc.id.goog
 
 externalSecrets:
+  # -- Wether to create both the SecretStore and the ExternalSecret K8s Resources
+  create: true
+  
+  # -- Location of the cluster in which to create the External Secrets K8s resources
   clusterLocation: europe-west3
+
+  # -- Name of the cluster in which to create the External Secrets K8s resources
   clusterName: cluster-name
+
+  # -- GCP Project of the cluster in which to create the External Secrets K8s resources
   clusterProjectID: project
+
+  # -- K8s Namespace in which to create the External Secrets resources
   namespace: default
