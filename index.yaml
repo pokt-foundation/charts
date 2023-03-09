@@ -1379,6 +1379,26 @@ entries:
   pokt-portal-v2:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2023-03-09T17:18:19.16608704Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.3.7
+    description: A Helm chart for deploying the POKT Portal API Rewrite service(s)
+    digest: 06b2712bfa2b57e4193a1814438d2af6c0bc64c069836a90caa3fac66032fdbf
+    maintainers:
+    - name: olakunle-pokt
+      url: https://github.com/olakunle-pokt/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-portal-v2
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-v2-0.0.3/pokt-portal-v2-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2023-02-20T14:56:00.451684997Z"
     dependencies:
     - condition: redis.enabled
@@ -1619,4 +1639,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2023-02-20T14:56:00.451867203Z"
+generated: "2023-03-09T17:18:19.166274435Z"
