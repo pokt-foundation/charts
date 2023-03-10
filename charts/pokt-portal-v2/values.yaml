@@ -12,15 +12,19 @@ middleware:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
 
-  localConfigPath: "config.json"
-  configMountPath: "/config"
+  # use a local config.json
+  #localConfigPath: "config.json"
+  # a secret holding the config.json for portal-middleware
+  configSecretName: "portal-middleware-config"
+  configMountPath: "/etc/portal/"
+  # GATEWAY_PRIVATE_KEY is the only secret env var
+  secretEnvName: "portal-middleware-secret-env"
   containerPort: 80
 
-  # iterate through all the key values and inject into env vars
-  portalSecretEnvs: "portal-secret-envs"
+  redisHost: "redis-master"
+  redisPort: 6379
 
   ### middleware  container probes ####
-
   livenessProbe:
     enabled: true
     # initialDelaySeconds: 30
@@ -42,9 +46,6 @@ middleware:
     # timeoutSeconds: 5
     # failureThreshold: 6
     # successThreshold: 1
-
-  envs:
-    BACKEND_URL: "http://localhost:3000"
 
   ### middleware resource definition
   resources: {}
@@ -200,7 +201,7 @@ externalSecrets:
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
 redis:
-  enabled: false
+  enabled: true
   fullnameOverride: "redis"
   architecture: "standalone"
   auth:
