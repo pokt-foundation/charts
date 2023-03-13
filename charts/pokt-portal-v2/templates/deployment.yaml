@@ -88,19 +88,19 @@ spec:
             - name: GATEWAY_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.middleware.secretEnvName | quote }}
+                  name: {{ .Values.middleware.secretName | quote }}
                   key: GATEWAY_PRIVATE_KEY
             # url contains basic auth
             - name: DISPATCHER_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.middleware.secretEnvName | quote }}
+                  name: {{ .Values.middleware.secretName | quote }}
                   key: DISPATCHER_URL
             # url contains basic auth
             - name: POCKET_NODE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.middleware.secretEnvName | quote }}
+                  name: {{ .Values.middleware.secretName | quote }}
                   key: POCKET_NODE_URL
 
           resources:
@@ -127,5 +127,8 @@ spec:
         {{- if .Values.middleware.enabled }}
         - name: portal-middleware-config
           secret:
-            secretName: {{ .Values.middleware.configSecretName | quote }}
+            secretName: {{ .Values.middleware.secretName | quote }}
+            items:
+              - key: "config.json"
+                path: "config.json"
         {{- end }}
