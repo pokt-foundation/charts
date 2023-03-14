@@ -12,15 +12,15 @@ middleware:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
 
-  localConfigPath: "config.json"
-  configMountPath: "/config"
+  secretName: "portal-middleware"
+  configMountPath: "/etc/portal/"
+  # GATEWAY_PRIVATE_KEY is the only secret env var
   containerPort: 80
 
-  # iterate through all the key values and inject into env vars
-  portalSecretEnvs: "portal-secret-envs"
+  redisHost: "redis-master"
+  redisPort: 6379
 
   ### middleware  container probes ####
-
   livenessProbe:
     enabled: true
     # initialDelaySeconds: 30
@@ -30,7 +30,7 @@ middleware:
     # successThreshold: 1
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 25
+    # initialDelaySeconds: 25
     # periodSeconds: 10
     # timeoutSeconds: 5
     # failureThreshold: 6
@@ -42,9 +42,6 @@ middleware:
     # timeoutSeconds: 5
     # failureThreshold: 6
     # successThreshold: 1
-
-  envs:
-    BACKEND_URL: "http://localhost:3000"
 
   ### middleware resource definition
   resources: {}
@@ -176,31 +173,10 @@ tolerations: []
 
 affinity: {}
 
-# Environment variable listing
-env:
-  # non sensitive variables
-  normal: []
-
-  # sensitive variables stored in a secret
-  secret: []
-
-externalSecrets:
-  enabled: true
-  # secret-store config
-  secretStore: "gcpsm"
-  gcpsm:
-    namespace: "external-secrets"
-    clusterLocation: "europe-west3"
-    clusterName: "portal-eu-west3-staging"
-    ProjectID: "portal-eu-west3-staging-bf66"
-    serviceAccount:
-      name: "external-secrets"
-      namespace: "external-secrets"
-
 ## @section redis subcharts parameters
 ## @param redis.enabled Deploy redis subchart
 redis:
-  enabled: false
+  enabled: true
   fullnameOverride: "redis"
   architecture: "standalone"
   auth:

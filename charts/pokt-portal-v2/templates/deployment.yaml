@@ -73,23 +73,35 @@ spec:
             successThreshold: {{ .Values.middleware.startupProbe.successThreshold | default 1 }}
           {{- end }}
           volumeMounts:
-          - mountPath: {{ .Values.middleware.configMountPath | default "/config" }}
-            name: config
+          - mountPath: {{ .Values.middleware.configMountPath }}
+            readOnly: true
+            name: portal-middleware-config
           env:
             - name: CONFIG_FILE
               value: {{ printf "%s/%s" ( trimSuffix "/" .Values.middleware.configMountPath ) "config.json"}}
             - name: PORT
               value: "{{ .Values.middleware.containerPort | default 80 }}"
-            - name: GATEWAY_PRIVATE_KEY
-              value: {{ .Values.middleware.gatewayPrivateKey | quote }}
-            - name: DISPATCHER_URL
-              value: {{ .Values.middleware.dispatcherUrl | quote }}
-            - name: POCKET_NODE_URL
-              value: {{ .Values.middleware.pocketNodeUrl | quote }}
             - name: REDIS_HOST
               value: {{ .Values.middleware.redisHost | quote }}
             - name: REDIS_PORT
               value: {{ .Values.middleware.redisPort | quote }}
+            - name: GATEWAY_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.middleware.secretName | quote }}
+                  key: GATEWAY_PRIVATE_KEY
+            # url contains basic auth
+            - name: DISPATCHER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.middleware.secretName | quote }}
+                  key: DISPATCHER_URL
+            # url contains basic auth
+            - name: POCKET_NODE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.middleware.secretName | quote }}
+                  key: POCKET_NODE_URL
 
           resources:
           {{- if not .Values.middleware.resources }}
@@ -113,7 +125,10 @@ spec:
       {{- end }}
       volumes:
         {{- if .Values.middleware.enabled }}
-        - name: config
-          configMap:
-            name: {{ include "pokt-portal-v2.fullname" . -}}-config
+        - name: portal-middleware-config
+          secret:
+            secretName: {{ .Values.middleware.secretName | quote }}
+            items:
+              - key: "config.json"
+                path: "config.json"
         {{- end }}
