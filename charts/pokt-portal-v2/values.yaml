@@ -75,7 +75,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: "80"
+  port: 80
 
 ### api container probes ####
 probes:
