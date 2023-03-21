@@ -81,10 +81,6 @@ spec:
               value: {{ printf "%s/%s" ( trimSuffix "/" .Values.middleware.configMountPath ) "config.json"}}
             - name: PORT
               value: "{{ .Values.middleware.containerPort | default 80 }}"
-            - name: REDIS_HOST
-              value: {{ .Values.middleware.redisHost | quote }}
-            - name: REDIS_PORT
-              value: {{ .Values.middleware.redisPort | quote }}
             - name: GATEWAY_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
