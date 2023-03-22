@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "pokt-http-db.fullname" . }}-test-connection"
+  name: "{{ include "pokt-http-txdb.fullname" . }}-test-connection"
   labels:
-    {{- include "pokt-http-db.labels" . | nindent 4 }}
+    {{- include "pokt-http-txdb.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -13,6 +13,6 @@ spec:
       command: ['nc']
       args:
         - '-zv'
-        - '{{ include "pokt-http-db.fullname" . }}'
+        - '{{ include "pokt-http-txdb.fullname" . }}'
         - '{{ .Values.service.port }}'
   restartPolicy: Never

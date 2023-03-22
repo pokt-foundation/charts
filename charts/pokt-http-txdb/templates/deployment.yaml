@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "pokt-txdb-http-db.fullname" . }}
+  name: {{ include "pokt-http-txdb.fullname" . }}
   labels:
-    {{- include "pokt-txdb-http-db.labels" . | nindent 4 }}
+    {{- include "pokt-http-txdb.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "pokt-txdb-http-db.selectorLabels" . | nindent 6 }}
+      {{- include "pokt-http-txdb.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "pokt-txdb-http-db.selectorLabels" . | nindent 8 }}
+        {{- include "pokt-http-txdb.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pokt-txdb-http-db.serviceAccountName" . }}
+      serviceAccountName: {{ include "pokt-http-txdb.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -39,14 +39,7 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           {{- if .Values.probes.enabled }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          {{ include "pokt-http-txdb.probes" . | nindent 10 }}
           {{- end }}
           env:
           {{- include "helpers.list-env-variables" . | indent 12 }}
@@ -56,7 +49,7 @@ spec:
           {{- if .Values.externalSecrets.enabled }}
           envFrom:
           - secretRef:
-              name: {{ include "pokt-txdb-http-db.fullname" . }}-es
+              name: {{ include "pokt-http-txdb.fullname" . }}-es
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

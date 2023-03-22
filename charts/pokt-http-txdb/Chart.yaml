@@ -1,9 +1,11 @@
 apiVersion: v2
-name: pokt-txdb-http-db
-description: A Helm chart for deploying the POKT HTTP DB service
+name: pokt-http-txdb
+description: A Helm chart for deploying the POKT HTTP Transactional DB service
 maintainers:
   - name: hebertcl
+    url: https://github.com/HebertCL/
   - name: pokt-foundation
+    url: https://github.com/pokt-foundation/charts
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -24,10 +26,4 @@ version: 0.0.1
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "0.0.1"
-
-dependencies:
-  - name: postgresql
-    version: "12.1.0"
-    repository: "https://charts.bitnami.com/bitnami"
-    condition: postgresql.enabled
+appVersion: "0.1.0"
