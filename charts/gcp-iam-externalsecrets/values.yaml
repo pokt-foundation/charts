@@ -13,8 +13,12 @@ iamPolicyMember:
   workloadIdentityEndpoint: cluster.svc.id.goog
 
 externalSecrets:
-  # -- Wether to create both the SecretStore and the ExternalSecret K8s Resources
-  create: true
+
+  # -- Wether to create the ExternalSecret K8s Resources
+  createExternalSecret: false
+
+  # -- Wether to create the SecretStore K8s Resources
+  createSecretStore: true
 
   # -- Location of the cluster in which to create the External Secrets K8s resources
   clusterLocation: europe-west3
