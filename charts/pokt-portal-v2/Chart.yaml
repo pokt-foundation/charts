@@ -1,9 +1,9 @@
 apiVersion: v2
-name: pokt-portal
-description: A Helm chart for deploying the POKT Portal API services
+name: pokt-portal-v2
+description: A Helm chart for deploying the POKT Portal API Rewrite service(s)
 maintainers:
-  - name: WesleyCharlesBlake
-    url: https://github.com/WesleyCharlesBlake/
+  - name: olakunle-pokt
+    url: https://github.com/olakunle-pokt/
   - name: pokt-foundation
     url: https://github.com/pokt-foundation/charts
 
@@ -20,7 +20,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.15
+version: 0.0.5
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -33,15 +33,3 @@ dependencies:
   version: "17.3.7"
   repository: "https://charts.bitnami.com/bitnami"
   condition: redis.enabled
-- name: influxdb2
-  version: "2.1.1"
-  repository: "https://helm.influxdata.com/"
-  condition: influxdb2.enabled
-- name: mongodb
-  version: "13.3.0"
-  repository: "https://charts.bitnami.com/bitnami"
-  condition: mongodb.enabled
-- name: postgresql
-  version: "12.1.0"
-  repository: "https://charts.bitnami.com/bitnami"
-  condition: postgresql.enabled

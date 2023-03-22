@@ -4,7 +4,8 @@ description: A Helm chart to deploy a blockchain node
 
 type: application
 
-version: 0.0.14-rc.16
+version: 0.1.4
+# Not compatible with 0.0.1 due to change container.command
 
 appVersion: "1.16.0"
 
