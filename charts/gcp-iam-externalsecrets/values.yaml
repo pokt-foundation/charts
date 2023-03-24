@@ -17,16 +17,20 @@ iamPolicyMember:
   # -- GCP Project of the cluster in which to create the External Secrets K8s resources
   clusterProjectID: project
 
-  # -- K8s Namespace in which to create the External Secrets resources
-  namespace: default
-
-
-externalSecrets:
-  # -- Wether to create both the SecretStore and the ExternalSecret K8s Resources
-  create: true
-
   # -- Location of the cluster in which to create the External Secrets K8s resources
   clusterLocation: europe-west3
 
   # -- Name of the cluster in which to create the External Secrets K8s resources
   clusterName: cluster-name
+
+  # -- K8s Namespace in which to create the External Secrets resources
+  namespace: default
+
+
+externalSecretStore:
+  # -- Wether to create both SecretStore
+  create: true
+
+externalSecrets:
+  # -- Wether to create ExternalSecret s K8s Resources foreach secretIDs
+  create: true
