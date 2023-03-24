@@ -5,7 +5,7 @@ kind: IAMPolicyMember
 metadata:
   name: iampolicymember-secret
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.externalSecrets.clusterProjectID }}.iam.gserviceaccount.com"
+  member: "serviceAccount:{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.iamPolicyMember.clusterProjectID }}.iam.gserviceaccount.com"
   role: "roles/secretmanager.secretAccessor"
   resourceRef:
     apiVersion: secretmanager.cnrm.cloud.google.com/v1beta1
@@ -18,7 +18,7 @@ kind: IAMPolicyMember
 metadata:
   name: iampolicymember-service-account
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicyMember.workloadIdentityEndpoint }}[{{$.Values.externalSecrets.namespace}}/{{ $.Values.iamPolicyMember.iamMember }}]"
+  member: "serviceAccount:{{ $.Values.iamPolicyMember.workloadIdentityEndpoint }}[{{$.Values.iamPolicyMember.namespace}}/{{ $.Values.iamPolicyMember.iamMember }}]"
   role: "roles/iam.serviceAccountTokenCreator"
   resourceRef:
     apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -30,7 +30,7 @@ kind: IAMPolicyMember
 metadata:
   name: iampolicymember-workload-identity
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.externalSecrets.clusterProjectID }}.iam.gserviceaccount.com"
+  member: "serviceAccount:{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.iamPolicyMember.clusterProjectID }}.iam.gserviceaccount.com"
   role: "roles/iam.workloadIdentityUser"
   resourceRef:
     apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -42,11 +42,11 @@ kind: IAMServiceAccount
 metadata:
   name: {{ $.Values.iamPolicyMember.iamMember }}
   annotations:
-    cnrm.cloud.google.com/project-id: "{{ required "Desired Project ID is required"  $.Values.externalSecrets.clusterProjectID }}"
+    cnrm.cloud.google.com/project-id: "{{ required "Desired Project ID is required"  $.Values.iamPolicyMember.clusterProjectID }}"
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ $.Values.iamPolicyMember.iamMember }}
   annotations:
-    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.externalSecrets.clusterProjectID }}.iam.gserviceaccount.com"
+    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.iamPolicyMember.clusterProjectID }}.iam.gserviceaccount.com"
