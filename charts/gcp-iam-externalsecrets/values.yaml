@@ -7,7 +7,9 @@ iamPolicyMember:
   secretProjectID: project
 
   # -- Secret ID that the created service account will have access to
-  secretID: my-secret
+  secretIDs:
+    - my-secret1
+    - my-secret2
 
   # -- GCP Workload Identity namespace that External Secrets will use to authenticate against
   workloadIdentityEndpoint: cluster.svc.id.goog
