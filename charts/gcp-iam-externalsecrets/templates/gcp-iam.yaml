@@ -3,7 +3,7 @@
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMPolicyMember
 metadata:
-  name: iampolicymember-{{ . }}
+  name: iam-{{ . | lower | replace "_" "-" | trunc 63 | trimSuffix "-"}}
 spec:
   member: "serviceAccount:{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.iamPolicyMember.clusterProjectID }}.iam.gserviceaccount.com"
   role: "roles/secretmanager.secretAccessor"
