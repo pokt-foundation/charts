@@ -43,3 +43,10 @@ metadata:
   name: {{ $.Values.iamPolicyMember.iamMember }}
   annotations:
     cnrm.cloud.google.com/project-id: "{{ required "Desired Project ID is required"  $.Values.externalSecrets.clusterProjectID }}"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $.Values.iamPolicyMember.iamMember }}
+  annotations:
+    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicyMember.iamMember }}@{{ required "Desired Project ID is required" $.Values.externalSecrets.clusterProjectID }}.iam.gserviceaccount.com"
