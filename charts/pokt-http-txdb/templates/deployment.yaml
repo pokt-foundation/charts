@@ -41,19 +41,10 @@ spec:
           {{- if .Values.probes.enabled }}
           {{ include "pokt-http-txdb.probes" . | nindent 10 }}
           {{- end }}
-          env:
-          {{- include "helpers.list-env-variables" . | indent 12 }}
-          {{- if not .Values.externalSecrets.enabled }}
-          {{- include "helpers.secret-env-variables" . | indent 12 }}
-          {{- end }}
-          {{- if .Values.externalSecrets.enabled }}
-          envFrom:
-          - secretRef:
-              name: {{ include "pokt-http-txdb.fullname" . }}-es
-          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

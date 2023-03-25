@@ -133,30 +133,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-externalSecrets:
-  enabled: false
-  # external secret key
-  # key: "some/path/secret"
-  # # secret-store config
-  # secretStore: "vault"
-  # vault:
-  #   server: "https://vault:8200"
-  #   mountPath: "k8s-mount-path"
-  #   namespace: "our/namespace/"
-  #   serviceAccount: "portal-api"
-  #   role: "my-role"
-  #   path: "path/"
-  #   version: "v1"
-
-# Environment variable listing
-env:
-  # non sensitive variables
-  normal:
-    PORT: 8080
-    MAX_BATCH_SIZE: 1000
-    MAX_BATCH_DURATION: 60
-    DB_TIMEOUT: 60
-    DEBUG: false
-  # sensitive variables stored in a secret
-  secret: []
