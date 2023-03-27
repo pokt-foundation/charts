@@ -1,31 +1,41 @@
-iamPolicyMember:
+iamPolicy:
   # -- Name of the GCP Service Account to create.
   # The service account will be created under the same project as the cluster in order to allow Workload Identity to work
-  iamMember: service-account-name
+  gke:
+    # -- GCP Workload Identity namespace that External Secrets will use to authenticate against
+    workloadIdentityEndpoint: cluster.svc.id.goog
 
-  # -- GCP Project that contains the secret that the created service account will have access to
-  secretProjectID: project
+    # -- GCP Project of the cluster in which to create the External Secrets K8s resources
+    clusterProjectID: project
 
-  # -- Secret ID that the created service account will have access to
-  secretIDs:
-    - my-secret1
-    - my-secret2
+    # -- Location of the cluster in which to create the External Secrets K8s resources
+    clusterLocation: europe-west3
 
-  # -- GCP Workload Identity namespace that External Secrets will use to authenticate against
-  workloadIdentityEndpoint: cluster.svc.id.goog
+    # -- Name of the cluster in which to create the External Secrets K8s resources
+    clusterName: cluster-name
 
-  # -- GCP Project of the cluster in which to create the External Secrets K8s resources
-  clusterProjectID: project
+    serviceAccount:
+      # -- K8s SA which will be used to get the secrets
+      name: service-account-name
+      # -- K8s Namespace in which to create the External Secrets resources
+      namespace: default
 
-  # -- Location of the cluster in which to create the External Secrets K8s resources
-  clusterLocation: europe-west3
+  secretRoles:
+    - secret: secret1
+      project: project1
+      role: roles/secretmanager.secretAccessor
+    - secret: secret2
+      project: project2
+      role: roles/secretmanager.secretAccessor
+    - secret: secret3
+      project: project2
+      role: roles/secretmanager.secretAccessor
 
-  # -- Name of the cluster in which to create the External Secrets K8s resources
-  clusterName: cluster-name
-
-  # -- K8s Namespace in which to create the External Secrets resources
-  namespace: default
-
+  projectRoles:
+    - project: project2
+      role: roles/secretmanager.admin
+    - project: project3
+      role: roles/secretmanager.viwer
 
 externalSecretStore:
   # -- Wether to create both SecretStore
