@@ -25,7 +25,6 @@ spec:
   role: "{{ $v.role }}"
   member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount.name }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
   resourceRef:
-    apiVersion: secretmanager.cnrm.cloud.google.com/v1beta1
     kind: Project
     external: projects/{{ $v.project }}
 {{- end }}
