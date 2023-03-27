@@ -20,22 +20,22 @@ iamPolicy:
       # -- K8s Namespace in which to create the External Secrets resources
       namespace: default
 
-  secretRoles: []
-    # - secret: secret1
-    #   project: project1
-    #   role: roles/secretmanager.secretAccessor
-    # - secret: secret2
-    #   project: project2
-    #   role: roles/secretmanager.secretAccessor
-    # - secret: secret3
-    #   project: project2
-    #   role: roles/secretmanager.secretAccessor
+  secretRoles:
+    - secret: secret1
+      project: project1
+      role: roles/secretmanager.secretAccessor
+    - secret: secret2
+      project: project2
+      role: roles/secretmanager.secretAccessor
+    - secret: secret3
+      project: project2
+      role: roles/secretmanager.secretAccessor
 
-  projectRoles: []
-    # - project: project2
-    #   role: roles/secretmanager.admin
-    # - project: project3
-    #   role: roles/secretmanager.viwer
+  projectRoles:
+    - project: project2
+      role: roles/secretmanager.admin
+    - project: project3
+      role: roles/secretmanager.viwer
 
 externalSecretStore:
   # -- Wether to create both SecretStore
