@@ -11,9 +11,8 @@ iamPolicy:
     # -- Name of the cluster in which to create the External Secrets K8s resources
     clusterName: cluster-name
 
-    serviceAccount:
-      # -- K8s SA which will be used to get the secrets
-      name: service-account-name
+    # -- K8s SA which will be used to get the secrets
+    serviceAccount: service-account-name
 
   secretRoles:
     - secret: secret1

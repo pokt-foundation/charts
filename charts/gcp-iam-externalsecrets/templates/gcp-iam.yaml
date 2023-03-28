@@ -6,7 +6,7 @@ kind: IAMPolicyMember
 metadata:
   name: sec-role-{{ printf "%s-%s" $v.project $v.secret | lower | replace "_" "-" | trunc 63 | trimSuffix "-"}}
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount.name }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
+  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
   role: "{{ $v.role }}"            #Can be hardcoded In most cases it will be roles/secretmanager.secretAccessor
   resourceRef:
     apiVersion: secretmanager.cnrm.cloud.google.com/v1beta1
@@ -23,7 +23,7 @@ metadata:
   name: {{ printf "projrole-%s-%s" $v.project (replace "." "-" (replace "roles/" "" $v.role)) | lower | replace "_" "-" | trunc 63 | trimSuffix "-"}}
 spec:
   role: "{{ $v.role }}"
-  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount.name }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
+  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
   resourceRef:
     kind: Project
     external: projects/{{ $v.project }}
@@ -35,35 +35,35 @@ kind: IAMPolicyMember
 metadata:
   name: iampolicymember-service-account
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicy.gke.clusterProjectID }}.svc.id.goog[{{ $.Release.Namespace }}/{{ $.Values.iamPolicy.gke.serviceAccount.name }}]"
+  member: "serviceAccount:{{ $.Values.iamPolicy.gke.clusterProjectID }}.svc.id.goog[{{ $.Release.Namespace }}/{{ $.Values.iamPolicy.gke.serviceAccount }}]"
   role: "roles/iam.serviceAccountTokenCreator"
   resourceRef:
     apiVersion: iam.cnrm.cloud.google.com/v1beta1
     kind: IAMServiceAccount
-    name: {{ $.Values.iamPolicy.gke.serviceAccount.name }}
+    name: {{ $.Values.iamPolicy.gke.serviceAccount }}
 ---
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMPolicyMember
 metadata:
   name: iampolicymember-workload-identity
 spec:
-  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount.name }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
+  member: "serviceAccount:{{ $.Values.iamPolicy.gke.serviceAccount }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
   role: "roles/iam.workloadIdentityUser"
   resourceRef:
     apiVersion: iam.cnrm.cloud.google.com/v1beta1
     kind: IAMServiceAccount
-    name: {{ $.Values.iamPolicy.gke.serviceAccount.name }}
+    name: {{ $.Values.iamPolicy.gke.serviceAccount }}
 ---
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMServiceAccount
 metadata:
-  name: {{ $.Values.iamPolicy.gke.serviceAccount.name }}
+  name: {{ $.Values.iamPolicy.gke.serviceAccount }}
   annotations:
     cnrm.cloud.google.com/project-id: "{{ $.Values.iamPolicy.gke.clusterProjectID }}"
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ $.Values.iamPolicy.gke.serviceAccount.name }}
+  name: {{ $.Values.iamPolicy.gke.serviceAccount }}
   annotations:
-    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicy.gke.serviceAccount.name }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
+    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicy.gke.serviceAccount }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
