@@ -14,8 +14,6 @@ iamPolicy:
     serviceAccount:
       # -- K8s SA which will be used to get the secrets
       name: service-account-name
-      # -- K8s Namespace in which to create the External Secrets resources
-      namespace: default
 
   secretRoles:
     - secret: secret1
