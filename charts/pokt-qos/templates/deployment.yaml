@@ -37,14 +37,18 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          {{- if .Values.probes.enabled }}
+          {{ include "pokt-qos.probes" . | nindent 10 }}
+          {{- end }}
+          env:
+          {{- with .Values.env }}
+          {{- toYaml . | nindent 12}}
+          {{- end }}
+          {{- if .Values.envFromSecret }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.envFromSecret }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
