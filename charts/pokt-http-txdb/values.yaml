@@ -24,6 +24,9 @@ env:
     DB_TIMEOUT: 60
     DEBUG: false
 
+# use populates all of the secret key values to env vars
+#envFromSecret: ""
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
