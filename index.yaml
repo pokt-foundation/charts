@@ -1604,6 +1604,21 @@ entries:
     version: 0.0.2
   pokt-qos:
   - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2023-03-30T15:20:01.733799093Z"
+    description: A Helm for deploying the POKT QOS Service
+    digest: 4e378825fe6966171ca58739815d08c83386a79921fdf338441ffe840b23e55f
+    maintainers:
+    - name: GustavoBelfort
+      url: https://github.com/GustavoBelfort/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-qos
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-qos-0.1.1/pokt-qos-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 1.16.0
     created: "2023-03-30T14:11:19.991353747Z"
     description: A Helm for deploying the POKT QOS Service
@@ -1840,4 +1855,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/release-watch-0.1.2/release-watch-0.1.2.tgz
     version: 0.1.2
-generated: "2023-03-30T14:11:19.991711444Z"
+generated: "2023-03-30T15:20:01.734093695Z"
