@@ -35,9 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/app/bin"]
           env:
-          {{- with .Values.env }}
-          {{- toYaml . | nindent 12}}
-          {{- end }}
+          {{- include "helpers.list-env-variables" . | indent 12}}
           {{- if .Values.envFromSecret }}
           envFrom:
           - secretRef:

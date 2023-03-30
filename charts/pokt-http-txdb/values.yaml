@@ -17,11 +17,12 @@ nameOverride: ""
 fullnameOverride: ""
 
 env:
-  PORT: 8080
-  MAX_BATCH_SIZE: 1000
-  MAX_BATCH_DURATION: 60
-  DB_TIMEOUT: 60
-  DEBUG: false
+  normal:
+    PORT: 8080
+    MAX_BATCH_SIZE: 1000
+    MAX_BATCH_DURATION: 60
+    DB_TIMEOUT: 60
+    DEBUG: false
 
 serviceAccount:
   # Specifies whether a service account should be created
