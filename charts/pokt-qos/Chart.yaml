@@ -1,10 +1,11 @@
 apiVersion: v2
-name: harmony
-description: A Helm chart for Kubernetes
+name: pokt-qos
+description: A Helm for deploying the POKT QOS Service
 maintainers:
-  - name: okdas
-  - name: WesleyCharlesBlake
+  - name: GustavoBelfort
+    url: https://github.com/GustavoBelfort/
   - name: pokt-foundation
+    url: https://github.com/pokt-foundation/charts
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -25,4 +26,4 @@ version: 0.1.1
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.16.0"
+appVersion: "0.0.1"

@@ -1,16 +1,15 @@
 {{- if .Values.autoscaling.enabled }}
----
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "ethereum.fullname" . }}
+  name: {{ include "pokt-qos.fullname" . }}
   labels:
-    {{- include "ethereum.labels" . | nindent 4 }}
+    {{- include "pokt-qos.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: StatefulSet
-    name: {{ include "ethereum.fullname" . }}
+    kind: Deployment
+    name: {{ include "pokt-qos.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
