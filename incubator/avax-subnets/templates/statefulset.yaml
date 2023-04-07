@@ -26,18 +26,18 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      initContainers:
-      - name: init-or-bootstrap
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ['/bin/bash', '-c', '{{ .Values.scripts_volume_mount }}/init.sh']
-        volumeMounts:
-          - name: avax-subnets-datadir
-            mountPath: /root/.avalanchego
-          - name: scripts
-            mountPath: {{ .Values.scripts_volume_mount }}
-          - mountPath: {{ .Values.config_volume_mount }}
-            name: configs-dir
+      # initContainers:
+      # - name: init-or-bootstrap
+      #   image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      #   imagePullPolicy: {{ .Values.image.pullPolicy }}
+      #   command: ['/bin/bash', '-c', '{{ .Values.scripts_volume_mount }}/init.sh']
+      #   volumeMounts:
+      #     - name: avax-subnets-datadir
+      #       mountPath: /root/.avalanchego
+      #     - name: scripts
+      #       mountPath: {{ .Values.scripts_volume_mount }}
+      #     - mountPath: {{ .Values.config_volume_mount }}
+      #       name: configs-dir
 
       containers:
 {{if .Values.healthcheckSidecar.enabled }}
