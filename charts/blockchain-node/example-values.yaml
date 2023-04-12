@@ -4,6 +4,10 @@ statefulset:
   - name: pokt  # <- STATEFULSET_NAME
     nodeSelector:
       node.kubernetes.io/instance-type: XXXXXXXX
+    tolerations:
+      - key: "example-key"
+        operator: "Exists"
+        effect: "NoSchedule"
     persistence:
       size: 500Gi
       storageClassName: XXXXX

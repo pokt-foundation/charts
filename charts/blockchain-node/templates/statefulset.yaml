@@ -54,6 +54,9 @@ spec:
       {{- with $sts.affinity }}
       affinity: {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $sts.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with $sts.nodeSelector }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}
