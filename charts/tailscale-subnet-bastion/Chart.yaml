@@ -1,0 +1,11 @@
+apiVersion: v2
+name: tailscale-subnet-router
+description: Deploy a Tailscale subnet router on Kubernetes
+type: application
+version: 1.2.1
+appVersion: "v1.34.1"
+home: https://github.com/pokt-network/charts/charts/tailscale-subnet-router
+sources:
+  - https://github.com/pokt-network/charts/charts/tailscale-subnet-router
+maintainers:
+  - name: Gustavo Belfort
