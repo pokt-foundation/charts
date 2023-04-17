@@ -24,6 +24,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: "pokt-http-db"
 
+
 podAnnotations: {}
 
 podSecurityContext: {}
@@ -83,32 +84,15 @@ tolerations: []
 
 affinity: {}
 
-externalSecrets:
-  enabled: false
-  # external secret key
-  # key: "some/path/secret"
-  # # secret-store config
-  # secretStore: "vault"
-  # vault:
-  #   server: "https://vault:8200"
-  #   mountPath: "k8s-mount-path"
-  #   namespace: "our/namespace/"
-  #   serviceAccount: "portal-api"
-  #   role: "my-role"
-  #   path: "path/"
-  #   version: "v1"
-
-
-# Environment variable listing
 env:
   # non sensitive variables
   normal:
     PORT: 80
-    CONNECTION_STRING: "postgres://pokt:P0K7p05tgr3s8@postgres-httpdb:5432/phd?sslmode=disable"
-    API_KEYS: "dummyvalue"
     CACHE_REFRESH: 180
   # sensitive variables stored in a secret
   secret: []
+    # CONNECTION_STRING: "postgres://pokt:P0K7p05tgr3s8@postgres-httpdb:5432/phd?sslmode=disable"
+    # API_KEYS: "dummyvalue"
     # PHD_API_KEY: "dummyvalu3"
     # PHD_BASE_URL: "https://phd.com/"
     # PROVIDER_RPC: "dummyvalu3"
@@ -119,6 +103,8 @@ env:
     # AUDIENCE: "dummyvalu3"
     # AUTH0_ISSUER: "dummyvalu3"
 
+# specify an secret object to inject secret env vars using envFrom
+secretFromEnvName:
 
 postgresql:
   enabled: true
