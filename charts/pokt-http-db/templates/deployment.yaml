@@ -50,13 +50,11 @@ spec:
           {{- end }}
           env:
           {{- include "helpers.list-env-variables" . | indent 12 }}
-          {{- if not .Values.externalSecrets.enabled }}
           {{- include "helpers.secret-env-variables" . | indent 12 }}
-          {{- end }}
-          {{- if .Values.externalSecrets.enabled }}
+          {{- if .Values.secretFromEnvName }}
           envFrom:
           - secretRef:
-              name: {{ include "pokt-http-db.fullname" . }}-es
+              name: {{ .Values.secretFromEnvName | quote }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
