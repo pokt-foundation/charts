@@ -770,6 +770,24 @@ entries:
   pokt-http-db:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2023-04-17T21:06:08.372295887Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.0
+    description: A Helm chart for deploying the POKT HTTP DB service
+    digest: a31346b7318938100bb9fdcacc2ae8384bdd8f8ac4b569af25d2b197fec5fac6
+    maintainers:
+    - name: olakunle-pokt
+    - name: pokt-foundation
+    name: pokt-http-db
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-http-db-0.0.4/pokt-http-db-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2022-12-22T21:02:42.567096814Z"
     dependencies:
     - condition: postgresql.enabled
@@ -1938,4 +1956,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-04-13T16:24:49.013348507Z"
+generated: "2023-04-17T21:06:08.373115004Z"
