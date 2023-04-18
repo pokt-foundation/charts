@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "pokt-qos.name" -}}
+{{- define "covalent-proxy.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "pokt-qos.fullname" -}}
+{{- define "covalent-proxy.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "pokt-qos.chart" -}}
+{{- define "covalent-proxy.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "pokt-qos.labels" -}}
-helm.sh/chart: {{ include "pokt-qos.chart" . }}
-{{ include "pokt-qos.selectorLabels" . }}
+{{- define "covalent-proxy.labels" -}}
+helm.sh/chart: {{ include "covalent-proxy.chart" . }}
+{{ include "covalent-proxy.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "pokt-qos.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "pokt-qos.name" . }}
+{{- define "covalent-proxy.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "covalent-proxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "pokt-qos.serviceAccountName" -}}
+{{- define "covalent-proxy.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "pokt-qos.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "covalent-proxy.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

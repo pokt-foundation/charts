@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "pokt-qos.fullname" . }}
+  name: {{ include "covalent-proxy.fullname" . }}
   labels:
-    {{- include "pokt-qos.labels" . | nindent 4 }}
+    {{- include "covalent-proxy.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "pokt-qos.selectorLabels" . | nindent 6 }}
+      {{- include "covalent-proxy.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "pokt-qos.selectorLabels" . | nindent 8 }}
+        {{- include "covalent-proxy.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pokt-qos.serviceAccountName" . }}
+      serviceAccountName: {{ include "covalent-proxy.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -38,7 +38,7 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           {{- if .Values.probes.enabled }}
-          {{ include "pokt-qos.probes" . | nindent 10 }}
+          {{ include "covalent-proxy.probes" . | nindent 10 }}
           {{- end }}
           env:
           {{- with .Values.env }}

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pokt-qos.fullname" . }}
+  name: {{ include "covalent-proxy.fullname" . }}
   labels:
-    {{- include "pokt-qos.labels" . | nindent 4 }}
+    {{- include "covalent-proxy.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "pokt-qos.selectorLabels" . | nindent 4 }}
+    {{- include "covalent-proxy.selectorLabels" . | nindent 4 }}

@@ -1,11 +1,11 @@
 apiVersion: v2
-name: pokt-qos
-description: A Helm for deploying the POKT QOS Service
+name: covalent-proxy
+description: A Helm for deploying the covalent proxy
 maintainers:
-  - name: GustavoBelfort
-    url: https://github.com/GustavoBelfort/
+  - name: olakunle-pokt
+    url: https://github.com/olakunle-pokt/
   - name: pokt-foundation
-    url: https://github.com/pokt-foundation/charts
+    url: https://github.com/pokt-foundation/chart
 
 # A chart can be either an 'application' or a 'library' chart.
 #
