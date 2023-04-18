@@ -546,6 +546,22 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.0.1/blockchain-node-0.0.1.tgz
     version: 0.0.1
+  covalent-proxy:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2023-04-18T21:38:00.781725393Z"
+    description: A Helm for deploying the covalent proxy
+    digest: 049811796ff796ef1e769ef74c77203794d66d093ad8330aa389d79f08558c29
+    maintainers:
+    - name: olakunle-pokt
+      url: https://github.com/olakunle-pokt/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/chart
+    name: covalent-proxy
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/covalent-proxy-0.1.1/covalent-proxy-0.1.1.tgz
+    version: 0.1.1
   ethereum:
   - apiVersion: v2
     appVersion: v1.10.14
@@ -1956,4 +1972,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-04-17T21:06:08.373115004Z"
+generated: "2023-04-18T21:38:00.782037701Z"
