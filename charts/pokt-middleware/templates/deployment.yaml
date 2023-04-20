@@ -44,10 +44,10 @@ spec:
           {{- with .Values.env }}
           {{- toYaml . | nindent 12}}
           {{- end }}
-          - name: CONFIG_FILE
-            value: {{ printf "%s/%s" ( trimSuffix "/" .Values.configMountPath ) "config.json"}}
-          - name: PORT
-            value: "{{ .Values.service.port | default 80 }}"
+            - name: CONFIG_FILE
+              value: {{ printf "%s/%s" ( trimSuffix "/" .Values.configMountPath ) "config.json"}}
+            - name: PORT
+              value: "{{ .Values.service.port | default 80 }}"
           {{- if .Values.envFromSecret }}
           envFrom:
           - secretRef:
