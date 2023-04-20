@@ -45,10 +45,6 @@ spec:
           {{- toYaml . | nindent 12}}
           {{- end }}
           {{- if .Values.envFromSecret }}
-          envFrom:
-          - secretRef:
-              name: {{ .Values.envFromSecret }}
-          {{- end }}
           - name: CONFIG_FILE
             value: {{ printf "%s/%s" ( trimSuffix "/" .Values.configMountPath ) "config.json"}}
           - name: PORT
@@ -70,6 +66,10 @@ spec:
               secretKeyRef:
                 name: {{ .Values.secretName | quote }}
                 key: POCKET_NODE_URL
+          envFrom:
+          - secretRef:
+              name: {{ .Values.envFromSecret }}
+          {{- end }}
           volumeMounts:
           - mountPath: {{ .Values.configMountPath }}
             readOnly: true
