@@ -78,6 +78,11 @@ service:
   port: "80"
   annotations: {}
 
+# Specifies the envinment variables that are going to be injected in the application
+env: {}
+  # PORT: 8080
+  # DEBUG: false
+
 ### api container probes ####
 probes:
   enabled: true
