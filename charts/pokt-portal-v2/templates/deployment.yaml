@@ -78,7 +78,7 @@ spec:
             name: portal-middleware-config
           env:
             {{- with .Values.env }}
-            {{- toYaml . | nindent 14}}
+            {{- toYaml . | nindent 12}}
             {{- end }}
             - name: CONFIG_FILE
               value: {{ printf "%s/%s" ( trimSuffix "/" .Values.middleware.configMountPath ) "config.json"}}
