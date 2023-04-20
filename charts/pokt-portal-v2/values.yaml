@@ -89,25 +89,25 @@ probes:
 
   livenessProbe:
     enabled: true
-    # initialDelaySeconds: 30
-    # periodSeconds: 10
-    # timeoutSeconds: 5
-    # failureThreshold: 6
-    # successThreshold: 1
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
   readinessProbe:
     enabled: true
-    # initialDelaySeconds: 5
-    # periodSeconds: 10
-    # timeoutSeconds: 5
-    # failureThreshold: 6
-    # successThreshold: 1
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
   startupProbe:
     enabled: true
-    # initialDelaySeconds: 5
-    # periodSeconds: 10
-    # timeoutSeconds: 5
-    # failureThreshold: 6
-    # successThreshold: 1
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
 
 ### end api container probes ####
 
