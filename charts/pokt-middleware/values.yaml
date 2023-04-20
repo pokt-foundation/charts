@@ -54,25 +54,24 @@ service:
   type: ClusterIP
   port: 80
 
-probes:
-  # livenessProbe:
-  #   # initialDelaySeconds: 30
-  #   # periodSeconds: 10
-  #   # timeoutSeconds: 5
-  #   # failureThreshold: 6
-  #   # successThreshold: 1
-  # readinessProbe:
-  #   # initialDelaySeconds: 5
-  #   # periodSeconds: 10
-  #   # timeoutSeconds: 5
-  #   # failureThreshold: 6
-  #   # successThreshold: 1
-  # startupProbe:
-  #   # initialDelaySeconds: 5
-  #   # periodSeconds: 10
-  #   # timeoutSeconds: 5
-  #   # failureThreshold: 6
-  #   # successThreshold: 1
+# livenessProbe:
+#   # initialDelaySeconds: 30
+#   # periodSeconds: 10
+#   # timeoutSeconds: 5
+#   # failureThreshold: 6
+#   # successThreshold: 1
+# readinessProbe:
+#   # initialDelaySeconds: 5
+#   # periodSeconds: 10
+#   # timeoutSeconds: 5
+#   # failureThreshold: 6
+#   # successThreshold: 1
+# startupProbe:
+#   # initialDelaySeconds: 5
+#   # periodSeconds: 10
+#   # timeoutSeconds: 5
+#   # failureThreshold: 6
+#   # successThreshold: 1
 
 ingress:
   enabled: false
