@@ -23,6 +23,8 @@ env: {}
 
 # Specifies a secret containing the envinment variables that are going to be injected in the application
 envFromSecret: ""
+secretName: "portal-middleware"
+configMountPath: "/etc/portal/"
 
 serviceAccount:
   # Specifies whether a service account should be created
