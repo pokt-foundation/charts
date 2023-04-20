@@ -48,23 +48,6 @@ spec:
             value: {{ printf "%s/%s" ( trimSuffix "/" .Values.configMountPath ) "config.json"}}
           - name: PORT
             value: "{{ .Values.service.port | default 80 }}"
-          - name: GATEWAY_PRIVATE_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretName | quote }}
-                key: GATEWAY_PRIVATE_KEY
-          # url contains basic auth
-          - name: DISPATCHER_URL
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretName | quote }}
-                key: DISPATCHER_URL
-          # url contains basic auth
-          - name: POCKET_NODE_URL
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretName | quote }}
-                key: POCKET_NODE_URL
           {{- if .Values.envFromSecret }}
           envFrom:
           - secretRef:
