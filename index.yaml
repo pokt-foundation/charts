@@ -1605,6 +1605,26 @@ entries:
   pokt-portal-v2:
   - apiVersion: v2
     appVersion: 0.1.0
+    created: "2023-04-20T16:41:08.595121698Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.3.7
+    description: A Helm chart for deploying the POKT Portal API Rewrite service(s)
+    digest: 11fdb3d0618638618af03dfe672fe5392a30450e198f2960a4a16c5d0b91ca8c
+    maintainers:
+    - name: olakunle-pokt
+      url: https://github.com/olakunle-pokt/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-portal-v2
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-portal-v2-0.0.7/pokt-portal-v2-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
+    appVersion: 0.1.0
     created: "2023-04-11T17:36:37.969393461Z"
     dependencies:
     - condition: redis.enabled
@@ -1972,4 +1992,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-04-18T21:38:00.782037701Z"
+generated: "2023-04-20T16:41:08.595355503Z"
