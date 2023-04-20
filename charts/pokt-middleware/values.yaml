@@ -55,23 +55,19 @@ service:
   port: 80
 
 probes:
-  enabled: false
   # livenessProbe:
-  #   enabled: false
   #   # initialDelaySeconds: 30
   #   # periodSeconds: 10
   #   # timeoutSeconds: 5
   #   # failureThreshold: 6
   #   # successThreshold: 1
   # readinessProbe:
-  #   enabled: false
   #   # initialDelaySeconds: 5
   #   # periodSeconds: 10
   #   # timeoutSeconds: 5
   #   # failureThreshold: 6
   #   # successThreshold: 1
   # startupProbe:
-  #   enabled: false
   #   # initialDelaySeconds: 5
   #   # periodSeconds: 10
   #   # timeoutSeconds: 5

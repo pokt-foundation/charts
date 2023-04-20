@@ -37,8 +37,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          {{- if .Values.probes.enabled }}
-          {{ include "pokt-middleware.probes" . | nindent 10 }}
+          probes:
+          {{- with .Values.probes }}
+          {{- toYaml . | nindent 12}}
           {{- end }}
           env:
           {{- with .Values.env }}
