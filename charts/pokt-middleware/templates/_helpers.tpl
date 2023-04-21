@@ -60,3 +60,42 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Probes definition
+*/}}
+{{- define "pokt-middleware.probes" -}}
+{{- if .Values.probes.livenessProbe.enabled }}
+livenessProbe:
+  httpGet:
+    path: {{ .Values.probes.livenessProbe.path | default "/healthz" }}
+    port: http
+  initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds | default 30 }}
+  periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds  | default 10 }}
+  timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds | default 5 }}
+  failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold | default 6 }}
+  successThreshold: {{ .Values.probes.livenessProbe.successThreshold | default 1}}
+{{- end }}
+{{- if .Values.probes.readinessProbe.enabled }}
+readinessProbe:
+  httpGet:
+    path: {{ .Values.probes.readinessProbe.path | default "/healthz" }}
+    port: http
+  initialDelaySeconds: {{ .Values.probes.readinessProbe.initialDelaySeconds | default 30 }}
+  periodSeconds: {{ .Values.probes.readinessProbe.periodSeconds | default 10 }}
+  timeoutSeconds: {{ .Values.probes.readinessProbe.timeoutSeconds | default 5 }}
+  failureThreshold: {{ .Values.probes.readinessProbe.failureThreshold | default 6 }}
+  successThreshold: {{ .Values.probes.readinessProbe.successThreshold | default 1 }}
+{{- end }}
+{{- if .Values.probes.startupProbe.enabled }}
+startupProbe:
+  httpGet:
+    path: {{ .Values.probes.startupProbe.path | default "/healthz" }}
+    port: http
+  initialDelaySeconds: {{ .Values.probes.startupProbe.initialDelaySeconds | default 30 }}
+  periodSeconds: {{ .Values.probes.startupProbe.periodSeconds | default 10 }}
+  timeoutSeconds: {{ .Values.probes.startupProbe.timeoutSeconds | default 5 }}
+  failureThreshold: {{ .Values.probes.startupProbe.failureThreshold | default 6 }}
+  successThreshold: {{ .Values.probes.startupProbe.successThreshold | default 1 }}
+{{- end }}
+{{- end }}
