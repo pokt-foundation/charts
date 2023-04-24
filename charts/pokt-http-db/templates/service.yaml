@@ -4,6 +4,9 @@ metadata:
   name: {{ include "pokt-http-db.fullname" . }}
   labels:
     {{- include "pokt-http-db.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
