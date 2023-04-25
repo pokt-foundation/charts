@@ -2138,6 +2138,19 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/pokt-relay-meter-0.0.1/pokt-relay-meter-0.0.1.tgz
     version: 0.0.1
+  pokt-txdb-pubsub:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2023-04-25T23:15:31.961661561Z"
+    description: A Helm chart for deploying the POKT Transaction DB Pub-Sub service
+    digest: 4d003bb9b7b795ded7c66f2022b23d9cd129e88ecef2d687b713ee9f34b0a171
+    maintainers:
+    - name: pokt-foundation
+    name: pokt-txdb-pubsub
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-txdb-pubsub-0.0.1/pokt-txdb-pubsub-0.0.1.tgz
+    version: 0.0.1
   portal-middleware:
   - apiVersion: v2
     appVersion: 0.0.16
@@ -2279,4 +2292,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-04-24T23:32:31.1907521Z"
+generated: "2023-04-25T23:15:31.961955161Z"
