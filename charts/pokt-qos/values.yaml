@@ -48,6 +48,11 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
+# dnsPolicy: "default"
+# dnsConfig:
+#   nameservers:
+#     - 8.8.8.8
+
 service:
   type: ClusterIP
   port: 80
