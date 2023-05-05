@@ -2013,6 +2013,21 @@ entries:
   pokt-qos:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2023-05-05T03:22:02.158666307Z"
+    description: A Helm for deploying the POKT QOS Service
+    digest: 2fc5f3ba0adaa4bce31d450952163954924e4d20edd5e4448a074347da3619ce
+    maintainers:
+    - name: GustavoBelfort
+      url: https://github.com/GustavoBelfort/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-qos
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-qos-0.1.2/pokt-qos-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2023-03-30T15:20:01.733799093Z"
     description: A Helm for deploying the POKT QOS Service
     digest: 4e378825fe6966171ca58739815d08c83386a79921fdf338441ffe840b23e55f
@@ -2292,4 +2307,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-04-25T23:15:31.961955161Z"
+generated: "2023-05-05T03:22:02.158939109Z"
