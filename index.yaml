@@ -911,6 +911,21 @@ entries:
   pokt-middleware:
   - apiVersion: v2
     appVersion: 0.0.1
+    created: "2023-05-09T18:06:59.155646152Z"
+    description: A Helm for deploying the POKT QOS Service
+    digest: 93473f87b1faef71d2affd5933492488e4cf3fa7ae649ecfe96e44f8bae700aa
+    maintainers:
+    - name: GustavoBelfort
+      url: https://github.com/GustavoBelfort/
+    - name: pokt-foundation
+      url: https://github.com/pokt-foundation/charts
+    name: pokt-middleware
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/pokt-middleware-0.1.11/pokt-middleware-0.1.11.tgz
+    version: 0.1.11
+  - apiVersion: v2
+    appVersion: 0.0.1
     created: "2023-04-21T12:38:25.599615228Z"
     description: A Helm for deploying the POKT QOS Service
     digest: 56d21bd20d5d687f591ae26828d4f0a5a02ebca3a97983a5b234e3eb6d8a93e1
@@ -2307,4 +2322,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-05-05T03:22:02.158939109Z"
+generated: "2023-05-09T18:06:59.156050049Z"
