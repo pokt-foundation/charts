@@ -81,13 +81,15 @@ deployments:
           - --rpc.laddr=tcp://0.0.0.0:26657
         ports:
           - name: heimdall-rpc
-            type: ClusterIP
             port: 26657
             protocol: TCP
           - name: heimdall-rest
-            type: ClusterIP
             port: 1317
             protocol: TCP
+            service:
+              type: ClusterIP
+              annotations:
+                cloud.google.com/neg: '{"ingress": true}'
         startupProbe:
           tcpSocket:
             port: 1317
@@ -113,6 +115,21 @@ deployments:
       options:
         - name: ndots
           value: "2"
+    annotations:
+      deployment-annotations: 'dfgfsdgsdgsdfgsdfgsdfgsdfgdsfgsd'
+    podAnnotations:
+      pod-annotations: 'dfgfsdgsdgsdfgsdfgsdfgsdfgdsfgsd'
+    mountConfigMaps:
+      - name: velas-entrypoint
+        mountPath: /dat0
+    mountSecrets:
+      - name: velas-entrypoint1
+        mountPath: /data1
+        items:
+          - key: "config.json"
+            path: "config.json"
+      - name: velas-entrypoint2
+        mountPath: /data2
     initContainers:
       download-snapshot:
         image:
@@ -185,16 +202,16 @@ deployments:
           - --http.addr=0.0.0.0
           - --http.vhosts=*
           - --http.corsdomain=*
-        mountConfigMaps:
-          - name: velas-entrypoint
-            targetPath: /data
         ports:
           - name: rpc
-            type: ClusterIP
             port: 8545
             protocol: TCP
+            service:
+              type: ClusterIP
+              annotations:
+                cloud.google.com/neg: '{"ingress": true}'
             ingress:
-              enabled: false
+              # enabled: false
               className: "className"
               annotations:
                 kubernetes.io/ingress.class: nginx

@@ -1,6 +1,9 @@
 {{- range $ndpl, $dpl := $.Values.deployments }}
 {{- range $kcntnr, $cntnr := $dpl.containers }}
 {{- range $kprt, $prt := $cntnr.ports }}
+
+{{- if $prt.service }}
+{{- if or $prt.service.enabled (not (has $prt.service .enabled)) }}{{/* # If enabled==true or not given*/}}
 ---
 apiVersion: v1
 kind: Service
@@ -8,10 +11,15 @@ metadata:
   name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}-{{ $prt.name }}
   labels:
     {{- include "universal-helm.labels" $ | nindent 4 }}
+
+  {{ with $prt.service.annotations }}
+  annotations:
+        {{- toYaml . | nindent 4 }}
+  {{ end }}
 spec:
   selector:
     deploymentname: {{ $ndpl }}
-  type: {{ $prt.type }}
+  type: {{ $prt.service.type }}
   ports:
     - port: {{ $prt.port }}
       targetPort: {{ $prt.port }}
@@ -20,7 +28,8 @@ spec:
 
 {{- /* if $prt.serviceMonitor */ -}}
 {{- /* end */ -}}
-
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

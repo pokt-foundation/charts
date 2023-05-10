@@ -11,13 +11,14 @@ metadata:
     {{- with $dpl.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
+  annotations:
+    {{- with $dpl.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   serviceName: {{ template "universal-helm.fullname" $ }}-{{ $ndpl }}
   updateStrategy:
     type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
-    {{- if (eq "Recreate" (default "RollingUpdate" $.Values.global.updateStrategy)) }}
-    rollingUpdate: null
-    {{- end }}
   selector:
     matchLabels:
       deploymentname: {{ $ndpl }}
@@ -97,11 +98,21 @@ spec:
               protocol: {{ $prt.protocol }}
               containerPort: {{ $prt.port }}
           {{- end }}
-          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
           volumeMounts:
+          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
             - name: {{ $volumeName }}
               mountPath: {{ $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
           {{- end }}{{end}}{{end}}
+
+          {{- range $cm := $dpl.mountConfigMaps }}{{/* # Volume mounts from mountConfigMaps */}}
+            - name: {{$cm.name}}
+              mountPath: {{ $cm.mountPath }}
+          {{- end }}
+
+          {{- range $sec := $dpl.mountSecrets }}{{/* # Volume mounts from mountSecrets */}}
+            - name: {{$sec.name}}
+              mountPath: {{ $sec.mountPath }}
+          {{- end }}
       {{- end }}  {{/* #range $kcntnr, $cntnr := $dpl.initContainers */}}
 
       containers:
@@ -133,11 +144,22 @@ spec:
               protocol: {{ $prt.protocol }}
               containerPort: {{ $prt.port }}
           {{- end }}
-          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+
           volumeMounts:
+          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
             - name: {{ $volumeName }}
               mountPath: {{ $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
           {{- end }}{{end}}{{end}}
+
+          {{- range $cm := $dpl.mountConfigMaps }}{{/* # Volume mounts from mountConfigMaps */}}
+            - name: {{$cm.name}}
+              mountPath: {{ $cm.mountPath }}
+          {{- end }}
+
+          {{- range $sec := $dpl.mountSecrets }}{{/* # Volume mounts from mountSecrets */}}
+            - name: {{$sec.name}}
+              mountPath: {{ $sec.mountPath }}
+          {{- end }}
 
           {{- with $cntnr.lifecycle }}
           lifecycle: {{- toYaml . | nindent 12 }}
@@ -152,6 +174,28 @@ spec:
           readinessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- end }} {{/* #range $kcntnr, $cntnr := $dpl.containers */}}
+
+      volumes:
+        {{- range $cm := $dpl.mountConfigMaps }}{{/* # Volume mounts from mountConfigMaps */}}
+        - name: {{$cm.name}}
+          configMap:
+            name: {{$cm.name}}
+          {{- with $cm.items }}
+            items:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+        {{- end }}
+
+        {{- range $sec := $dpl.mountSecrets }}{{/* # Volume mounts from mountSecrets */}}
+        - name: {{$sec.name}}
+          secret:
+            secretName: {{$sec.name}}
+            optional: false
+          {{- with $sec.items }}
+            items:
+              {{- toYaml . | nindent 14 }}
+          {{- end }}
+        {{- end }}
 
   {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}}
   {{with $dpl.persistence.volumeClaimTemplates}}
