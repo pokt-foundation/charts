@@ -16,8 +16,6 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  updateStrategy:
-    type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
   selector:
     matchLabels:
       deploymentname: {{ $ndpl }}
