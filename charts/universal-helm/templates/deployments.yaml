@@ -16,7 +16,6 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  serviceName: {{ template "universal-helm.fullname" $ }}-{{ $ndpl }}
   updateStrategy:
     type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
   selector:
