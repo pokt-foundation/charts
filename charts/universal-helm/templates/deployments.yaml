@@ -57,15 +57,53 @@ spec:
       {{- with $.Values.global.serviceAccount.name }}
       serviceAccountName: {{ . }}
       {{- end }}
-
-      {{- range $nicntnr, $icntnr := $dpl.initContainers }}
-      initContainers:
-      - name: {{$nicntnr}}
-        {{- toYaml $icntnr | nindent 8 }}
+      {{- with $dpl.dnsPolicy }}
+      dnsPolicy: {{  . }}
+      {{- end }}
+      {{- with $dpl.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with $dpl.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
+
+      initContainers:
+      {{- range $kcntnr, $cntnr := $dpl.initContainers }}
+        - name: {{ $kcntnr }}
+          image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
+          {{- with $cntnr.envFrom }}
+          envFrom: {{- toYaml . | nindent 12}}
+          {{- end }}
+          {{- with $cntnr.env }}
+          env: {{- toYaml . | nindent 12}}
+          {{- end }}
+          {{- with $cntnr.workingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- with $cntnr.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- range $kprt, $prt := $cntnr.ports }}
+          ports:
+            - name:  {{ $prt.name}}
+              protocol: {{ $prt.protocol }}
+              containerPort: {{ $prt.port }}
+          {{- end }}
+          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+          volumeMounts:
+            - name: {{ $volumeName }}
+              mountPath: {{ $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+          {{- end }}{{end}}{{end}}
+      {{- end }}  {{/* #range $kcntnr, $cntnr := $dpl.initContainers */}}
+
       containers:
       {{- range $kcntnr, $cntnr := $dpl.containers }}
         - name: {{ $kcntnr }}
@@ -89,16 +127,21 @@ spec:
           {{- with $cntnr.resources }}
           resources: {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cntnr.lifecycle }}
-          lifecycle: {{- toYaml . | nindent 12 }}
-          {{- end }}
           {{- range $kprt, $prt := $cntnr.ports }}
           ports:
             - name:  {{ $prt.name}}
               protocol: {{ $prt.protocol }}
               containerPort: {{ $prt.port }}
           {{- end }}
+          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+          volumeMounts:
+            - name: {{ $volumeName }}
+              mountPath: {{ $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+          {{- end }}{{end}}{{end}}
 
+          {{- with $cntnr.lifecycle }}
+          lifecycle: {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with (default (list ) $cntnr.startupProbe) }}
           startupProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -108,13 +151,6 @@ spec:
           {{- with (default (list ) $cntnr.readinessProbe) }}
           readinessProbe: {{- toYaml . | nindent 12 }}
           {{- end }}
-
-          {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
-          volumeMounts:
-            - name: {{ $volumeName }}
-              mountPath: {{ $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
-          {{- end }}{{end}}{{end}}
-
       {{- end }} {{/* #range $kcntnr, $cntnr := $dpl.containers */}}
 
   {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}}

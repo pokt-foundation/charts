@@ -18,7 +18,9 @@ deployments:
         gcpVolumeSnapshot: polygon-mainnet-archival-heimdall-latest
     initContainers:
       init-configs:
-        image: heimdall/image:heimdall.tag
+        image:
+          repository: heimdall/image
+          tag: heimdall.tag
         command:
           - 'sh'
           - '-c'
@@ -31,7 +33,9 @@ deployments:
           - name: heimdall-data
             mountPath: /data
       download-genesis:
-        image: "alpine:latest"
+        image:
+          repository: heimdall/image
+          tag: heimdall.tag
         env:
           - name: GENESIS_FILE
             value: "/data/config/genesis.json"
@@ -95,9 +99,25 @@ deployments:
 
   erigonbor:
     replicas: 3
+    dnsPolicy: "None"
+    dnsConfig:
+      searches:
+        - qos.svc.eu-southwest1-prod.v2.pokt.network
+        - svc.eu-southwest1-prod.v2.pokt.network 
+        - eu-southwest1-prod.v2.pokt.network 
+        - europe-southwest1-c.c.portal-eu-southwest1-prod.internal 
+        - c.portal-eu-southwest1-prod.internal
+        - google.internal
+      nameservers:
+        - 10.12.183.20
+      options:
+        - name: ndots
+          value: "2"
     initContainers:
       download-snapshot:
-        image: alpine:latest
+        image:
+          repository: heimdall/image
+          tag: heimdall.tag
         workingDir: /data
         env:
           - name: APP_HOME
@@ -122,7 +142,9 @@ deployments:
           - name: erigonbor-data
             mountPath: /data
       wait-heimdall-synced:
-        image: alpine:latest                               
+        image:
+          repository: heimdall/image
+          tag: heimdall.tag
         command:
           - /bin/sh
           - -c
