@@ -2322,4 +2322,18 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
-generated: "2023-05-09T18:06:59.156050049Z"
+  universal-helm:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-05-10T02:48:22.772597068Z"
+    description: A Universal Helm chart
+    digest: 4bcf4cc09c93ac4286de854059de150b0ccf9addc1908fc6b55a9fa4ef39b324
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    name: universal-helm
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
+    version: 0.0.1
+generated: "2023-05-10T02:48:22.77285877Z"
