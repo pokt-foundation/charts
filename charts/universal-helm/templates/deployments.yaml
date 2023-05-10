@@ -1,0 +1,216 @@
+{{- range $ndpl, $dpl := $.Values.deployments }}
+  {{- $dplCMNames := list }}
+  {{- $dplSecNames := list }}
+  {{- with $dpl}}{{- range $ncntnr, $cntnr := .containers }}
+    {{- range $cm := $cntnr.mountConfigMaps }}
+      {{- $dplCMNames = append $dplCMNames $cm.name  }}
+    {{- end }}
+    {{- range $sec := $cntnr.mountSecrets }}
+      {{- $dplSecNames = append $dplSecNames $sec.name  }}
+    {{- end }}
+  {{- end }}{{- end }}
+
+  {{- $volumeName := printf "%s-data" $ndpl }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $ndpl }}
+  labels:
+    {{- include "universal-helm.labels" $ | nindent 4 }}
+    {{- with $dpl.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: {{ template "universal-helm.fullname" $ }}-{{ $ndpl }}
+  updateStrategy:
+    type: {{ default "RollingUpdate" $.Values.global.updateStrategy }}
+    {{- if (eq "Recreate" (default "RollingUpdate" $.Values.global.updateStrategy)) }}
+    rollingUpdate: null
+    {{- end }}
+  selector:
+    matchLabels:
+      deploymentname: {{ $ndpl }}
+  replicas: {{ default 1 $dpl.replicas }}
+  template:
+    metadata:
+      name: {{ template "universal-helm.fullname" $ }}
+      labels:
+        {{- include "universal-helm.labels" $ | nindent 8 }}
+        {{- with $dpl.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        deploymentname: {{ $ndpl }}
+      {{- with $dpl.podAnnotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      terminationGracePeriodSeconds: {{ default 180 $.Values.global.terminationGracePeriodSeconds }}
+      {{- with $dpl.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $dpl.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $dpl.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $dpl.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with $.Values.global.securityContext }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.global.serviceAccount.name }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+
+      initContainers:
+      {{- range $kcntnr, $cntnr := $dpl.containers }}
+      {{- if or $cntnr.mountConfigMaps $cntnr.mountSecrets }}
+      {{ $cmPref := "/cm" }}
+      {{ $secPref := "/sec" }}
+      - name: cp-configs
+        image: alpine:latest
+        workingDir: {{ $dpl.persistence.volumeMountPath }}
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -exu
+          {{- range $cm := (concat (default (list ) $cntnr.mountConfigMaps) (default (list ) $cntnr.mountSecrets)) }}
+            mkdir -p {{$cm.targetPath}}
+            cp -f /{{$cm.name}}/* {{$cm.targetPath}}
+          {{- end }}
+        volumeMounts:
+          - name: {{ $volumeName }}
+            mountPath: {{ $dpl.persistence.volumeMountPath }}
+          # Volume mounts from mountConfigMaps
+          {{- range $cm := $cntnr.mountConfigMaps }}
+          - name: {{$cm.name}}
+            mountPath: /{{ $cm.name }}
+          {{- end }}
+          # Volume mounts from mountSecrets
+          {{- range $sec := $cntnr.mountSecrets }}
+          - name: {{$sec.name}}
+            mountPath: /{{ $sec.name }}
+            readOnly: true
+          {{- end }}
+      {{- end }}
+      {{- end }} {{/* #range $kcntnr, $cntnr := $dpl.containers */}}
+
+      {{- range $nicntnr, $icntnr := $dpl.initContainers }}
+      - name: {{$nicntnr}}
+        {{- toYaml $icntnr | nindent 8 }}
+      {{- end }}
+      {{- with $dpl.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      {{- range $kcntnr, $cntnr := $dpl.containers }}
+        - name: {{ $kcntnr }}
+          image: "{{ $cntnr.image.repository }}:{{ $cntnr.image.tag }}"
+          imagePullPolicy: {{ default "IfNotPresent" $.Values.global.imagePullPolicy }}
+
+          {{- with $cntnr.envFrom }}
+          envFrom: {{- toYaml . | nindent 12}}
+          {{- end }}
+          {{- with $cntnr.env }}
+          env: {{- toYaml . | nindent 12}}
+          {{- end }}
+
+          {{- with $cntnr.workingDir }}
+          workingDir: {{ . }}
+          {{- end }}
+          {{- with $cntnr.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cntnr.lifecycle }}
+          lifecycle: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          ports:
+          {{- range $kprt, $prt := $cntnr.ports }}
+            - name:  {{ $prt.name}}
+              protocol: {{ $prt.protocol }}
+              containerPort: {{ $prt.port }}
+          {{- end }}
+
+          {{- with (default (list ) $cntnr.startupProbe) }}
+          startupProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with (default (list ) $cntnr.livenessProbe) }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- if and $cntnr.healthProbes (not $cntnr.readinessProbe) }}
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 9090
+            failureThreshold: 1
+            periodSeconds: 15
+          {{- else }}
+            {{- with (default (list ) $cntnr.readinessProbe) }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+
+          volumeMounts:
+            - name: {{ $volumeName }}
+              mountPath: {{ $dpl.persistence.volumeMountPath }}
+
+            {{- if $dpl.persistence.extraPVC }}
+            - name: extra-data
+              mountPath: /extra-data
+            {{- end }}
+
+      {{- end }} {{/* #range $kcntnr, $cntnr := $dpl.containers */}}
+
+      volumes:
+        {{- range $cmn := $dplCMNames }}
+        - name: {{$cmn}}
+          configMap:
+            name: {{$cmn}}
+        {{- end }}
+
+        {{- range $secn := $dplSecNames }}
+        - name: {{$secn}}
+          secret:
+            secretName: {{$secn}}
+            optional: false
+        {{- end }}
+
+        {{- if $dpl.persistence.extraPVC }}
+        - name: extra-data
+          persistentVolumeClaim:
+            claimName: {{ $dpl.persistence.extraPVC }}
+        {{- end }}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ $volumeName }}
+      spec:
+        {{- if $dpl.persistence.storageClassName }}
+        storageClassName: {{ $dpl.persistence.storageClassName }}
+        {{- end }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requedpl:
+            storage: {{ $dpl.persistence.size | quote }}
+        {{- if $dpl.persistence.gcpVolumeSnapshot }}
+        dataSource:
+          name: {{ $dpl.persistence.gcpVolumeSnapshot | quote }}
+          kind: VolumeSnapshot
+          apiGroup: snapshot.storage.k8s.io
+        {{- end }}
+{{ end }} {{/* #range $ndpl, $dpl := $.Values.deployments */}}

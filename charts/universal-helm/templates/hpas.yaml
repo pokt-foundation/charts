@@ -1,0 +1,33 @@
+{{- range $ndpl, $dpl := $.Values.deployments }}
+{{- with $dpl.horizontalPodAutoscaler }}
+{{- if .enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}
+  labels:
+    {{- include "universal-helm.labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $ndpl }}
+  minReplicas: {{ .minReplicas }}
+  maxReplicas: {{ .maxReplicas }}
+  metrics:
+    {{- if .targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .targetMemoryUtilizationPercentage }}
+    {{- end }}
+
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: universal-helm
+description: A Universal Helm chart
+
+type: application
+
+version: 0.0.1
+# Not compatible with 0.0.1 due to change container.command
+
+appVersion: "1.16.0"
+
+maintainers:
+  - name: pokt-foundation
+  - name: vlad

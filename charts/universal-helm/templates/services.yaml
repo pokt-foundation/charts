@@ -1,0 +1,26 @@
+{{- range $ndpl, $dpl := $.Values.deployments }}
+{{- range $kcntnr, $cntnr := $dpl.containers }}
+{{- range $kprt, $prt := $cntnr.ports }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}-{{ $prt.name }}
+  labels:
+    {{- include "universal-helm.labels" $ | nindent 4 }}
+spec:
+  selector:
+    deploymentname: {{ $ndpl }}
+  type: {{ $prt.type }}
+  ports:
+    - port: {{ $prt.port }}
+      targetPort: {{ $prt.port }}
+      protocol: {{ $prt.protocol }}
+      name: {{ $prt.name }}
+
+{{- /* if $prt.serviceMonitor */ -}}
+{{- /* end */ -}}
+
+{{- end -}}
+{{- end -}}
+{{- end -}}

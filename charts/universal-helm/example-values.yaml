@@ -1,0 +1,239 @@
+deployments:
+  heimdall:             # <- STATEFULSET_NAME
+    replicas: 1
+    horizontalPodAutoscaler:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 10
+      targetMemoryUtilizationPercentage: 50
+      targetCPUUtilizationPercentage: 60
+
+    nodeSelector:
+      node.kubernetes.io/instance-type: n2-standard-16
+    persistence:
+      size: 350Gi
+      storageClassName: standard-rwo
+      volumeMountPath: /data
+      gcpVolumeSnapshot: polygon-mainnet-archival-heimdall-latest
+    initContainers:
+      init-configs:
+        image: heimdall/image:heimdall.tag
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            # rm -rf /data/config
+            if [ ! -d /data/config ]; then
+              echo "Initialising heimdall configs"
+            fi
+        volumeMounts:
+          - name: heimdall-data
+            mountPath: /data
+      download-genesis:
+        image: "alpine:latest"
+        env:
+          - name: GENESIS_FILE
+            value: "/data/config/genesis.json"
+          - name: GENESIS_URL
+            value: https://raw.githubusercontent.com/maticnetwork/heimdall/master/builder/files/genesis-mainnet-v1.json
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            if [ ! -f $GENESIS_FILE ]; then
+              echo "Genesis not exist, downloading it."
+            fi
+        volumeMounts:
+          - name: heimdall-data
+            mountPath: /data
+
+    containers:
+      heimdalld:
+        image:
+          repository: heimdall/image
+          tag: heimdall.tag
+        resources:
+          limits:
+            memory: 2Gi
+            cpu: 1
+          requests:
+            memory: 512Mi
+            cpu: 256m
+        command:
+          - heimdalld
+          - --home=/data
+          - --chain=mainnet
+          - start
+          - --seeds=f4f605d60b8
+          - --rest-server
+          - --laddr=tcp://0.0.0.0:1317
+          - --rpc.laddr=tcp://0.0.0.0:26657
+        ports:
+          - name: heimdall-rpc
+            type: ClusterIP
+            port: 26657
+            protocol: TCP
+          - name: heimdall-rest
+            type: ClusterIP
+            port: 1317
+            protocol: TCP
+        startupProbe:
+          tcpSocket:
+            port: 1317
+          periodSeconds: 60
+          failureThreshold: 10
+        livenessProbe:
+          tcpSocket:
+            port: 1317
+
+  erigonbor:
+    replicas: 3
+    nodeSelector:
+      node.kubernetes.io/instance-type: n2-standard-16
+    persistence:
+      size: 7400Gi
+      storageClassName: premium-rwo
+      volumeMountPath: /data
+      gcpVolumeSnapshot: polygon-mainnet-archival-erigonbor-latest
+      extraPVC: erigon-data11111111
+    initContainers:
+      download-snapshot:
+        image: alpine:latest
+        workingDir: /data
+        env:
+          - name: APP_HOME
+            value: "/data"
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            set -ex
+            # If heimdalld container and we need to bootstrap on first run then download the snapshot
+            if [ ! -f "$APP_HOME/bootstrapped" ];
+            then
+              echo "downloading snapshot from ${SNAPSHOT_URL}"
+            fi
+        securityContext:
+          runAsUser: 0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        volumeMounts:
+          - name: erigonbor-data
+            mountPath: /data
+      wait-heimdall-synced:
+        image: alpine:latest                               
+        command:
+          - /bin/sh
+          - -c
+          - |
+            set -ex
+            apk add curl jq
+            while :; do
+              CATCHINGUP=$(curl http://fullname-heimdall-rpc:26657/status | \
+                  jq -r '.result.sync_info.catching_up')
+              echo "CatchingUp: $CATCHINGUP"
+              if [ "$CATCHINGUP" == "false" ]; then
+                echo "HEIMDALL is up and synched, running BOR."
+                break
+              fi
+              sleep 60
+            done
+        securityContext:
+          runAsUser: 0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+    containers:
+      erigonbor:
+        image:
+          repository: erigon/image
+          tag: erigontag
+        resources:
+          limits:
+            memory: 100Gi
+            cpu: 8
+          requests:
+            memory: 50Gi
+            cpu: 1
+        command:
+          - erigon
+          - --chain=bor-mainnet
+          - --http.addr=0.0.0.0
+          - --http.vhosts=*
+          - --http.corsdomain=*
+        mountConfigMaps:
+          - name: velas-entrypoint
+            targetPath: /data
+        ports:
+          - name: rpc
+            type: ClusterIP
+            port: 8545
+            protocol: TCP
+            ingress:
+              enabled: false
+              className: "className"
+              annotations:
+                kubernetes.io/ingress.class: nginx
+                kubernetes.io/tls-acme: "true"
+              hosts:
+                - host: chart-example.local
+                  paths:
+                    - path: /
+                      pathType: ImplementationSpecific
+              tls:
+               - secretName: chart-example-tls
+                 hosts:
+                   - chart-example.local
+        startupProbe:
+          tcpSocket:
+            port: 8545
+          periodSeconds: 60
+          failureThreshold: 120
+        livenessProbe:
+          tcpSocket:
+            port: 8545
+
+global:
+  fullnameOverride: fullname
+  serviceAccount:
+    name: polygon
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+
+# Additional manifests to deploy as an array
+additionalManifests:
+  - kind: Host
+    apiVersion: getambassador.io/v3alpha1
+    metadata:
+      name: fullname-rpc
+      annotations:
+        external-dns.ambassador-service: emissary-ingress.emissary-ingress
+    spec:
+      hostname: hostname.domain.com
+      tlsSecret:
+        name: wildcard-poktnodes--network-tls
+        namespace: emissary-ingress
+
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: velas-entrypoint
+    data:
+      entrypoint.sh: |
+        #!/bin/bash
+
+        velas-validator --ledger /data --evm-state-archive /data/evmarchive \
+        --entrypoint bootstrap.velas.com:8001 \
+        --trusted-validator 78rvyxYJAUXGaZHJWyz7Yx81ribpAYvwupVuF9CugGws \
+        --trusted-validator FSZbHLPerYngGGwgWbXHtqTLRvLmgKVeUZCKwbFttWng \
+        --limit-ledger-size \
+        --maximum-full-snapshots-to-retain 1 \
+        --maximum-incremental-snapshots-to-retain 1 \
+        --log - &
+
