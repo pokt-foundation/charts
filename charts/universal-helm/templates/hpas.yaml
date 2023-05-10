@@ -1,5 +1,8 @@
 {{- range $ndpl, $dpl := $.Values.deployments }}
 {{- with $dpl.horizontalPodAutoscaler }}
+{{- if and .enabled $dpl.replicas }}
+{{fail "VALIDATION FILED: Specify eaither replicas, or horizontalPodAutoscaler!!!"}}
+{{- end -}}
 {{- if .enabled }}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler

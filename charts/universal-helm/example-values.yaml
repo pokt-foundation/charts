@@ -1,6 +1,6 @@
 deployments:
   heimdall:             # <- STATEFULSET_NAME
-    replicas: 1
+    # replicas: 1
     horizontalPodAutoscaler:
       enabled: true
       minReplicas: 1
@@ -11,10 +11,11 @@ deployments:
     nodeSelector:
       node.kubernetes.io/instance-type: n2-standard-16
     persistence:
-      size: 350Gi
-      storageClassName: standard-rwo
-      volumeMountPath: /data
-      gcpVolumeSnapshot: polygon-mainnet-archival-heimdall-latest
+      volumeClaimTemplates:
+        size: 350Gi
+        storageClassName: standard-rwo
+        volumeMountPath: /data
+        gcpVolumeSnapshot: polygon-mainnet-archival-heimdall-latest
     initContainers:
       init-configs:
         image: heimdall/image:heimdall.tag
@@ -59,6 +60,12 @@ deployments:
           requests:
             memory: 512Mi
             cpu: 256m
+        env:
+          - name: GENESIS_FILE
+            value: "/data/config/genesis.json"
+        envFrom:
+        - secretRef:
+            name: some-secret
         command:
           - heimdalld
           - --home=/data
@@ -88,14 +95,6 @@ deployments:
 
   erigonbor:
     replicas: 3
-    nodeSelector:
-      node.kubernetes.io/instance-type: n2-standard-16
-    persistence:
-      size: 7400Gi
-      storageClassName: premium-rwo
-      volumeMountPath: /data
-      gcpVolumeSnapshot: polygon-mainnet-archival-erigonbor-latest
-      extraPVC: erigon-data11111111
     initContainers:
       download-snapshot:
         image: alpine:latest
