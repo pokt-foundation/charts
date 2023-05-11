@@ -22,7 +22,7 @@ spec:
   replicas: {{ default 1 $dpl.replicas }}
   template:
     metadata:
-      name: {{ template "universal-helm.fullname" $ }}
+      name: {{ $ndpl }}
       labels:
         {{- include "universal-helm.labels" $ | nindent 8 }}
         {{- with $dpl.labels }}

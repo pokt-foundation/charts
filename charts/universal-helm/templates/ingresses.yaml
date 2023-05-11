@@ -8,7 +8,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}-{{ $prt.name }}
+  name: {{$ndpl}}-{{ $prt.name }}
   labels:
     {{- include "universal-helm.labels" $ | nindent 4 }}
   {{- with $prt.ingress.annotations }}
@@ -39,7 +39,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}-{{ $prt.name }}
+                name: {{$ndpl}}-{{ $prt.name }}
                 port:
                   number: {{ $prt.port }}
           {{- end }}

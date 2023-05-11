@@ -8,7 +8,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "universal-helm.fullname" $ }}-{{$ndpl}}-{{ $prt.name }}
+  name: {{$ndpl}}-{{ $prt.name }}
   labels:
     {{- include "universal-helm.labels" $ | nindent 4 }}
 
