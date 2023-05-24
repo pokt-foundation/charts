@@ -11,3 +11,4 @@ global:
 deployments: {}
 
 additionalManifests: []
+additionalYamlManifests: ""
