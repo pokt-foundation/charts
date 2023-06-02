@@ -1,3 +1,5 @@
 docker-secret.yaml
 .idea
 .DS_Store
+# Ignore test values files in charts forder
+charts/*.yaml
