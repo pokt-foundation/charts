@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-root
+data:
+  index.html: |-
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Welcome to {{ .Release.Name }}!</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+            background-color: BLUE;
+        }
+    </style>
+    </head>
+    <body>
+    <h1 style=\"text-align: center;\">Welcome to {{ .Release.Name }}!</h1>
+    </body>
+    </html>
