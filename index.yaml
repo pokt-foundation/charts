@@ -2331,6 +2331,17 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/tailscale-subnet-router-1.2.1/tailscale-subnet-router-1.2.1.tgz
     version: 1.2.1
+  test-app:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-06-02T01:40:03.586982556Z"
+    description: A simple web app which returns a static page with the release name
+    digest: f83550ab41076024b70003adc415b33537ea14f67d3377d4327cc6215dec6cd6
+    name: test-app
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/test-app-0.1.0/test-app-0.1.0.tgz
+    version: 0.1.0
   universal-helm:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -2436,4 +2447,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-05-31T18:50:47.828696546Z"
+generated: "2023-06-02T01:40:03.587240059Z"
