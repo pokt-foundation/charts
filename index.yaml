@@ -2334,6 +2334,16 @@ entries:
   test-app:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-06-06T02:26:35.874011724Z"
+    description: A simple web app which returns a static page with the release name
+    digest: a1bebd9ba1f1a91a1a224da9a2a25c45a910003f5a7baabc358e47a1d1a9082a
+    name: test-app
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/test-app-0.1.1/test-app-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-06-02T01:40:03.586982556Z"
     description: A simple web app which returns a static page with the release name
     digest: f83550ab41076024b70003adc415b33537ea14f67d3377d4327cc6215dec6cd6
@@ -2447,4 +2457,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-06-02T01:40:03.587240059Z"
+generated: "2023-06-06T02:26:35.874474028Z"
