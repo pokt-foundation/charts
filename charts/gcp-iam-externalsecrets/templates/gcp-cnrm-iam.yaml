@@ -1,3 +1,9 @@
+#* In case of multiple GKE deployed in the same project
+#* We don't need to setup GCP permissions for each cluster, only one is enough
+#* coz 1 project has only one GKE workloads authentication namespace
+#* So adding this flag, to allow disabling them
+{{- if not .Values.disableConfigConnectorCRDs }}
+
 # Secret level roles
 {{- range $v := $.Values.iamPolicy.secretRoles }}
 ---
@@ -60,10 +66,5 @@ metadata:
   name: {{ $.Values.iamPolicy.gke.serviceAccount }}
   annotations:
     cnrm.cloud.google.com/project-id: "{{ $.Values.iamPolicy.gke.clusterProjectID }}"
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: {{ $.Values.iamPolicy.gke.serviceAccount }}
-  annotations:
-    iam.gke.io/gcp-service-account: "{{ $.Values.iamPolicy.gke.serviceAccount }}@{{ $.Values.iamPolicy.gke.clusterProjectID }}.iam.gserviceaccount.com"
+
+{{- end }} {{/* # not .Values.disableConfigConnectorCRDs */}}
