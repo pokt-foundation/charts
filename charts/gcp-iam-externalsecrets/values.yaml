@@ -38,3 +38,5 @@ externalSecretStore:
 externalSecrets:
   # -- Wether to create ExternalSecret s K8s Resources foreach secretIDs
   create: true
+
+disableConfigConnectorCRDs: false
