@@ -19,7 +19,9 @@ spec:
   selector:
     matchLabels:
       deploymentname: {{ $ndpl }}
-  replicas: {{ default 1 $dpl.replicas }}
+  {{- with $dpl.replicas }}
+  replicas: {{ . }}
+  {{- end }}
   template:
     metadata:
       name: {{ $ndpl }}

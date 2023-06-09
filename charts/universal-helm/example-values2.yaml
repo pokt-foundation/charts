@@ -1,0 +1,88 @@
+deployments:
+  middleware:
+    horizontalPodAutoscaler:
+      enabled: true
+      maxReplicas: 80
+      minReplicas: 1
+      targetCPUUtilizationPercentage: 60
+    nodeSelector:
+      cloud.google.com/gke-nodepool: n2-highcpu-8
+    dnsConfig:
+      options:
+        - name: ndots
+          value: "2"
+
+    mountSecrets:
+      - name: portal-middleware
+        mountPath: /etc/portal
+        items:
+        - key: config.json
+          path: config.json
+
+    containers:
+      middleware:
+        image:
+          repository: us-central1-docker.pkg.dev/portal-gb-prod/portal-middleware/pokt-middleware
+          tag: v0.0.110-rc61
+        resources:
+          limits:
+            memory: 4G
+          requests:
+            cpu: 3
+            memory: 2G
+        envFrom:
+          - secretRef:
+              name: "portal-middleware"
+        env:
+          - name: GOMEMLIMIT
+            value: 2000MiB
+          - name: PORT
+            value: "8080"
+          - name: CONFIG_FILE
+            value: "/etc/portal/config.json"
+
+        # command:
+        #   - command
+        ports:
+          - name: port8080
+            port: 8080
+            protocol: TCP
+            service:
+              type: ClusterIP
+              annotations:
+                cloud.google.com/neg: '{"ingress": true}'
+            ingress:
+              annotations:
+                kubernetes.io/ingress.class: "gce"
+                cert-manager.io/cluster-issuer: "letsencrypt-prod"
+              hosts:
+                - host: "*.middleware.europe-west3-prod.v2.pokt.network"
+                  paths:
+                    - path: /
+                      pathType: Prefix
+              tls:
+                - secretName: portal-middleware-tls
+                  hosts:
+                    - "middleware.europe-west3-prod.v2.pokt.network"
+                    - "*.middleware.europe-west3-prod.v2.pokt.network"
+
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+
+global:
+  serviceAccount:
+    name: "pokt-middleware"
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsGroup: 1001
