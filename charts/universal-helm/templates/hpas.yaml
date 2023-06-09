@@ -22,15 +22,17 @@ spec:
     - type: Resource
       resource:
         name: cpu
-        averageUtilization: {{ .targetCPUUtilizationPercentage }}
-        type: Utilization
+        target:
+          type: Utilization
+          averageUtilization: {{ .targetCPUUtilizationPercentage }}
     {{- end }}
     {{- if .targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
-        averageUtilization: {{ .targetMemoryUtilizationPercentage }}
-        type: Utilization
+        target:
+          averageUtilization: {{ .targetMemoryUtilizationPercentage }}
+          type: Utilization
     {{- end }}
 {{- end -}}
 {{- end -}}
