@@ -4,7 +4,7 @@
 {{fail "VALIDATION FILED: Specify eaither replicas, or horizontalPodAutoscaler!!!"}}
 {{- end -}}
 {{- if .enabled }}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{$ndpl}}
@@ -22,15 +22,16 @@ spec:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .targetCPUUtilizationPercentage }}
+        averageUtilization: {{ .targetCPUUtilizationPercentage }}
+        type: Utilization
     {{- end }}
     {{- if .targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: {{ .targetMemoryUtilizationPercentage }}
+        averageUtilization: {{ .targetMemoryUtilizationPercentage }}
+        type: Utilization
     {{- end }}
-
 {{- end -}}
 {{- end -}}
 {{- end -}}

@@ -2,11 +2,9 @@ deployments:
   middleware:
     horizontalPodAutoscaler:
       enabled: true
-      maxReplicas: 80
-      minReplicas: 1
+      maxReplicas: 100
+      minReplicas: 50
       targetCPUUtilizationPercentage: 60
-    nodeSelector:
-      cloud.google.com/gke-nodepool: n2-highcpu-8
     dnsConfig:
       options:
         - name: ndots
