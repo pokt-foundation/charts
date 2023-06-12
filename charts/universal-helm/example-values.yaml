@@ -1,3 +1,4 @@
+fullnameOverride: fullname
 deployments:
   heimdall:             # <- STATEFULSET_NAME
     # replicas: 1
@@ -250,7 +251,6 @@ deployments:
             port: 8545
 
 global:
-  fullnameOverride: fullname
   serviceAccount:
     name: polygon
   securityContext:
