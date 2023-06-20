@@ -4,11 +4,11 @@ description: A Universal Helm chart
 
 type: application
 
-version: 0.0.12
+version: 0.0.13
 # Not compatible with 0.0.1 due to change container.command
 
 appVersion: "1.16.0"
 
 maintainers:
-  - name: pokt-inc
-  - name: vlad
+  - name: pokt-foundation
+  - name: vlad-she

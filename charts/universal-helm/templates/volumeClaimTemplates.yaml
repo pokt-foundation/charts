@@ -1,0 +1,41 @@
+{{- range $ndpl, $dpl := $.Values.deployments }}
+
+{{- $volumeName := printf "%s-data" $ndpl }}
+
+{{- if $dpl.persistence }}
+{{- if $dpl.persistence.volumeClaimTemplates }}
+{{with $dpl.persistence.volumeClaimTemplates}}
+{{- if and .storageClassName .size .volumeMountPath }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $volumeName }}
+  labels:
+    {{- include "universal-helm.labels" $ | nindent 4 }}
+    {{- with $dpl.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with $dpl.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  storageClassName: {{ .storageClassName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requedpl:
+      storage: {{ .size | quote }}
+  {{- if .gcpVolumeSnapshot }}
+  dataSource:
+    name: {{ .gcpVolumeSnapshot | quote }}
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- end }}
