@@ -196,28 +196,10 @@ spec:
           {{- end }}
         {{- end }}
 
-  {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}}
-  {{with $dpl.persistence.volumeClaimTemplates}}
-  {{- if and .storageClassName .size .volumeMountPath }}
-  volumeClaimTemplates:
-    - metadata:
-        name: {{ $volumeName }}
-      spec:
-        {{- if .storageClassName }}
-        storageClassName: {{ .storageClassName }}
-        {{- end }}
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requedpl:
-            storage: {{ .size | quote }}
-        {{- if .gcpVolumeSnapshot }}
-        dataSource:
-          name: {{ .gcpVolumeSnapshot | quote }}
-          kind: VolumeSnapshot
-          apiGroup: snapshot.storage.k8s.io
-        {{- end }}
-  {{- end }}
-  {{end}}
-  {{end}}{{end}}
+        {{- if $dpl.persistence }} {{ if $dpl.persistence.volumeClaimTemplates}} {{if $dpl.persistence.volumeClaimTemplates.volumeMountPath }}
+        - name: {{ $volumeName }}
+          persistentVolumeClaim:
+              claimName: {{ $volumeName }}
+          {{- end }}{{end}}{{end}}
+
 {{ end }} {{/* #range $ndpl, $dpl := $.Values.deployments */}}
