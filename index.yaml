@@ -3,6 +3,16 @@ entries:
   altruists-manager:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-07-13T04:33:25.935327442Z"
+    description: A Helm chart for Kubernetes
+    digest: d299a5dec619b20057b4d20e6878312791688f6c9ffff997ca03ba4457861118
+    name: altruists-manager
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/altruists-manager-0.1.1/altruists-manager-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-07-13T02:50:00.70404835Z"
     dependencies:
     - name: postgresql
@@ -2586,4 +2596,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-07-13T02:50:00.973022821Z"
+generated: "2023-07-13T04:33:25.935680642Z"
