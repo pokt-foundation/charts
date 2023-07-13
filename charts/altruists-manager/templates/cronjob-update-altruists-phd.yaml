@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-altruists-phd
+  labels:
+    {{- include "altruists-manager.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 1
+  schedule: {{ .Values.updateAltruistsPHD.schedule | quote }}
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 180
+      template:
+        spec:
+          restartPolicy: Never
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "altruists-manager.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: update-altruists-phd
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: NAMESPACE
+                  value: "{{ $.Release.Namespace }}"
+              {{- with .Values.env }}
+              {{- toYaml . | nindent 16}}
+              {{- end }}
+              {{- if .Values.envFromSecret }}
+              envFrom:
+              - secretRef:
+                  name: {{ .Values.envFromSecret }}
+              {{- end }}
+              command:
+                - python
+                - manage.py
+                - update-altruists-phd
+
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 512Mi
+                requests:
+                  cpu: 200m
+                  memory: 256Mi
+---

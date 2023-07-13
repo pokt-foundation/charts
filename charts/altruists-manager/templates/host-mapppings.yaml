@@ -1,0 +1,31 @@
+{{- if .Values.hostname -}}
+kind: Host
+apiVersion: getambassador.io/v3alpha1
+metadata:
+  name: {{ include "altruists-manager.fullname" . }}
+  annotations:
+    external-dns.ambassador-service: emissary-ingress.emissary-ingress
+spec:
+  hostname: {{ .Values.hostname }}
+  tlsSecret:
+    name: {{ .Values.tlsSecret }}
+    namespace: emissary-ingress
+---
+kind: Mapping
+apiVersion: getambassador.io/v3alpha1
+metadata:
+  name: {{ include "altruists-manager.fullname" . }}
+spec:
+  prefix: /
+  hostname: {{ .Values.hostname }}
+  service: {{ include "altruists-manager.fullname" . }}:{{ .Values.service.port }}
+  resolver: endpoint
+  connect_timeout_ms: 10000
+  timeout_ms: 10000
+  # headers:
+  #   {{ .Values.requiredHeader}}
+  add_request_headers:
+    x-forwarded-proto:
+      value: "https"
+      append: True
+{{- end }}

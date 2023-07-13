@@ -1,0 +1,208 @@
+######
+# altruists-manager-ui:
+image:
+  repository: us-east4-docker.pkg.dev/nodes-prd-us-west1-ca7c/nodes-repo/altruists-manager
+  tag: "v0.1.19"
+  pullPolicy: IfNotPresent
+
+envFromSecret: altruists-manager-environment              
+
+env:
+  - name: POSTGRES_NAME
+    value: "postgresql"
+  - name: POSTGRES_DB
+    value: "altruists-manager"
+  - name: DJANGO_CSRF_TRUSTED_ORIGINS
+    value: "https://*.portal-prd.v2.pokt.network"
+  - name: DJANGO_DEBUG
+    value: "False"
+  # Victoria Metrics scrape config configmap
+  - name: SCRAPE_CONFIGMAP
+    value: "vm-scrape-config"
+  - name: VM_ADDRESS
+    value: "http://victoria-metrics:8428"
+  - name: PHD_BASE_URL
+    value: "https://phd.portal-prd.v2.pokt.network"
+  - name: BB_EXPORTER_ADDRESS
+    value: "bb-exporter:9000"
+
+args:
+  - runserver
+  - 0.0.0.0:8000
+
+#Emissary mappings
+# tlsSecret: wildcard-us-west1--poktnodes--network-tls            
+# hostname: altruists.portal-prd.v2.pokt.network                  
+
+
+### CRON Jobs
+updateScrapeConfig:
+  schedule: "*/15 * * * *"
+
+updateAltruistsPHD:
+  schedule: "*/5 * * * *"
+
+# additionalManifests:
+#   - kind: ExternalSecret
+#     apiVersion: external-secrets.io/v1beta1
+#     metadata:
+#       name: altruists-manager-environment
+#     spec:
+#       refreshInterval: 5s
+#       secretStoreRef:
+#         kind: SecretStore
+#         name: secstore-nodes-gcp-secrets    # Created with gcp-iam-externalsecrets chart
+#       target:
+#         name: altruists-manager-environment
+#       dataFrom:
+#       - find:
+#           # path: path/to/my
+#           name:
+#             regexp: "altman-prod-"
+#         rewrite:
+#         - regexp:
+#             # To drop "altman-prod-" preffix
+#             source: "(altman-prod-)(.*)"
+#             target: "$2"
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+################################ blackbox-blockchain-exporter ################
+blackbox-blockchain-exporter:
+  image:
+    repository: us-east4-docker.pkg.dev/nodes-prd-us-west1-ca7c/nodes-repo/blockchain-blackbox-exporter
+    tag: "v0.1.14"
+  fullnameOverride: "bb-exporter"
+
+################################ POSTGRESQL ################                                                             
+postgresql:
+  fullnameOverride: "postgresql"
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14-debian-11
+  auth:
+    enablePostgresUser: true
+    database: "altruists-manager"
+    existingSecret: altruists-manager-environment    ###postgres-password
+    secretKeys:
+      adminPasswordKey: POSTGRES_PASSWORD    #postgres-password
+
+################################ victoria-metrics-single ################
+# victoriaMetricsHost: am-vm.us-west1.poktnodes.network
+victoria-metrics-single:
+  rbac:
+    pspEnabled: false
+  server:
+    retentionPeriod: 2w
+    persistentVolume:
+      enabled: true
+      size: 16Gi
+    scrape:
+      enabled: true
+      configMap: vm-scrape-config
+    extraArgs:
+      envflag.enable: "true"
+      envflag.prefix: VM_
+      loggerFormat: json
+      promscrape.configCheckInterval: 2m
+    fullnameOverride: victoria-metrics
+    resources:
+      limits:
+        cpu: 1
+        memory: 1500Mi
+      requests:
+        cpu: 100m
+        memory: 800Mi
+
+########
+gcp-iam-externalsecrets:
+  iamPolicy:
+    # projectRoles:
+    #   - project: portal-gcp-secrets
+    #     role: roles/secretmanager.secretAccessor
+    secretRoles:
+      - secret: altruists-manager-prod
+        project: portal-gcp-secrets
+        role: roles/secretmanager.secretAccessor
+    gke:
+      clusterLocation: us-west1
+      clusterName: portal-prd-us-west1
+      clusterProjectID: portal-prd-gke-all
+      serviceAccount: altman
+  externalSecretStore:
+    create: true
+  externalSecrets:
+    create: true
+
+
