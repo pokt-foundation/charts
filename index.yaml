@@ -1,5 +1,26 @@
 apiVersion: v1
 entries:
+  altruists-manager:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-07-13T02:50:00.70404835Z"
+    dependencies:
+    - name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.2.0
+    - name: victoria-metrics-single
+      repository: https://victoriametrics.github.io/helm-charts/
+      version: 0.8.*
+    - name: gcp-iam-externalsecrets
+      repository: https://pokt-foundation.github.io/charts
+      version: 0.2.19
+    description: A Helm chart for Kubernetes
+    digest: c20ff28a6db1567950849d52d5c45db6e3004ea4aa9d308967f8d703c3b87f25
+    name: altruists-manager
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/altruists-manager-0.1.0/altruists-manager-0.1.0.tgz
+    version: 0.1.0
   backstage:
   - apiVersion: v2
     appVersion: v0.1.1-alpha.23
@@ -64,6 +85,17 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/backstage-0.1.3/backstage-0.1.3.tgz
     version: 0.1.3
+  blackbox-blockchain-exporter:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-07-13T02:50:00.836521908Z"
+    description: A Helm chart for Kubernetes
+    digest: ecdfa6044616077c392dcdef6edeb853dd693a573ab34e686bce0cf03d5db755
+    name: blackbox-blockchain-exporter
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blackbox-blockchain-exporter-0.0.1/blackbox-blockchain-exporter-0.0.1.tgz
+    version: 0.0.1
   blockchain-node:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -2554,4 +2586,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-06-20T15:23:53.147486208Z"
+generated: "2023-07-13T02:50:00.973022821Z"
