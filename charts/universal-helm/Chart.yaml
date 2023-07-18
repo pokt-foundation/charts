@@ -4,7 +4,7 @@ description: A Universal Helm chart
 
 type: application
 
-version: 0.0.14
+version: 0.0.15
 # Not compatible with 0.0.1 due to change container.command
 
 appVersion: "1.16.0"
@@ -12,3 +12,4 @@ appVersion: "1.16.0"
 maintainers:
   - name: pokt-foundation
   - name: vlad-she
+  - name: TakGN
