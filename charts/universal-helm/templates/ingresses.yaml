@@ -39,11 +39,19 @@ spec:
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}
             {{- end }}
+            {{- if .backend}}
+            backend:
+              service:
+                name: {{ .backend.service.name }}
+                port:
+                  number: {{ .backend.service.port.number }}
+            {{- else }}
             backend:
               service:
                 name: {{$ndpl}}-{{ $prt.name }}
                 port:
                   number: {{ $prt.port }}
+            {{- end }}
           {{- end }}
     {{- end }}
 
