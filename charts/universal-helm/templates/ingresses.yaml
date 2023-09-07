@@ -3,7 +3,7 @@
 {{- range $kprt, $prt := $cntnr.ports }}
 
 {{- if $prt.ingress }}
-{{- if or $prt.ingress.enabled (not (has $prt.ingress .enabled))}}{{/* # If enabled==true or not given*/}}
+{{- if or (eq "true" (get $prt.ingress "enabled"|toString)) (empty (get $prt.ingress "enabled"|toString))}}{{/* # If enabled==true or not given*/}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
