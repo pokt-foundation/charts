@@ -2438,6 +2438,21 @@ entries:
   universal-helm:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-12-12T23:50:28.204497251Z"
+    description: A Universal Helm chart
+    digest: 1b3e99919406382a7b3d53390b446317ef4fc987c3affcafd4c4061a444b2871
+    maintainers:
+    - name: pokt-foundation
+    - name: ManInWeb3
+    - name: TakGN
+    - name: GustavoBelfort
+    name: universal-helm
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.18/universal-helm-0.0.18.tgz
+    version: 0.0.18
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-09-07T22:40:49.850214135Z"
     description: A Universal Helm chart
     digest: cabe4546c661171b148119ac86a13c8be33e7e1397aca1c99a82ef469e7fda85
@@ -2660,4 +2675,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-09-07T22:40:49.85087294Z"
+generated: "2023-12-12T23:50:28.205251439Z"
