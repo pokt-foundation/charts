@@ -190,7 +190,7 @@ spec:
           secret:
             secretName: {{$sec.name}}
             optional: false
-            defaultMode: {{- default 420 $sec.defaultMode }}
+            defaultMode: {{$sec.defaultMode}}
           {{- with $sec.items }}
             items:
               {{- toYaml . | nindent 14 }}
