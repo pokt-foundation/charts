@@ -598,6 +598,20 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.0.1/blockchain-node-0.0.1.tgz
     version: 0.0.1
+  cosmos-operator:
+  - apiVersion: v2
+    appVersion: v0.21.8
+    created: "2024-03-05T23:21:45.981799253Z"
+    description: Cosmos Operator Chart
+    digest: c6cb671d67863443ecf12f4c4620fab4a77aa2486032a1305f3ef63d42646b12
+    maintainers:
+    - name: pokt-foundation
+    - name: GustavoBelfort
+    name: cosmos-operator
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/cosmos-operator-v0.21.8/cosmos-operator-v0.21.8.tgz
+    version: v0.21.8
   covalent-proxy:
   - apiVersion: v2
     appVersion: 0.0.1
@@ -2690,4 +2704,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2023-12-13T00:29:59.744253191Z"
+generated: "2024-03-05T23:21:45.982251007Z"
