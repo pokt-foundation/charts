@@ -659,6 +659,15 @@ entries:
     version: 0.0.8
   gcp-iam-externalsecrets:
   - apiVersion: v1
+    created: "2024-03-07T21:28:16.782568187Z"
+    description: A Helm chart to create a service account in your desired project,
+      and grant it a specific role.
+    digest: bb95ca74125de298b1e05790029d2a4a6cc1c93fa4e02177e322d81d2a82dadb
+    name: gcp-iam-externalsecrets
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/gcp-iam-externalsecrets-0.2.20/gcp-iam-externalsecrets-0.2.20.tgz
+    version: 0.2.20
+  - apiVersion: v1
     created: "2023-06-08T19:49:59.912023831Z"
     description: A Helm chart to create a service account in your desired project,
       and grant it a specific role.
@@ -2704,4 +2713,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2024-03-05T23:21:45.982251007Z"
+generated: "2024-03-07T21:28:16.783079324Z"
