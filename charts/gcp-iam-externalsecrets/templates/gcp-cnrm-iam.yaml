@@ -4,9 +4,9 @@
 #* So adding this flag, to allow disabling them
 {{- if not .Values.disableConfigConnectorCRDs }}
 
-#* Secret level roles
-#* This section provides access to secrets manager iterating over a number of secrets and binds
-#* access to the designated SA created in the same section.
+# Secret level roles
+# This section provides access to secrets manager iterating over a number of secrets and binds
+# access to the designated SA created in the same section.
 {{- range $v := $.Values.iamPolicy.secretRoles }}
 ---
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -22,8 +22,8 @@ spec:
     external: "projects/{{ $v.project }}/secrets/{{ $v.secret }}"
 {{ end }}
 
-#* Project level roles
-#* Within this section additional permissions can be bound to the same SA using this section.
+# Project level roles
+# Within this section additional permissions can be bound to the same SA using this section.
 {{- range $v := $.Values.iamPolicy.projectRoles }}
 ---
 kind: IAMPolicyMember
