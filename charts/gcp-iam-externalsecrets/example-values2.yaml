@@ -1,0 +1,48 @@
+## WARNING: This example is using gcp-iam-externalsecrets-0.3.0 version
+## which uses a different way to fetch secrets. User should use version 0.2.X
+## if it's still using JSON-based secrets from Secret Manager.
+iamPolicy:
+  # -- Name of the GCP Service Account to create.
+  # The service account will be created under the same project as the cluster in order to allow Workload Identity to work
+  gke:
+    # -- GCP Project of the cluster in which to create the External Secrets K8s resources
+    clusterProjectID: project0
+
+    # -- Location of the cluster in which to create the External Secrets K8s resources
+    clusterLocation: europe-west3
+
+    # -- Name of the cluster in which to create the External Secrets K8s resources
+    clusterName: cluster-name
+
+    # -- K8s SA which will be used to get the secrets
+    serviceAccount: service-account-name
+
+  secretRoles:
+    - secret: secret1
+      project: project1
+      secretKey: my-key1
+      role: roles/secretmanager.secretAccessor
+    - secret: secret2
+      project: project2
+      secretKey: my-key2
+      role: roles/secretmanager.secretAccessor
+    - secret: secret3
+      project: project2
+      secretKey: my-key3
+      role: roles/secretmanager.secretAccessor
+
+  projectRoles:
+    - project: project2
+      role: roles/secretmanager.admin
+    - project: project3
+      role: roles/secretmanager.viwer
+
+externalSecretStore:
+  # -- Wether to create both SecretStore
+  create: true
+
+externalSecrets:
+  # -- Wether to create ExternalSecret s K8s Resources foreach secretIDs
+  create: true
+
+# disableConfigConnectorCRDs: true
