@@ -111,6 +111,7 @@ spec:
           {{- range $sec := $dpl.mountSecrets }}{{/* # Volume mounts from mountSecrets */}}
             - name: {{$sec.name}}
               mountPath: {{ $sec.mountPath }}
+              subPath: {{ $sec.subPath }}
           {{- end }}
       {{- end }}  {{/* #range $kcntnr, $cntnr := $dpl.initContainers */}}
 
