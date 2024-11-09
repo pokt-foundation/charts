@@ -4,7 +4,7 @@ description: A Universal Helm chart
 
 type: application
 
-version: 0.0.22
+version: 0.0.23
 # Not compatible with 0.0.1 due to change container.command
 
 appVersion: "1.16.0"
@@ -14,3 +14,4 @@ maintainers:
   - name: ManInWeb3
   - name: TakGN
   - name: GustavoBelfort
+  - name: HebertCL
