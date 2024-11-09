@@ -224,6 +224,9 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: {{ $volumeName }}
+        {{- with $sts.persistence.pvcAnnotations }}
+        annotations: {{- toYaml . | nindent 10 }}
+        {{- end }}
       spec:
         {{- if $sts.persistence.storageClassName }}
         storageClassName: {{ $sts.persistence.storageClassName }}
