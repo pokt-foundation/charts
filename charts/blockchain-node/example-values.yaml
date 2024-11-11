@@ -93,6 +93,7 @@ statefulset:
           --datadir=/home/app/.pocket \
           --mainnet \
           --keybase=false"
+        GCPHTTPSLoadBalancer: true
         ports:
           - name: tendermint
             type: ClusterIP

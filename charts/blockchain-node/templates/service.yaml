@@ -11,7 +11,7 @@ metadata:
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
 
-{{- if .GCPHTTPSLoadBalancer }}
+{{- if $cntnr.GCPHTTPSLoadBalancer }}
   annotations:
     cloud.google.com/backend-config: '{"default": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}'
 {{- end }}
