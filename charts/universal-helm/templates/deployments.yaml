@@ -155,6 +155,7 @@ spec:
           {{- range $cm := $dpl.mountConfigMaps }}{{/* # Volume mounts from mountConfigMaps */}}
             - name: {{$cm.name}}
               mountPath: {{ $cm.mountPath }}
+              subPath: {{ $cm.subPath }}
           {{- end }}
 
           {{- range $sec := $dpl.mountSecrets }}{{/* # Volume mounts from mountSecrets */}}
