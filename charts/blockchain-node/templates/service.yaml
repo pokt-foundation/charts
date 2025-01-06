@@ -13,7 +13,7 @@ metadata:
 
 {{- if $cntnr.GCPHTTPSLoadBalancer }}
   annotations:
-    cloud.google.com/backend-config: '{"default": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}'
+    cloud.google.com/backend-config: '{"ports": {"{{ $prt.port }}": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}}'
     cloud.google.com/neg: '{"ingress": true}'
 {{- end }}
 spec:
