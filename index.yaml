@@ -118,6 +118,20 @@ entries:
     version: 0.0.1
   blockchain-node:
   - apiVersion: v2
+    appVersion: 1.17.0
+    created: "2025-01-06T18:32:15.949884072Z"
+    description: A Helm chart to deploy a blockchain node
+    digest: 4c7a61d648f6c79893aaf3885728e6be861ef597a725597e276253b3af6d282d
+    maintainers:
+    - name: pokt-foundation
+    - name: vlad
+    - name: HebertCL
+    name: blockchain-node
+    type: application
+    urls:
+    - https://github.com/pokt-foundation/charts/releases/download/blockchain-node-0.1.8/blockchain-node-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
     appVersion: 1.16.0
     created: "2024-11-11T19:51:46.624114811Z"
     description: A Helm chart to deploy a blockchain node
@@ -263,9 +277,9 @@ entries:
     version: 0.0.14-rc.13
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-11-14T12:54:18.999250083Z"
+    created: "2022-11-13T21:11:07.281549692Z"
     description: A Helm chart to deploy a blockchain node
-    digest: f60acdd8275ad9bde51a795e3d8ef86b6fce2bbfbf6161ccb087d74ec9b3e3bf
+    digest: 0b7bbf622fe61227a32e1bd22f68990ef955df4d9423527158e45287b43cece7
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -276,9 +290,9 @@ entries:
     version: 0.0.14-rc.13
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-11-13T21:11:07.281549692Z"
+    created: "2022-11-14T12:54:18.999250083Z"
     description: A Helm chart to deploy a blockchain node
-    digest: 0b7bbf622fe61227a32e1bd22f68990ef955df4d9423527158e45287b43cece7
+    digest: f60acdd8275ad9bde51a795e3d8ef86b6fce2bbfbf6161ccb087d74ec9b3e3bf
     maintainers:
     - name: pokt-foundation
     - name: vlad
@@ -2882,4 +2896,4 @@ entries:
     urls:
     - https://github.com/pokt-foundation/charts/releases/download/universal-helm-0.0.1/universal-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2024-11-13T17:39:55.263539079Z"
+generated: "2025-01-06T18:32:16.043265063Z"
