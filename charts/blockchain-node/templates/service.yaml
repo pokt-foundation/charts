@@ -15,6 +15,11 @@ metadata:
   annotations:
     cloud.google.com/backend-config: '{"default": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}'
     cloud.google.com/neg: '{"ingress": true}'
+{{- else }}
+  annotations:
+  {{- with $prt.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
 spec:
   selector:

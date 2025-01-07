@@ -99,6 +99,8 @@ statefulset:
             type: ClusterIP
             port: 26657
             protocol: TCP
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: "seed10.mainnet.pokt.network"
           - name: rpc
             type: ClusterIP
             port: 8081
