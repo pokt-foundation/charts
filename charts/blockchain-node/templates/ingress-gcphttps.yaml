@@ -2,7 +2,7 @@
 {{- range $kcntnr, $cntnr := $sts.containers }}
 {{- range $kprt, $prt := $cntnr.ports }}
 
-{{- if .GCPHTTPSLoadBalancer }}
+{{- if $prt.GCPHTTPSLoadBalancer }}
 # https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#create_service
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
@@ -10,16 +10,14 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
 spec:
-  {{- if .GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
+  {{- if $prt.GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
   securityPolicy:
-    name: {{ .GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
+    name: {{ $prt.GCPHTTPSLoadBalancer.CloudArmorPolicyName }}
   {{- end }}
   healthCheck:
     type: HTTP
-    requestPath: {{ quote .GCPHTTPSLoadBalancer.healthCheck.requestPath }}
-    {{- if .GCPHTTPSLoadBalancer.healthCheck.port }}
-    port: {{ .GCPHTTPSLoadBalancer.healthCheck.port }}
-    {{- end }}
+    requestPath: {{ quote $prt.GCPHTTPSLoadBalancer.healthCheck.requestPath }}
+    port: {{ $prt.port }}
 
 ---
 apiVersion: networking.gke.io/v1
@@ -28,7 +26,7 @@ metadata:
   name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
 spec:
   domains:
-  {{- with .GCPHTTPSLoadBalancer.domains }}
+  {{- with $prt.GCPHTTPSLoadBalancer.domains }}
   {{- toYaml . | nindent 4 }}
   {{- end }}
 ---
@@ -39,29 +37,27 @@ metadata:
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
   annotations:
-  {{- if .GCPHTTPSLoadBalancer.dnsTTL }}
-    external-dns.alpha.kubernetes.io/ttl: {{ quote .GCPHTTPSLoadBalancer.dnsTTL }}
+  {{- with $prt.GCPHTTPSLoadBalancer.annotations }}
+  {{- toYaml . | nindent 4 }}
   {{- end }}
     kubernetes.io/ingress.class: "gce"
     networking.gke.io/managed-certificates: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}
     kubernetes.io/ingress.allow-http: "false"
-    # networking.gke.io/v1beta1.FrontendConfig: XXX
-    # kubernetes.io/ingress.global-static-ip-name: my-static-address
 spec:
   defaultBackend:
     service:
       name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
       port:
-        number: {{ .port }}
+        number: {{ $prt.port }}
   rules:
-  - host:  {{ index .GCPHTTPSLoadBalancer.domains 0 }}
+  - host:  {{ index $prt.GCPHTTPSLoadBalancer.domains 0 }}
     http:
       paths:
       - backend:
           service:
             name: {{ include "blockchain-node.fullname" $ }}-{{ $prt.name}}
             port:
-              number: {{ .port }}
+              number: {{ $prt.port }}
         path: /*
         pathType: ImplementationSpecific
 {{- end -}}

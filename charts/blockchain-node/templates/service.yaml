@@ -11,15 +11,19 @@ metadata:
   labels:
     {{- include "blockchain-node.labels" $ | nindent 4 }}
 
-{{- if $cntnr.GCPHTTPSLoadBalancer }}
+{{- if $prt.GCPHTTPSLoadBalancer }}
   annotations:
-    cloud.google.com/backend-config: '{"ports": {"{{ $prt.port }}": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}}'
+    cloud.google.com/backend-config: '{"default": "{{ include "blockchain-node.fullname" $ }}-{{ $prt.name }}"}'
     cloud.google.com/neg: '{"ingress": true}'
 {{- end }}
 spec:
   selector:
     statefulsetname: {{ $sts.name }}
+{{- if $prt.GCPHTTPSLoadBalancer }}
+  type: LoadBalancer
+{{- else }}
   type: {{ $prt.type }}
+{{- end }}
   ports:
     - port: {{ $prt.port }}
       targetPort: {{ $prt.port }}
