@@ -17,6 +17,10 @@ spec:
     name: {{ $ndpl }}
   minReplicas: {{ .minReplicas }}
   maxReplicas: {{ .maxReplicas }}
+  {{ with $dpl.horizontalPodAutoscaler.behavior }}
+  behavior:
+    {{- toYaml . | nindent 4 }}
+  {{ end }}
   metrics:
     {{- if .targetCPUUtilizationPercentage }}
     - type: Resource
