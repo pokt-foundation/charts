@@ -5,6 +5,19 @@ deployments:
       maxReplicas: 100
       minReplicas: 50
       targetCPUUtilizationPercentage: 60
+      behavior:
+        scaleDown: 
+          stabilizationWindowSeconds: 300
+          policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 120
+        scaleUp:
+          stabilizationWindowSeconds: 60
+          policies:
+          - type: Pods
+            values: 2
+            periodSeconds: 60
     dnsConfig:
       options:
         - name: ndots
